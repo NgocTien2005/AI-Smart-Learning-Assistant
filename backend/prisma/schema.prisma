@@ -11,3 +11,64 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum Role {
+  INSTRUCTOR
+  STUDENT
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  password      String
+  role          Role
+  createdAt     DateTime       @default(now())
+  courses       Course[]       // các khóa học mình dạy (nếu là INSTRUCTOR)
+  enrollments   Enrollment[]   // các khóa học mình đã tham gia (nếu là STUDENT)
+  chatMessages  ChatMessage[]  // lịch sử chat với AI
+}
+
+model Course {
+  id           Int          @id @default(autoincrement())
+  title        String
+  joinCode     String       @unique   // mã mời để sinh viên tham gia
+  instructorId Int
+  instructor   User         @relation(fields: [instructorId], references: [id])
+  createdAt    DateTime     @default(now())
+  lessons      Lesson[]
+  enrollments  Enrollment[]
+}
+
+// Bảng trung gian thể hiện quan hệ nhiều-nhiều: 1 student tham gia nhiều course, 1 course có nhiều student
+model Enrollment {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  courseId  Int
+  user      User     @relation(fields: [userId], references: [id])
+  course    Course   @relation(fields: [courseId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, courseId]) // 1 user không thể enroll trùng 1 course 2 lần
+}
+
+model Lesson {
+  id            Int           @id @default(autoincrement())
+  title         String
+  documentUrl   String        // đường dẫn file PDF/text đã upload
+  extractedText String?       @db.Text // nội dung trích xuất từ file, dùng làm context cho AI
+  courseId      Int
+  course        Course        @relation(fields: [courseId], references: [id])
+  createdAt     DateTime      @default(now())
+  chatMessages  ChatMessage[]
+}
+
+model ChatMessage {
+  id        Int      @id @default(autoincrement())
+  question  String   @db.Text
+  answer    String   @db.Text
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  lessonId  Int
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+  createdAt DateTime @default(now())
+}
