@@ -30,9 +30,35 @@ const createToken = (user) => jwt.sign(
 
 const publicUser = (user) => ({
   id: user.id,
+  name: user.name,
   email: user.email,
   role: user.role,
 })
+
+const authenticate = async (request, response, next) => {
+  const authorization = request.headers.authorization
+  const token = authorization?.startsWith('Bearer ')
+    ? authorization.slice('Bearer '.length)
+    : null
+
+  if (!token) {
+    return response.status(401).json({ error: 'Bạn chưa đăng nhập' })
+  }
+
+  try {
+    const { userId } = jwt.verify(token, jwtSecret)
+    const user = await prisma.user.findUnique({ where: { id: userId } })
+
+    if (!user) {
+      return response.status(401).json({ error: 'Phiên đăng nhập không hợp lệ' })
+    }
+
+    request.user = user
+    return next()
+  } catch {
+    return response.status(401).json({ error: 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn' })
+  }
+}
 
 app.get('/api/health', (_request, response) => {
   response.json({
@@ -42,7 +68,11 @@ app.get('/api/health', (_request, response) => {
 })
 
 app.post('/api/auth/register', async (request, response) => {
-  const { email, password, role } = request.body
+  const { name, email, password, role } = request.body
+
+  if (typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 80) {
+    return response.status(400).json({ error: 'Họ và tên phải từ 2 đến 80 ký tự' })
+  }
 
   if (typeof email !== 'string' || !email.trim() || typeof password !== 'string' || password.length < 6) {
     return response.status(400).json({ error: 'Email và mật khẩu tối thiểu 6 ký tự là bắt buộc' })
@@ -64,6 +94,7 @@ app.post('/api/auth/register', async (request, response) => {
 
     const user = await prisma.user.create({
       data: {
+        name: name.trim(),
         email: normalizedEmail,
         password: await bcrypt.hash(password, 10),
         role: normalizedRole,
@@ -97,6 +128,10 @@ app.post('/api/auth/login', async (request, response) => {
     console.error('Login error:', error)
     return response.status(500).json({ error: 'Không thể đăng nhập' })
   }
+})
+
+app.get('/api/auth/me', authenticate, (request, response) => {
+  response.json({ user: publicUser(request.user) })
 })
 
 const server = app.listen(port, () => {

@@ -1,22 +1,60 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 function App() {
   const [mode, setMode] = useState('login')
   const [role, setRole] = useState('STUDENT')
   const [showPassword, setShowPassword] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', password: '' })
+  const [rememberMe, setRememberMe] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [currentUser, setCurrentUser] = useState(null)
   const [message, setMessage] = useState('')
+  const [messageType, setMessageType] = useState('')
   const isRegister = mode === 'register'
+
+  useEffect(() => {
+    const token = localStorage.getItem('luminaToken') || sessionStorage.getItem('luminaToken')
+    if (!token) return
+
+    fetch(`${API_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('expired')
+        const data = await response.json()
+        setCurrentUser(data.user)
+      })
+      .catch(() => {
+        localStorage.removeItem('luminaToken')
+        localStorage.removeItem('luminaUser')
+        sessionStorage.removeItem('luminaToken')
+        sessionStorage.removeItem('luminaUser')
+      })
+  }, [])
 
   const updateField = (event) => {
     setForm({ ...form, [event.target.name]: event.target.value })
     setMessage('')
+    setMessageType('')
   }
 
   const switchMode = (nextMode) => {
     setMode(nextMode)
     setMessage('')
+    setMessageType('')
+    setCurrentUser(null)
+  }
+
+  const logout = () => {
+    localStorage.removeItem('luminaToken')
+    localStorage.removeItem('luminaUser')
+    sessionStorage.removeItem('luminaToken')
+    sessionStorage.removeItem('luminaUser')
+    setCurrentUser(null)
+    setForm({ name: '', email: '', password: '' })
+    setMessage('Bạn đã đăng xuất.')
+    setMessageType('success')
   }
 
   const submit = async (event) => {
@@ -26,18 +64,32 @@ function App() {
       ? { email: form.email, password: form.password, role }
       : { email: form.email, password: form.password }
 
+    setIsSubmitting(true)
+    setMessage('')
+    setMessageType('')
+
     try {
-      const response = await fetch(`http://localhost:3000${endpoint}`, {
+      const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Có lỗi xảy ra')
-      localStorage.setItem('luminaToken', data.token)
+      const storage = rememberMe || isRegister ? localStorage : sessionStorage
+      const otherStorage = storage === localStorage ? sessionStorage : localStorage
+      storage.setItem('luminaToken', data.token)
+      storage.setItem('luminaUser', JSON.stringify(data.user))
+      otherStorage.removeItem('luminaToken')
+      otherStorage.removeItem('luminaUser')
+      setCurrentUser(data.user)
+      setMessageType('success')
       setMessage(isRegister ? 'Tạo tài khoản thành công.' : 'Đăng nhập thành công.')
     } catch (error) {
+      setMessageType('error')
       setMessage(error.message === 'Failed to fetch' ? 'Không thể kết nối tới máy chủ.' : error.message)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -80,14 +132,15 @@ function App() {
             )}
 
             <div className="form-fields">
-              {isRegister && <label>Họ và tên<div className="input-wrap"><span>♙</span><input name="name" value={form.name} onChange={updateField} placeholder="Nguyễn Văn A" /></div></label>}
+              {isRegister && <label>Họ và tên<div className="input-wrap"><span>♙</span><input name="name" value={form.name} onChange={updateField} placeholder="Nguyễn Văn A" minLength="2" maxLength="80" required /></div></label>}
               <label>Email<div className="input-wrap"><span>✉</span><input name="email" type="email" value={form.email} onChange={updateField} placeholder="email@example.com" required /></div></label>
               <label>Mật khẩu<div className="input-wrap"><span>▣</span><input name="password" type={showPassword ? 'text' : 'password'} value={form.password} onChange={updateField} placeholder="••••••••" minLength="6" required /><button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)} aria-label="Hiện hoặc ẩn mật khẩu">◉</button></div></label>
             </div>
 
-            {!isRegister && <div className="form-options"><label className="remember"><input type="checkbox" /> Ghi nhớ đăng nhập</label><button type="button" className="text-button">Quên mật khẩu?</button></div>}
-            <button className="submit-button" type="submit">{isRegister ? 'Đăng ký ngay  →' : 'Đăng nhập'}</button>
-            {message && <p className="form-message" role="status">{message}</p>}
+            {!isRegister && <div className="form-options"><label className="remember"><input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} /> Ghi nhớ đăng nhập</label><button type="button" className="text-button">Quên mật khẩu?</button></div>}
+            <button className="submit-button" type="submit" disabled={isSubmitting}>{isSubmitting ? 'Đang xử lý...' : isRegister ? 'Đăng ký ngay  →' : 'Đăng nhập'}</button>
+            {message && <p className={`form-message ${messageType}`} role="status">{message}</p>}
+            {currentUser && <div className="signed-in-user"><span>Xin chào, {currentUser.name || currentUser.email}</span><button type="button" onClick={logout}>Đăng xuất</button></div>}
 
             <div className="divider"><span>{isRegister ? 'Hoặc đăng ký bằng' : 'Hoặc tiếp tục với'}</span></div>
             <div className="social-buttons"><button type="button"><b>G</b> Google</button><button type="button"><b>{isRegister ? '●' : '⊞'}</b> {isRegister ? 'Apple' : 'Microsoft'}</button></div>
