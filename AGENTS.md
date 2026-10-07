@@ -62,6 +62,34 @@ VITE_API_URL=http://localhost:3000
 
 Không đọc hoặc in giá trị secret vào log, test output, issue hay phần bàn giao.
 
+## Chạy toàn bộ hệ thống bằng Docker
+
+Docker Compose là cách chạy mặc định khi cần kiểm thử tích hợp hoặc chuẩn bị deploy. Stack gồm:
+
+- `db`: PostgreSQL 17, chỉ truy cập trong Docker network và lưu dữ liệu trong volume `postgres_data`.
+- `backend`: Express/Prisma trên cổng nội bộ `3000`; tự chạy `prisma migrate deploy` trước khi khởi động server.
+- `frontend`: build Vite và phục vụ bằng Nginx tại `http://localhost:8080`; Nginx proxy `/api` sang backend.
+
+Sao chép `.env.docker.example` thành `.env` ở thư mục gốc và thay các giá trị bí mật trước khi chạy. File `.env` không được commit.
+
+```powershell
+Copy-Item .env.docker.example .env
+docker compose up -d --build
+docker compose ps
+Invoke-RestMethod http://localhost:8080/api/health
+```
+
+Các lệnh vận hành:
+
+```powershell
+docker compose logs -f
+docker compose down
+```
+
+Không dùng `docker compose down -v` nếu người dùng chưa yêu cầu xóa dữ liệu. Không cần chạy `npx prisma migrate deploy` trên host khi dùng toàn bộ stack Docker; backend container tự chạy migration và kết nối database qua `db:5432`. Database mặc định không publish cổng `5432` ra host.
+
+Khi thay đổi dependency, Dockerfile, Prisma schema hoặc migration, phải build lại image và kiểm tra trạng thái healthy cùng endpoint `/api/health`. Cấu hình hiện tại phù hợp để chạy một máy; trước khi deploy công khai vẫn phải đặt secret mạnh, cấu hình domain/TLS và giới hạn CORS theo môi trường thật.
+
 ## Lệnh chuẩn
 
 Chạy các lệnh trong đúng package tương ứng.

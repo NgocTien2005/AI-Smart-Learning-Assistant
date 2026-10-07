@@ -1,37 +1,27 @@
-import { PrismaPg } from '@prisma/adapter-pg'
-import { PrismaClient } from './generated/prisma/client.ts'
-import 'dotenv/config'
-import { createApp } from './app.js'
+import { createApp } from './src/app.js'
+import { port } from './src/config/env.js'
+import { prisma } from './src/lib/prisma.js'
 
-const port = Number(process.env.PORT) || 3000
-const connectionString = process.env.DATABASE_URL
-const jwtSecret = process.env.JWT_SECRET
-
-if (!connectionString) {
-  throw new Error('DATABASE_URL is required to start the backend')
-}
-if (!jwtSecret && process.env.NODE_ENV === 'production') {
-  throw new Error('JWT_SECRET is required in production')
-}
-
-const adapter = new PrismaPg({ connectionString })
-const prisma = new PrismaClient({ adapter })
-const app = createApp({
-  prisma,
-  jwtSecret: jwtSecret || 'development-only-secret',
-  corsOrigin: process.env.CORS_ORIGIN || '*',
-})
-
-const server = app.listen(port, () => {
+const server = createApp().listen(port, () => {
   console.log(`API server listening on http://localhost:${port}`)
 })
 
-const shutdown = () => {
-  server.close(async () => {
-    await prisma.$disconnect()
-    process.exit(0)
+let isShuttingDown = false
+
+const shutdown = (signal) => {
+  if (isShuttingDown) return
+  isShuttingDown = true
+
+  console.log(`${signal} received, shutting down`)
+  server.close(async (error) => {
+    try {
+      await prisma.$disconnect()
+    } finally {
+      if (error) console.error('HTTP server shutdown error:', error)
+      process.exitCode = error ? 1 : 0
+    }
   })
 }
 
-process.on('SIGINT', shutdown)
-process.on('SIGTERM', shutdown)
+process.on('SIGINT', () => shutdown('SIGINT'))
+process.on('SIGTERM', () => shutdown('SIGTERM'))

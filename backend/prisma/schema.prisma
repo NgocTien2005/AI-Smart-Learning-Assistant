@@ -18,24 +18,26 @@ enum Role {
 }
 
 model User {
-  id            Int            @id @default(autoincrement())
-  name          String
-  email         String         @unique
-  password      String
-  role          Role
-  createdAt     DateTime       @default(now())
-  courses       Course[]       // các khóa học mình dạy (nếu là INSTRUCTOR)
-  enrollments   Enrollment[]   // các khóa học mình đã tham gia (nếu là STUDENT)
-  chatMessages  ChatMessage[]  // lịch sử chat với AI
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  password     String
+  role         Role
+  createdAt    DateTime      @default(now())
+  courses      Course[] // các khóa học mình dạy (nếu là INSTRUCTOR)
+  enrollments  Enrollment[] // các khóa học mình đã tham gia (nếu là STUDENT)
+  chatMessages ChatMessage[] // lịch sử chat với AI
 }
 
 model Course {
   id           Int          @id @default(autoincrement())
   title        String
-  joinCode     String       @unique   // mã mời để sinh viên tham gia
+  description  String       @default("") @db.Text
+  joinCode     String       @unique // mã mời để sinh viên tham gia
   instructorId Int
-  instructor   User         @relation(fields: [instructorId], references: [id])
+  instructor   User         @relation(fields: [instructorId], references: [id], onDelete: Cascade)
   createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
   lessons      Lesson[]
   enrollments  Enrollment[]
 }
@@ -45,8 +47,8 @@ model Enrollment {
   id        Int      @id @default(autoincrement())
   userId    Int
   courseId  Int
-  user      User     @relation(fields: [userId], references: [id])
-  course    Course   @relation(fields: [courseId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
   @@unique([userId, courseId]) // 1 user không thể enroll trùng 1 course 2 lần
@@ -55,11 +57,15 @@ model Enrollment {
 model Lesson {
   id            Int           @id @default(autoincrement())
   title         String
-  documentUrl   String        // đường dẫn file PDF/text đã upload
+  content       String?       @db.Text
+  documentUrl   String? // tên file PDF/text được lưu cục bộ
+  documentName  String?
   extractedText String?       @db.Text // nội dung trích xuất từ file, dùng làm context cho AI
+  order         Int           @default(0)
   courseId      Int
-  course        Course        @relation(fields: [courseId], references: [id])
+  course        Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
   createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   chatMessages  ChatMessage[]
 }
 
@@ -68,8 +74,8 @@ model ChatMessage {
   question  String   @db.Text
   answer    String   @db.Text
   userId    Int
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   lessonId  Int
-  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }

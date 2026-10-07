@@ -1,38 +1,63 @@
-# AI Smart Learning Assistant
+# AI-Smart-Learning-Assistant
+AI-Powered LMS là nền tảng quản lý học tập trực tuyến giúp giảng viên quản lý khóa học, bài giảng, bài tập và kết quả học tập. Sinh viên có thể học, làm bài và theo dõi tiến độ. Hệ thống tích hợp AI trợ giảng để hỗ trợ hỏi đáp, tóm tắt tài liệu, tạo câu hỏi ôn tập và đề xuất nội dung học tập phù hợp.
 
-Lumina LMS là nền tảng quản lý học tập dành cho hai vai trò `STUDENT` và `INSTRUCTOR`. Repository đã có luồng xác thực gồm đăng ký, đăng nhập, khôi phục phiên, lấy thông tin người dùng hiện tại và đăng xuất. Sau khi xác thực, người dùng được đưa vào dashboard responsive tương ứng với vai trò học viên hoặc giảng viên.
+## Cấu trúc repository
 
-## Chạy dự án
+- `frontend/src/app`: application shell và route composition.
+- `frontend/src/pages`: các màn hình React và style theo trang.
+- `frontend/src/data`: dữ liệu prototype cho giao diện khóa học.
+- `backend/src/config`: cấu hình runtime và biến môi trường.
+- `backend/src/routes`: các route HTTP theo nhóm tính năng.
+- `backend/src/middleware`: middleware dùng chung như authentication.
+- `backend/src/lib`: kết nối Prisma/database.
+- `backend/src/utils`: hàm dùng chung cho authentication và public response.
+- `backend/prisma`: schema và lịch sử migration.
 
-Yêu cầu Node.js 24+ và PostgreSQL.
+`frontend/src/assets` chỉ chứa asset được ứng dụng sử dụng. Prisma client trong `backend/generated/prisma` là mã sinh tự động, không chỉnh sửa thủ công.
 
-### Backend
+## Chạy bằng Docker
 
-Tạo `backend/.env` từ `backend/.env.example`, sau đó chạy:
+Yêu cầu Docker Desktop đang chạy. Tạo cấu hình local:
 
 ```powershell
-cd backend
-npm ci
-npx prisma migrate deploy
-npx prisma generate
-npm run dev
+Copy-Item .env.docker.example .env
 ```
 
-### Frontend
+Đổi `POSTGRES_PASSWORD` và `JWT_SECRET` trong `.env`, sau đó chạy:
 
 ```powershell
-cd frontend
-npm ci
-npm run dev
+docker compose up -d --build
+docker compose ps
 ```
 
-Frontend mặc định gọi API tại `http://localhost:3000`. Có thể cấu hình địa chỉ khác bằng `VITE_API_URL` trong `frontend/.env`.
+Mở `http://localhost:8080`. Backend không public cổng riêng; Nginx chuyển tiếp `/api` tới backend. Backend tự chạy `prisma migrate deploy` khi container khởi động.
 
-## Kiểm tra
+```powershell
+docker compose logs -f
+docker compose down
+```
+
+`docker compose down` giữ dữ liệu PostgreSQL. Chỉ dùng `docker compose down -v` khi chủ động muốn xóa volume database.
+
+Khi chạy frontend bằng Vite trên host, backend mặc định chỉ cho phép origin `http://localhost:5173`. Có thể đặt `CORS_ORIGIN` thành một hoặc nhiều origin phân tách bằng dấu phẩy cho môi trường khác.
+
+Tài liệu upload được lưu trong Docker volume `uploads_data` và chỉ tải xuống qua endpoint có authentication. Định dạng hỗ trợ là PDF, TXT, Markdown và CSV, tối đa 10 MB. Nội dung text được dùng cho trợ lý tài liệu cục bộ; dữ liệu không được gửi sang dịch vụ AI bên ngoài.
+
+## Chức năng LMS hiện có
+
+- Đăng ký, đăng nhập và kiểm tra phiên cho vai trò `INSTRUCTOR` và `STUDENT`.
+- Giảng viên tạo, sửa, xóa khóa học; hệ thống sinh mã tham gia 8 ký tự.
+- Học viên tham gia bằng mã và chỉ truy cập khóa học đã tham gia.
+- Giảng viên thêm/xóa bài học, nhập nội dung hoặc upload tài liệu.
+- Người có quyền trong khóa học tải tài liệu, hỏi đáp theo nội dung text và xem lịch sử hỏi đáp.
+- Authorization được kiểm tra riêng cho từng thao tác khóa học và bài học.
+
+Các kiểm tra chính:
 
 ```powershell
 cd backend
 npm test
+npm run test:integration
 npx prisma validate
 
 cd ../frontend
@@ -40,4 +65,6 @@ npm run lint
 npm run build
 ```
 
-Các nút đăng nhập mạng xã hội và quên mật khẩu hiện được đánh dấu “Sắp có”; dự án chưa giả lập thành công cho các luồng chưa có backend tương ứng.
+`npm run test:integration` yêu cầu Docker stack đang chạy. Script tạo dữ liệu riêng, kiểm tra toàn bộ luồng qua `http://localhost:8080/api` rồi xóa dữ liệu kiểm thử.
+
+Đăng nhập Google/Microsoft và quên mật khẩu hiện được đánh dấu “Sắp có”; các luồng này cần cấu hình OAuth hoặc dịch vụ email và không được giả lập thành công.
