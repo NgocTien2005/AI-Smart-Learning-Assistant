@@ -32,6 +32,7 @@ model User {
   enrollments              Enrollment[] // các khóa học mình đã tham gia (nếu là STUDENT)
   chatMessages             ChatMessage[] // lịch sử chat với AI
   lessonProgress           LessonProgress[]
+  submissions              AssignmentSubmission[]
 }
 
 model Course {
@@ -45,6 +46,7 @@ model Course {
   updatedAt    DateTime     @updatedAt
   lessons      Lesson[]
   enrollments  Enrollment[]
+  assignments  Assignment[]
 }
 
 // Bảng trung gian thể hiện quan hệ nhiều-nhiều: 1 student tham gia nhiều course, 1 course có nhiều student
@@ -73,6 +75,34 @@ model Lesson {
   updatedAt     DateTime      @updatedAt
   chatMessages  ChatMessage[]
   progress      LessonProgress[]
+}
+
+model Assignment {
+  id          Int                    @id @default(autoincrement())
+  title       String
+  description String                 @db.Text
+  dueAt       DateTime?
+  points      Int                    @default(100)
+  courseId    Int
+  course      Course                 @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  submissions AssignmentSubmission[]
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+}
+
+model AssignmentSubmission {
+  id          Int        @id @default(autoincrement())
+  content     String     @db.Text
+  submittedAt DateTime   @default(now())
+  grade       Int?
+  feedback    String?    @db.Text
+  assignmentId Int
+  studentId   Int
+  assignment  Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student     User       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, studentId])
+  @@index([studentId])
 }
 
 model LessonProgress {

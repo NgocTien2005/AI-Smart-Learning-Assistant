@@ -121,6 +121,33 @@ try {
     content: 'Chia mục tiêu lớn thành các phiên học ngắn. Sau mỗi phiên, tự nhớ lại kiến thức mà không nhìn tài liệu, rồi ghi lại điều còn chưa rõ.',
   }, 1)
 
+  const existingAssignment = await prisma.assignment.findFirst({
+    where: { courseId: courses[0].id, title: 'Bài tập: tính tổng bằng vòng lặp' },
+  })
+  const assignmentData = {
+    title: 'Bài tập: tính tổng bằng vòng lặp',
+    description: 'Viết các bước tính tổng các số chẵn từ 2 đến 20. Nêu biến tích lũy và điều kiện dừng của vòng lặp.',
+    dueAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    points: 20,
+    courseId: courses[0].id,
+  }
+  const demoAssignment = existingAssignment
+    ? await prisma.assignment.update({ where: { id: existingAssignment.id }, data: assignmentData })
+    : await prisma.assignment.create({ data: assignmentData })
+  await prisma.assignmentSubmission.upsert({
+    where: { assignmentId_studentId: { assignmentId: demoAssignment.id, studentId: student.id } },
+    update: {
+      content: 'Em khởi tạo biến tổng bằng 0, lặp số chẵn từ 2 đến 20 và cộng từng số vào biến tổng. Dừng sau số 20; kết quả là 110.',
+      grade: null,
+      feedback: null,
+    },
+    create: {
+      assignmentId: demoAssignment.id,
+      studentId: student.id,
+      content: 'Em khởi tạo biến tổng bằng 0, lặp số chẵn từ 2 đến 20 và cộng từng số vào biến tổng. Dừng sau số 20; kết quả là 110.',
+    },
+  })
+
   console.log('Demo data is ready. Sign in with either demo account; password: LuminaDemo123!')
   console.log(`Instructor: ${users[0].email} | Student: ${users[1].email}`)
 } finally {

@@ -147,6 +147,36 @@ try {
     method: 'PUT', headers: { Authorization: `Bearer ${student.token}` },
   })
 
+  const createdAssignment = await request(`/courses/${courseId}/assignments`, jsonOptions('POST', {
+    title: 'Integration Assignment',
+    description: 'Explain the loop result and show your steps.',
+    dueAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    points: 20,
+  }, instructorToken))
+  const updatedAssignment = await request(`/courses/assignments/${createdAssignment.assignment.id}`, jsonOptions('PATCH', {
+    description: 'Explain the loop result and show each addition.',
+  }, instructorToken))
+  if (updatedAssignment.assignment.description !== 'Explain the loop result and show each addition.') throw new Error('Assignment update did not persist')
+  const studentCourseWithAssignment = await request(`/courses/${courseId}`, { headers: { Authorization: `Bearer ${student.token}` } })
+  if (studentCourseWithAssignment.course.assignments.length !== 1 || studentCourseWithAssignment.course.assignments[0].submissions.length !== 0) {
+    throw new Error('Student assignment visibility or submission privacy is incorrect')
+  }
+  const submittedWork = await request(`/courses/assignments/${createdAssignment.assignment.id}/submission`, jsonOptions('PUT', {
+    content: 'The loop adds each even number from 2 through 20, for a total of 110.',
+  }, student.token))
+  if (!submittedWork.submission.id) throw new Error('Student submission was not saved')
+  const gradedWork = await request(`/courses/assignments/${createdAssignment.assignment.id}/submissions/${student.user.id}`, jsonOptions('PATCH', {
+    grade: 18, feedback: 'Correct method and result; explain the stop condition more clearly next time.',
+  }, instructorToken))
+  if (gradedWork.submission.grade !== 18) throw new Error('Instructor grade did not persist')
+  const gradedAssignment = await request(`/courses/${courseId}`, { headers: { Authorization: `Bearer ${student.token}` } })
+  const studentResult = gradedAssignment.course.assignments[0].submissions[0]
+  if (studentResult.grade !== 18 || !studentResult.feedback) throw new Error('Student cannot see grade and feedback')
+  const resubmitGraded = await fetch(`${baseUrl}/courses/assignments/${createdAssignment.assignment.id}/submission`, jsonOptions('PUT', {
+    content: 'Edited after grading.',
+  }, student.token))
+  if (resubmitGraded.status !== 409) throw new Error(`Graded assignment update returned ${resubmitGraded.status}, expected 409`)
+
   const chat = await request(`/courses/lessons/${createdLesson.lesson.id}/chat`, jsonOptions('POST', {
     question: 'Machine Learning học từ đâu?',
   }, student.token))
@@ -187,7 +217,7 @@ try {
 
   await request(`/courses/${courseId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${instructorToken}` } })
   courseId = null
-  console.log('Integration flow passed: auth, password reset, authorization, course, enrollment, lesson progress, upload, assistant and cascade delete.')
+  console.log('Integration flow passed: auth, password reset, authorization, course, enrollment, lesson progress, assignments, grading, upload, assistant and cascade delete.')
 } finally {
   if (courseId && instructorToken) {
     await fetch(`${baseUrl}/courses/${courseId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${instructorToken}` } }).catch(() => {})

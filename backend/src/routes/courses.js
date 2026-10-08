@@ -224,6 +224,14 @@ router.get('/:courseId', async (request, response) => {
         select: { ...lessonSelect, progress: { where: { userId: request.user.id }, select: { completedAt: true } } },
         orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
       },
+      assignments: {
+        orderBy: { createdAt: 'asc' },
+        include: {
+          submissions: request.user.role === 'INSTRUCTOR'
+            ? { orderBy: { submittedAt: 'desc' }, include: { student: { select: { id: true, name: true, email: true } } } }
+            : { where: { studentId: request.user.id } },
+        },
+      },
     },
   })
 
@@ -233,7 +241,115 @@ router.get('/:courseId', async (request, response) => {
   const lessons = course.lessons.map(({ progress, ...lesson }) => request.user.role === 'STUDENT'
     ? { ...lesson, isCompleted: progress.length > 0, completedAt: progress[0]?.completedAt || null }
     : lesson)
-  return response.json({ course: { ...course, lessons } })
+  const assignments = course.assignments.map((assignment) => ({
+    ...assignment,
+    isOverdue: Boolean(assignment.dueAt && assignment.dueAt < new Date()),
+  }))
+  return response.json({ course: { ...course, lessons, assignments } })
+})
+
+router.post('/:courseId/assignments', authorizeRole('INSTRUCTOR'), async (request, response) => {
+  const courseId = parseId(request.params.courseId)
+  if (!courseId) return response.status(400).json({ error: 'ID khóa học không hợp lệ' })
+  const course = await prisma.course.findUnique({ where: { id: courseId }, select: { instructorId: true } })
+  if (!course) return response.status(404).json({ error: 'Không tìm thấy khóa học' })
+  if (course.instructorId !== request.user.id) return response.status(403).json({ error: 'Bạn không sở hữu khóa học này' })
+
+  const title = typeof request.body.title === 'string' ? request.body.title.trim() : ''
+  const description = typeof request.body.description === 'string' ? request.body.description.trim() : ''
+  const points = request.body.points === undefined ? 100 : Number(request.body.points)
+  const dueAt = request.body.dueAt ? new Date(request.body.dueAt) : null
+  if (title.length < 3 || title.length > 160) return response.status(400).json({ error: 'Tiêu đề bài tập phải từ 3 đến 160 ký tự' })
+  if (!description || description.length > 20000) return response.status(400).json({ error: 'Mô tả bài tập là bắt buộc và tối đa 20.000 ký tự' })
+  if (!Number.isInteger(points) || points < 1 || points > 1000) return response.status(400).json({ error: 'Điểm tối đa phải từ 1 đến 1000' })
+  if (request.body.dueAt && Number.isNaN(dueAt.getTime())) return response.status(400).json({ error: 'Hạn nộp không hợp lệ' })
+
+  const assignment = await prisma.assignment.create({ data: { title, description, points, dueAt, courseId }, include: { submissions: true } })
+  return response.status(201).json({ assignment: { ...assignment, isOverdue: Boolean(assignment.dueAt && assignment.dueAt < new Date()) } })
+})
+
+router.patch('/assignments/:assignmentId', authorizeRole('INSTRUCTOR'), async (request, response) => {
+  const assignmentId = parseId(request.params.assignmentId)
+  if (!assignmentId) return response.status(400).json({ error: 'ID bài tập không hợp lệ' })
+  const assignment = await prisma.assignment.findUnique({ where: { id: assignmentId }, include: { course: { select: { instructorId: true } } } })
+  if (!assignment) return response.status(404).json({ error: 'Không tìm thấy bài tập' })
+  if (assignment.course.instructorId !== request.user.id) return response.status(403).json({ error: 'Bạn không có quyền sửa bài tập này' })
+
+  const data = {}
+  if ('title' in request.body) {
+    const title = typeof request.body.title === 'string' ? request.body.title.trim() : ''
+    if (title.length < 3 || title.length > 160) return response.status(400).json({ error: 'Tiêu đề bài tập phải từ 3 đến 160 ký tự' })
+    data.title = title
+  }
+  if ('description' in request.body) {
+    const description = typeof request.body.description === 'string' ? request.body.description.trim() : ''
+    if (!description || description.length > 20000) return response.status(400).json({ error: 'Mô tả bài tập là bắt buộc và tối đa 20.000 ký tự' })
+    data.description = description
+  }
+  if ('points' in request.body) {
+    const points = Number(request.body.points)
+    if (!Number.isInteger(points) || points < 1 || points > 1000) return response.status(400).json({ error: 'Điểm tối đa phải từ 1 đến 1000' })
+    data.points = points
+  }
+  if ('dueAt' in request.body) {
+    const dueAt = request.body.dueAt ? new Date(request.body.dueAt) : null
+    if (request.body.dueAt && Number.isNaN(dueAt.getTime())) return response.status(400).json({ error: 'Hạn nộp không hợp lệ' })
+    data.dueAt = dueAt
+  }
+  if (!Object.keys(data).length) return response.status(400).json({ error: 'Không có dữ liệu cần cập nhật' })
+  const updated = await prisma.assignment.update({ where: { id: assignmentId }, data })
+  return response.json({ assignment: updated })
+})
+
+router.delete('/assignments/:assignmentId', authorizeRole('INSTRUCTOR'), async (request, response) => {
+  const assignmentId = parseId(request.params.assignmentId)
+  if (!assignmentId) return response.status(400).json({ error: 'ID bài tập không hợp lệ' })
+  const assignment = await prisma.assignment.findUnique({ where: { id: assignmentId }, include: { course: { select: { instructorId: true } } } })
+  if (!assignment) return response.status(404).json({ error: 'Không tìm thấy bài tập' })
+  if (assignment.course.instructorId !== request.user.id) return response.status(403).json({ error: 'Bạn không có quyền xóa bài tập này' })
+  await prisma.assignment.delete({ where: { id: assignmentId } })
+  return response.status(204).end()
+})
+
+router.put('/assignments/:assignmentId/submission', authorizeRole('STUDENT'), async (request, response) => {
+  const assignmentId = parseId(request.params.assignmentId)
+  if (!assignmentId) return response.status(400).json({ error: 'ID bài tập không hợp lệ' })
+  const content = typeof request.body.content === 'string' ? request.body.content.trim() : ''
+  if (!content || content.length > 20000) return response.status(400).json({ error: 'Bài làm là bắt buộc và tối đa 20.000 ký tự' })
+  const assignment = await prisma.assignment.findUnique({
+    where: { id: assignmentId },
+    include: { course: { include: { enrollments: { where: { userId: request.user.id }, select: { userId: true } } } } },
+  })
+  if (!assignment) return response.status(404).json({ error: 'Không tìm thấy bài tập' })
+  if (!canAccessCourse(assignment.course, request.user)) return response.status(403).json({ error: 'Bạn chưa tham gia khóa học này' })
+  if (assignment.dueAt && assignment.dueAt < new Date()) return response.status(409).json({ error: 'Đã quá hạn nộp bài' })
+  const existing = await prisma.assignmentSubmission.findUnique({ where: { assignmentId_studentId: { assignmentId, studentId: request.user.id } } })
+  if (existing?.grade !== null && existing?.grade !== undefined) return response.status(409).json({ error: 'Bài đã được chấm và không thể sửa' })
+  const submission = await prisma.assignmentSubmission.upsert({
+    where: { assignmentId_studentId: { assignmentId, studentId: request.user.id } },
+    create: { assignmentId, studentId: request.user.id, content },
+    update: { content, submittedAt: new Date() },
+  })
+  return response.json({ submission })
+})
+
+router.patch('/assignments/:assignmentId/submissions/:studentId', authorizeRole('INSTRUCTOR'), async (request, response) => {
+  const assignmentId = parseId(request.params.assignmentId)
+  const studentId = parseId(request.params.studentId)
+  if (!assignmentId || !studentId) return response.status(400).json({ error: 'ID bài tập hoặc học viên không hợp lệ' })
+  const assignment = await prisma.assignment.findUnique({ where: { id: assignmentId }, include: { course: { select: { instructorId: true } } } })
+  if (!assignment) return response.status(404).json({ error: 'Không tìm thấy bài tập' })
+  if (assignment.course.instructorId !== request.user.id) return response.status(403).json({ error: 'Bạn không có quyền chấm bài tập này' })
+  const submission = await prisma.assignmentSubmission.findUnique({ where: { assignmentId_studentId: { assignmentId, studentId } } })
+  if (!submission) return response.status(404).json({ error: 'Học viên chưa nộp bài' })
+  const grade = request.body.grade === null ? null : Number(request.body.grade)
+  const feedback = typeof request.body.feedback === 'string' ? request.body.feedback.trim() : ''
+  if (grade !== null && (!Number.isInteger(grade) || grade < 0 || grade > assignment.points)) {
+    return response.status(400).json({ error: `Điểm phải từ 0 đến ${assignment.points}` })
+  }
+  if (feedback.length > 5000) return response.status(400).json({ error: 'Nhận xét không được vượt quá 5000 ký tự' })
+  const updated = await prisma.assignmentSubmission.update({ where: { id: submission.id }, data: { grade, feedback: feedback || null } })
+  return response.json({ submission: updated })
 })
 
 router.put('/lessons/:lessonId/progress', authorizeRole('STUDENT'), async (request, response) => {
