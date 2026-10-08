@@ -12,6 +12,7 @@ function CourseWorkspacePage() {
   const [lessonForm, setLessonForm] = useState({ title: '', content: '', order: 0, document: null })
   const [editForm, setEditForm] = useState({ title: '', description: '' })
   const [selectedLesson, setSelectedLesson] = useState(null)
+  const [editingLesson, setEditingLesson] = useState(null)
   const [messages, setMessages] = useState([])
   const [question, setQuestion] = useState('')
   const [loading, setLoading] = useState(true)
@@ -80,6 +81,33 @@ function CourseWorkspacePage() {
     }
   }
 
+  const saveLesson = async (event) => {
+    event.preventDefault()
+    if (!editingLesson) return
+    setSubmitting(true)
+    try {
+      const data = await apiRequest(`/api/courses/lessons/${editingLesson.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          title: editingLesson.title,
+          content: editingLesson.content || '',
+          order: Number(editingLesson.order),
+        }),
+      })
+      setCourse((current) => ({
+        ...current,
+        lessons: current.lessons.map((lesson) => lesson.id === data.lesson.id ? data.lesson : lesson).sort((a, b) => a.order - b.order),
+      }))
+      if (selectedLesson?.id === data.lesson.id) setSelectedLesson(data.lesson)
+      setEditingLesson(null)
+      setNotice('Đã cập nhật bài học.')
+    } catch (error) {
+      setNotice(error.message)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   const deleteCourse = async () => {
     if (!window.confirm('Xóa khóa học, bài học, lượt tham gia và lịch sử hỏi đáp? Thao tác này không thể hoàn tác.')) return
     try {
@@ -140,7 +168,7 @@ function CourseWorkspacePage() {
 
         {isInstructor && <div className="instructor-grid"><section className="management-card"><h2>Thông tin khóa học</h2><form onSubmit={updateCourse}><label>Tên khóa học<input value={editForm.title} onChange={(event) => setEditForm({ ...editForm, title: event.target.value })} minLength="3" maxLength="120" required /></label><label>Mô tả<textarea value={editForm.description} onChange={(event) => setEditForm({ ...editForm, description: event.target.value })} rows="4" maxLength="4000" /></label><div className="form-actions"><button className="primary-button" disabled={submitting}>Lưu thay đổi</button><button className="danger-button" type="button" onClick={deleteCourse}>Xóa khóa học</button></div></form></section><section className="management-card"><h2>Thêm bài học</h2><form onSubmit={createLesson}><label>Tiêu đề<input value={lessonForm.title} onChange={(event) => setLessonForm({ ...lessonForm, title: event.target.value })} minLength="2" maxLength="160" required /></label><label>Nội dung text<textarea value={lessonForm.content} onChange={(event) => setLessonForm({ ...lessonForm, content: event.target.value })} rows="5" maxLength="100000" placeholder="Nội dung này dùng cho học viên và trợ lý tài liệu…" /></label><div className="form-row"><label>Thứ tự<input type="number" min="0" max="10000" value={lessonForm.order} onChange={(event) => setLessonForm({ ...lessonForm, order: event.target.value })} /></label><label>Tài liệu<input type="file" accept=".pdf,.txt,.md,.csv,application/pdf,text/plain,text/markdown,text/csv" onChange={(event) => setLessonForm({ ...lessonForm, document: event.target.files[0] || null })} /></label></div><small>PDF được lưu để tải xuống. TXT, Markdown và CSV còn được dùng cho trợ lý tài liệu cục bộ. Tối đa 10 MB.</small><button className="primary-button" disabled={submitting}>{submitting ? 'Đang thêm…' : 'Thêm bài học'}</button></form></section></div>}
 
-        <section className="lesson-section"><div className="section-title"><div><span className="eyebrow">NỘI DUNG</span><h2>Danh sách bài học</h2></div></div>{course.lessons.length === 0 ? <div className="empty-state"><strong>Chưa có bài học</strong><span>{isInstructor ? 'Thêm nội dung bằng biểu mẫu phía trên.' : 'Giảng viên chưa đăng bài học nào.'}</span></div> : <div className="lesson-card-list">{course.lessons.map((lesson, index) => <article className="lesson-card" key={lesson.id}><span className="lesson-number">{String(index + 1).padStart(2, '0')}</span><div className="lesson-copy"><small>Bài học {lesson.order || index + 1}</small><h3>{lesson.title}</h3>{lesson.content && <p>{lesson.content}</p>}<div className="lesson-actions">{lesson.documentName && <button type="button" onClick={() => download(lesson)}>↓ {lesson.documentName}</button>}<button type="button" onClick={() => openAssistant(lesson)}>✦ Trợ lý tài liệu</button>{isInstructor && <button className="delete-link" type="button" onClick={() => deleteLesson(lesson.id)}>Xóa</button>}</div></div></article>)}</div>}</section>
+        <section className="lesson-section"><div className="section-title"><div><span className="eyebrow">NỘI DUNG</span><h2>Danh sách bài học</h2></div></div>{course.lessons.length === 0 ? <div className="empty-state"><strong>Chưa có bài học</strong><span>{isInstructor ? 'Thêm nội dung bằng biểu mẫu phía trên.' : 'Giảng viên chưa đăng bài học nào.'}</span></div> : <div className="lesson-card-list">{course.lessons.map((lesson, index) => editingLesson?.id === lesson.id ? <form className="lesson-edit-form" key={lesson.id} onSubmit={saveLesson}><label>Tiêu đề<input value={editingLesson.title} onChange={(event) => setEditingLesson({ ...editingLesson, title: event.target.value })} minLength="2" maxLength="160" required /></label><label>Nội dung<textarea value={editingLesson.content || ''} onChange={(event) => setEditingLesson({ ...editingLesson, content: event.target.value })} rows="5" maxLength="100000" /></label><label>Thứ tự<input type="number" value={editingLesson.order} onChange={(event) => setEditingLesson({ ...editingLesson, order: event.target.value })} min="0" max="10000" required /></label><div className="form-actions"><button className="primary-button" disabled={submitting}>{submitting ? 'Đang lưu…' : 'Lưu bài học'}</button><button type="button" onClick={() => setEditingLesson(null)}>Hủy</button></div></form> : <article className="lesson-card" key={lesson.id}><span className="lesson-number">{String(index + 1).padStart(2, '0')}</span><div className="lesson-copy"><small>Bài học {lesson.order || index + 1}</small><h3>{lesson.title}</h3>{lesson.content && <p>{lesson.content}</p>}<div className="lesson-actions">{lesson.documentName && <button type="button" onClick={() => download(lesson)}>↓ {lesson.documentName}</button>}<button type="button" onClick={() => openAssistant(lesson)}>✦ Trợ lý tài liệu</button>{isInstructor && <button type="button" onClick={() => setEditingLesson({ id: lesson.id, title: lesson.title, content: lesson.content || '', order: lesson.order })}>Sửa</button>}{isInstructor && <button className="delete-link" type="button" onClick={() => deleteLesson(lesson.id)}>Xóa</button>}</div></div></article>)}</div>}</section>
 
         {selectedLesson && <section className="assistant-panel"><header><div><span>✦</span><div><small>TRỢ LÝ TÀI LIỆU CỤC BỘ</small><h2>{selectedLesson.title}</h2></div></div><button type="button" aria-label="Đóng" onClick={() => setSelectedLesson(null)}>×</button></header><p className="assistant-note">Câu trả lời chỉ trích xuất từ nội dung bài học và không gửi dữ liệu tới dịch vụ bên ngoài.</p><div className="chat-history">{messages.length === 0 ? <p>Chưa có câu hỏi nào. Hãy hỏi bằng một từ khóa cụ thể trong bài.</p> : messages.map((message) => <div className="chat-pair" key={message.id}><p className="question"><strong>Bạn</strong>{message.question}</p><p className="answer"><strong>Lumina</strong>{message.answer}</p></div>)}</div><form className="chat-form" onSubmit={askQuestion}><label className="sr-only" htmlFor="lesson-question">Câu hỏi</label><input id="lesson-question" value={question} onChange={(event) => setQuestion(event.target.value)} minLength="3" maxLength="1000" placeholder="Ví dụ: Mạng nơ-ron được dùng để làm gì?" required /><button className="primary-button" disabled={submitting}>Gửi</button></form></section>}
       </main>

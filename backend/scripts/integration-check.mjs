@@ -78,6 +78,12 @@ try {
     content: 'Machine Learning giúp hệ thống học từ dữ liệu thay vì chỉ theo quy tắc. Mạng nơ-ron thường dùng trong nhận dạng hình ảnh.',
     order: 1,
   }, instructorToken))
+  const updatedLesson = await request(`/courses/lessons/${createdLesson.lesson.id}`, jsonOptions('PATCH', {
+    title: 'Nền tảng Machine Learning đã cập nhật', order: 2,
+  }, instructorToken))
+  if (updatedLesson.lesson.title !== 'Nền tảng Machine Learning đã cập nhật' || updatedLesson.lesson.order !== 2) {
+    throw new Error('Lesson update did not persist')
+  }
 
   const uploadBody = new FormData()
   uploadBody.set('title', 'Tài liệu kiểm thử')
