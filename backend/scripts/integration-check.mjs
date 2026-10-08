@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 
 const baseUrl = process.env.TEST_API_URL || 'http://localhost:8080/api'
 const stamp = Date.now()
@@ -32,6 +33,17 @@ const cleanupUsers = () => {
     shell: false,
   })
   if (result.status !== 0) process.stderr.write('Không thể dọn tài khoản integration test.\n')
+}
+
+const seedResetToken = (email, token) => {
+  const tokenHash = createHash('sha256').update(token).digest('hex')
+  const sql = `UPDATE "User" SET "passwordResetTokenHash" = '${tokenHash}', "passwordResetExpiresAt" = NOW() + INTERVAL '30 minutes', "passwordResetRequestedAt" = NOW() WHERE email = '${email}';`
+  const result = spawnSync('docker', ['compose', 'exec', '-T', 'db', 'psql', '-q', '-U', 'postgres', '-d', 'lumina_lms', '-c', sql], {
+    cwd: new URL('../..', import.meta.url),
+    stdio: 'pipe',
+    shell: false,
+  })
+  if (result.status !== 0) throw new Error('Không thể chuẩn bị token đặt lại mật khẩu cho integration test')
 }
 
 try {
@@ -101,9 +113,23 @@ try {
   }, student.token))
   if (forbiddenResponse.status !== 403) throw new Error(`Student update returned ${forbiddenResponse.status}, expected 403`)
 
+  const resetToken = 'a'.repeat(64)
+  const newPassword = 'NewTestPass456'
+  seedResetToken(studentEmail, resetToken)
+  await request('/auth/reset-password', jsonOptions('POST', { token: resetToken, password: newPassword }))
+
+  const oldSession = await fetch(`${baseUrl}/auth/me`, { headers: { Authorization: `Bearer ${student.token}` } })
+  if (oldSession.status !== 401) throw new Error(`Old session returned ${oldSession.status}, expected 401`)
+  const oldLogin = await fetch(`${baseUrl}/auth/login`, jsonOptions('POST', { email: studentEmail, password }))
+  if (oldLogin.status !== 401) throw new Error(`Old password returned ${oldLogin.status}, expected 401`)
+  const newLogin = await request('/auth/login', jsonOptions('POST', { email: studentEmail, password: newPassword }))
+  if (!newLogin.token) throw new Error('New password login did not return a token')
+  const reusedToken = await fetch(`${baseUrl}/auth/reset-password`, jsonOptions('POST', { token: resetToken, password }))
+  if (reusedToken.status !== 400) throw new Error(`Reused reset token returned ${reusedToken.status}, expected 400`)
+
   await request(`/courses/${courseId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${instructorToken}` } })
   courseId = null
-  console.log('Integration flow passed: auth, authorization, course, enrollment, lesson, upload, assistant and cascade delete.')
+  console.log('Integration flow passed: auth, password reset, authorization, course, enrollment, lesson, upload, assistant and cascade delete.')
 } finally {
   if (courseId && instructorToken) {
     await fetch(`${baseUrl}/courses/${courseId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${instructorToken}` } }).catch(() => {})

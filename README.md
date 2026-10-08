@@ -23,7 +23,15 @@ Yêu cầu Docker Desktop đang chạy. Tạo cấu hình local:
 Copy-Item .env.docker.example .env
 ```
 
-Đổi `POSTGRES_PASSWORD` và `JWT_SECRET` trong `.env`, sau đó chạy:
+Đổi `POSTGRES_PASSWORD` và `JWT_SECRET` trong `.env`. Để gửi email quên mật khẩu qua Gmail, bật xác minh 2 bước cho tài khoản Google, tạo App Password rồi cấu hình:
+
+```dotenv
+SMTP_USER=your-gmail-address@gmail.com
+SMTP_APP_PASSWORD=your-16-character-google-app-password
+APP_ORIGIN=http://localhost:8080
+```
+
+Không dùng mật khẩu đăng nhập Gmail thông thường và không commit file `.env`. Sau đó chạy:
 
 ```powershell
 docker compose up -d --build
@@ -45,7 +53,7 @@ Tài liệu upload được lưu trong Docker volume `uploads_data` và chỉ t�
 
 ## Chức năng LMS hiện có
 
-- Đăng ký, đăng nhập và kiểm tra phiên cho vai trò `INSTRUCTOR` và `STUDENT`.
+- Đăng ký, đăng nhập, quên/đặt lại mật khẩu qua Gmail SMTP và kiểm tra phiên cho vai trò `INSTRUCTOR` và `STUDENT`.
 - Giảng viên tạo, sửa, xóa khóa học; hệ thống sinh mã tham gia 8 ký tự.
 - Học viên tham gia bằng mã và chỉ truy cập khóa học đã tham gia.
 - Giảng viên thêm/xóa bài học, nhập nội dung hoặc upload tài liệu.
@@ -67,4 +75,4 @@ npm run build
 
 `npm run test:integration` yêu cầu Docker stack đang chạy. Script tạo dữ liệu riêng, kiểm tra toàn bộ luồng qua `http://localhost:8080/api` rồi xóa dữ liệu kiểm thử.
 
-Đăng nhập Google/Microsoft và quên mật khẩu hiện được đánh dấu “Sắp có”; các luồng này cần cấu hình OAuth hoặc dịch vụ email và không được giả lập thành công.
+Đăng nhập Google/Microsoft hiện được đánh dấu “Sắp có” và cần cấu hình OAuth trước khi triển khai.

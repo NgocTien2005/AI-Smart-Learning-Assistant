@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import { jwtSecret } from '../config/env.js'
 
 export const createToken = (user) => jwt.sign(
-  { userId: user.id, role: user.role },
+  { userId: user.id, role: user.role, authVersion: user.authVersion ?? 0 },
   jwtSecret,
   { expiresIn: '1d' },
 )

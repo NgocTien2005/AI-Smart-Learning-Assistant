@@ -11,6 +11,9 @@ export const corsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
   .filter(Boolean)
 export const validRoles = new Set(['INSTRUCTOR', 'STUDENT'])
 export const uploadDirectory = resolve(process.env.UPLOAD_DIR || 'uploads')
+export const appOrigin = (process.env.APP_ORIGIN || corsOrigins[0]).replace(/\/$/, '')
+export const smtpUser = process.env.SMTP_USER?.trim()
+export const smtpAppPassword = process.env.SMTP_APP_PASSWORD?.replace(/\s/g, '')
 
 if (!connectionString) {
   throw new Error('DATABASE_URL is required to start the backend')

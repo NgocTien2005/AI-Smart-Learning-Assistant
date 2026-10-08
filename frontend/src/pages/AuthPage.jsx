@@ -14,6 +14,7 @@ function AuthPage() {
   const [message, setMessage] = useState('')
   const [messageType, setMessageType] = useState('')
   const isRegister = mode === 'register'
+  const isForgot = mode === 'forgot'
 
   useEffect(() => {
     const token = localStorage.getItem('luminaToken') || sessionStorage.getItem('luminaToken')
@@ -59,10 +60,12 @@ function AuthPage() {
 
   const submit = async (event) => {
     event.preventDefault()
-    const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login'
-    const payload = isRegister
-      ? { name: form.name, email: form.email, password: form.password, role }
-      : { email: form.email, password: form.password }
+    const endpoint = isForgot ? '/api/auth/forgot-password' : isRegister ? '/api/auth/register' : '/api/auth/login'
+    const payload = isForgot
+      ? { email: form.email }
+      : isRegister
+        ? { name: form.name, email: form.email, password: form.password, role }
+        : { email: form.email, password: form.password }
 
     setIsSubmitting(true)
     setMessage('')
@@ -76,6 +79,13 @@ function AuthPage() {
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Có lỗi xảy ra')
+
+      if (isForgot) {
+        setMessageType('success')
+        setMessage(data.message)
+        return
+      }
+
       const storage = rememberMe || isRegister ? localStorage : sessionStorage
       const otherStorage = storage === localStorage ? sessionStorage : localStorage
       storage.setItem('luminaToken', data.token)
@@ -121,8 +131,8 @@ function AuthPage() {
           <form className="auth-card" onSubmit={submit}>
             {isRegister && <div className="accent-line" />}
             <header className="form-heading">
-              <h2>{isRegister ? 'Tạo tài khoản mới' : 'Đăng nhập'}</h2>
-              {!isRegister && <p>Vui lòng nhập thông tin chi tiết của bạn để truy cập tài khoản.</p>}
+              <h2>{isForgot ? 'Quên mật khẩu' : isRegister ? 'Tạo tài khoản mới' : 'Đăng nhập'}</h2>
+              {!isRegister && <p>{isForgot ? 'Nhập email đã đăng ký để nhận liên kết đặt lại mật khẩu.' : 'Vui lòng nhập thông tin chi tiết của bạn để truy cập tài khoản.'}</p>}
             </header>
 
             {isRegister && (
@@ -135,17 +145,16 @@ function AuthPage() {
             <div className="form-fields">
               {isRegister && <label htmlFor="name">Họ và tên<div className="input-wrap"><span aria-hidden="true">♙</span><input id="name" name="name" autoComplete="name" value={form.name} onChange={updateField} placeholder="Nguyễn Văn A" minLength="2" maxLength="80" required /></div></label>}
               <label htmlFor="email">Email<div className="input-wrap"><span aria-hidden="true">✉</span><input id="email" name="email" type="email" autoComplete="email" value={form.email} onChange={updateField} placeholder="email@example.com" maxLength="254" required /></div></label>
-              <label htmlFor="password">Mật khẩu<div className="input-wrap"><span aria-hidden="true">▣</span><input id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete={isRegister ? 'new-password' : 'current-password'} value={form.password} onChange={updateField} placeholder="Từ 6 đến 72 ký tự" minLength="6" maxLength="72" required /><button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'} aria-pressed={showPassword}>{showPassword ? '◌' : '◉'}</button></div></label>
+              {!isForgot && <label htmlFor="password">Mật khẩu<div className="input-wrap"><span aria-hidden="true">▣</span><input id="password" name="password" type={showPassword ? 'text' : 'password'} autoComplete={isRegister ? 'new-password' : 'current-password'} value={form.password} onChange={updateField} placeholder="Từ 6 đến 72 ký tự" minLength="6" maxLength="72" required /><button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'} aria-pressed={showPassword}>{showPassword ? '◌' : '◉'}</button></div></label>}
             </div>
 
-            {!isRegister && <div className="form-options"><label className="remember"><input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} /> Ghi nhớ đăng nhập</label><span className="coming-soon" title="Tính năng đang được phát triển">Quên mật khẩu? · Sắp có</span></div>}
-            <button className="submit-button" type="submit" disabled={isSubmitting}>{isSubmitting ? 'Đang xử lý...' : isRegister ? 'Đăng ký ngay  →' : 'Đăng nhập'}</button>
+            {!isRegister && !isForgot && <div className="form-options"><label className="remember"><input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} /> Ghi nhớ đăng nhập</label><button className="text-button" type="button" onClick={() => switchMode('forgot')}>Quên mật khẩu?</button></div>}
+            <button className="submit-button" type="submit" disabled={isSubmitting}>{isSubmitting ? 'Đang xử lý...' : isForgot ? 'Gửi liên kết đặt lại' : isRegister ? 'Đăng ký ngay  →' : 'Đăng nhập'}</button>
             {message && <p className={`form-message ${messageType}`} aria-live="polite">{message}</p>}
             {currentUser && <div className="signed-in-user"><span>Xin chào, {currentUser.name || currentUser.email}</span><button type="button" onClick={() => navigate('/dashboard')}>Vào dashboard</button><button type="button" onClick={logout}>Đăng xuất</button></div>}
 
-            <div className="divider"><span>Đăng nhập mạng xã hội · Sắp có</span></div>
-            <div className="social-buttons" aria-label="Đăng nhập mạng xã hội đang được phát triển"><button type="button" disabled><b>G</b> Google</button><button type="button" disabled><b>⊞</b> Microsoft</button></div>
-            <p className="switch-copy">{isRegister ? 'Đã có tài khoản?' : 'Chưa có tài khoản?'} <button type="button" onClick={() => switchMode(isRegister ? 'login' : 'register')}>{isRegister ? 'Đăng nhập' : 'Đăng ký ngay'}</button></p>
+            {!isForgot && <><div className="divider"><span>Đăng nhập mạng xã hội · Sắp có</span></div><div className="social-buttons" aria-label="Đăng nhập mạng xã hội đang được phát triển"><button type="button" disabled><b>G</b> Google</button><button type="button" disabled><b>⊞</b> Microsoft</button></div></>}
+            <p className="switch-copy">{isForgot ? 'Đã nhớ mật khẩu?' : isRegister ? 'Đã có tài khoản?' : 'Chưa có tài khoản?'} <button type="button" onClick={() => switchMode(isForgot || isRegister ? 'login' : 'register')}>{isForgot || isRegister ? 'Đăng nhập' : 'Đăng ký ngay'}</button></p>
             {isRegister && <p className="terms">Bằng việc đăng ký, bạn đồng ý với <u>Điều khoản dịch vụ</u> và <u>Chính sách bảo mật</u><br />của chúng tôi.</p>}
           </form>
         </section>

@@ -18,15 +18,19 @@ enum Role {
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  name         String
-  email        String        @unique
-  password     String
-  role         Role
-  createdAt    DateTime      @default(now())
-  courses      Course[] // các khóa học mình dạy (nếu là INSTRUCTOR)
-  enrollments  Enrollment[] // các khóa học mình đã tham gia (nếu là STUDENT)
-  chatMessages ChatMessage[] // lịch sử chat với AI
+  id                       Int           @id @default(autoincrement())
+  name                     String
+  email                    String        @unique
+  password                 String
+  role                     Role
+  authVersion              Int           @default(0)
+  passwordResetTokenHash   String?       @unique
+  passwordResetExpiresAt   DateTime?
+  passwordResetRequestedAt DateTime?
+  createdAt                DateTime      @default(now())
+  courses                  Course[] // các khóa học mình dạy (nếu là INSTRUCTOR)
+  enrollments              Enrollment[] // các khóa học mình đã tham gia (nếu là STUDENT)
+  chatMessages             ChatMessage[] // lịch sử chat với AI
 }
 
 model Course {
