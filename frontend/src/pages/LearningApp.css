@@ -84,6 +84,12 @@
 .lesson-edit-form label:nth-child(2), .lesson-edit-form .form-actions { grid-column: 1 / -1; }
 .lesson-edit-form input, .lesson-edit-form textarea { width: 100%; padding: 11px 13px; border: 1px solid #ccd6e4; border-radius: 9px; background: #fff; color: #172033; font: inherit; }
 .lesson-edit-form .form-actions > button:not(.primary-button) { padding: 10px 16px; border: 1px solid #ccd6e4; border-radius: 9px; background: #fff; cursor: pointer; }
+.roster-card { margin-top: 28px; }
+.roster-card ul { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.roster-card li { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 13px 0; border-top: 1px solid #e6ebf2; }
+.student-avatar { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 11px; background: #e8f1ff; color: #1769e0; font-weight: 800; }
+.roster-card li strong, .roster-card li small { display: block; }
+.roster-card li small, .roster-card time { margin-top: 3px; color: #738097; font-size: 12px; }
 .assistant-panel { margin-top: 34px; overflow: hidden; border: 1px solid #d7e1ee; border-radius: 18px; background: #fff; box-shadow: 0 16px 45px rgba(27,48,86,.1); }
 .assistant-panel > header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; background: #142b54; color: #fff; }
 .assistant-panel > header > div { display: flex; gap: 13px; align-items: center; }

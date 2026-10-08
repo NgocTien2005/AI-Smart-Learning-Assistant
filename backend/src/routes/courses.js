@@ -151,6 +151,27 @@ router.delete('/:courseId/enrollment', authorizeRole('STUDENT'), async (request,
   return response.status(204).end()
 })
 
+router.get('/:courseId/students', authorizeRole('INSTRUCTOR'), async (request, response) => {
+  const courseId = parseId(request.params.courseId)
+  if (!courseId) return response.status(400).json({ error: 'ID khóa học không hợp lệ' })
+
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
+    select: {
+      instructorId: true,
+      enrollments: {
+        orderBy: { createdAt: 'desc' },
+        select: { createdAt: true, user: { select: { id: true, name: true, email: true } } },
+      },
+    },
+  })
+  if (!course) return response.status(404).json({ error: 'Không tìm thấy khóa học' })
+  if (course.instructorId !== request.user.id) return response.status(403).json({ error: 'Bạn không sở hữu khóa học này' })
+
+  const students = course.enrollments.map(({ user, createdAt }) => ({ ...user, enrolledAt: createdAt }))
+  return response.json({ students })
+})
+
 router.get('/:courseId', async (request, response) => {
   const courseId = parseId(request.params.courseId)
   if (!courseId) return response.status(400).json({ error: 'ID khóa học không hợp lệ' })

@@ -74,6 +74,8 @@ try {
     joinCode: createdCourse.course.joinCode,
   }, student.token))
   if (joined.course.id !== courseId) throw new Error('Joined course does not match')
+  const roster = await request(`/courses/${courseId}/students`, { headers: { Authorization: `Bearer ${instructorToken}` } })
+  if (roster.students.length !== 1 || roster.students[0].email !== studentEmail) throw new Error('Instructor roster is incorrect')
 
   const createdLesson = await request(`/courses/${courseId}/lessons`, jsonOptions('POST', {
     title: 'Nền tảng Machine Learning',
