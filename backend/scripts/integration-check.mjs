@@ -99,12 +99,26 @@ try {
     method: 'POST', headers: { Authorization: `Bearer ${instructorToken}` }, body: uploadBody,
   })
   if (!uploadedLesson.lesson.documentName) throw new Error('Uploaded lesson has no document name')
+  const replacementBody = new FormData()
+  replacementBody.set('document', new Blob(['Replacement document content for integration verification.'], { type: 'text/plain' }), 'replacement.txt')
+  const replacedDocument = await request(`/courses/lessons/${uploadedLesson.lesson.id}/document`, {
+    method: 'PATCH', headers: { Authorization: `Bearer ${instructorToken}` }, body: replacementBody,
+  })
+  if (replacedDocument.lesson.documentName !== 'replacement.txt') throw new Error('Lesson document replacement did not persist')
   const downloadResponse = await fetch(`${baseUrl}/courses/lessons/${uploadedLesson.lesson.id}/document`, {
     headers: { Authorization: `Bearer ${student.token}` },
   })
-  if (!downloadResponse.ok || !(await downloadResponse.text()).includes('học từ dữ liệu')) {
+  if (!downloadResponse.ok || !(await downloadResponse.text()).includes('Replacement document content')) {
     throw new Error('Protected document download did not return the uploaded content')
   }
+  const removedDocument = await request(`/courses/lessons/${uploadedLesson.lesson.id}/document`, {
+    method: 'DELETE', headers: { Authorization: `Bearer ${instructorToken}` },
+  })
+  if (removedDocument.lesson.documentName !== null) throw new Error('Lesson document removal did not persist')
+  const removedDownload = await fetch(`${baseUrl}/courses/lessons/${uploadedLesson.lesson.id}/document`, {
+    headers: { Authorization: `Bearer ${student.token}` },
+  })
+  if (removedDownload.status !== 404) throw new Error(`Removed document download returned ${removedDownload.status}, expected 404`)
 
   const detail = await request(`/courses/${courseId}`, { headers: { Authorization: `Bearer ${student.token}` } })
   if (detail.course.lessons.length !== 2) throw new Error('Student cannot see both lessons')

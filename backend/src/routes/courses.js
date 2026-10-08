@@ -315,6 +315,58 @@ router.patch('/lessons/:lessonId', authorizeRole('INSTRUCTOR'), async (request, 
   return response.json({ lesson: updatedLesson })
 })
 
+router.patch('/lessons/:lessonId/document', authorizeRole('INSTRUCTOR'), upload.single('document'), async (request, response) => {
+  const lessonId = parseId(request.params.lessonId)
+  if (!lessonId) return response.status(400).json({ error: 'ID bài học không hợp lệ' })
+  if (!request.file) return response.status(400).json({ error: 'Vui lòng chọn tài liệu' })
+
+  const lesson = await prisma.lesson.findUnique({ where: { id: lessonId }, include: { course: { select: { instructorId: true } } } })
+  if (!lesson) return response.status(404).json({ error: 'Không tìm thấy bài học' })
+  if (lesson.course.instructorId !== request.user.id) return response.status(403).json({ error: 'Bạn không có quyền sửa bài học này' })
+
+  const originalExtension = extname(request.file.originalname).toLowerCase()
+  const allowedExtension = request.file.mimetype === 'application/pdf'
+    ? '.pdf'
+    : ['.txt', '.md', '.csv'].includes(originalExtension) ? originalExtension : '.txt'
+  const storedName = `${randomUUID()}${allowedExtension}`
+
+  try {
+    await mkdir(uploadDirectory, { recursive: true })
+    await writeFile(resolve(uploadDirectory, storedName), request.file.buffer)
+    const extractedText = textDocumentTypes.has(request.file.mimetype)
+      ? request.file.buffer.toString('utf8').slice(0, 100000)
+      : lesson.content || null
+    const updatedLesson = await prisma.lesson.update({
+      where: { id: lessonId },
+      data: { documentUrl: storedName, documentName: request.file.originalname.slice(0, 255), extractedText },
+      select: lessonSelect,
+    })
+    await removeStoredFile(lesson.documentUrl)
+    return response.json({ lesson: updatedLesson })
+  } catch (error) {
+    await removeStoredFile(storedName)
+    throw error
+  }
+})
+
+router.delete('/lessons/:lessonId/document', authorizeRole('INSTRUCTOR'), async (request, response) => {
+  const lessonId = parseId(request.params.lessonId)
+  if (!lessonId) return response.status(400).json({ error: 'ID bài học không hợp lệ' })
+
+  const lesson = await prisma.lesson.findUnique({ where: { id: lessonId }, include: { course: { select: { instructorId: true } } } })
+  if (!lesson) return response.status(404).json({ error: 'Không tìm thấy bài học' })
+  if (lesson.course.instructorId !== request.user.id) return response.status(403).json({ error: 'Bạn không có quyền sửa bài học này' })
+  if (!lesson.documentUrl) return response.status(404).json({ error: 'Bài học chưa có tài liệu' })
+
+  const updatedLesson = await prisma.lesson.update({
+    where: { id: lessonId },
+    data: { documentUrl: null, documentName: null, extractedText: lesson.content || null },
+    select: lessonSelect,
+  })
+  await removeStoredFile(lesson.documentUrl)
+  return response.json({ lesson: updatedLesson })
+})
+
 router.delete('/lessons/:lessonId', authorizeRole('INSTRUCTOR'), async (request, response) => {
   const lessonId = parseId(request.params.lessonId)
   if (!lessonId) return response.status(400).json({ error: 'ID bài học không hợp lệ' })
