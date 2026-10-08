@@ -25,6 +25,9 @@
 .danger-button { background: #fff0f1; color: #bd2735; }
 .inline-message, .workspace-notice { grid-column: 1 / -1; margin: 0; padding: 12px 15px; border-radius: 9px; background: #eaf3ff; color: #1959ad; }
 .course-library, .lesson-section { margin-top: 46px; }
+.course-filter { display: block; margin: 0 0 20px; }
+.course-filter input { width: min(480px,100%); padding: 11px 14px; border: 1px solid #ccd6e4; border-radius: 10px; background: #fff; color: #172033; font: inherit; outline: none; }
+.course-filter input:focus { border-color: #1769e0; box-shadow: 0 0 0 3px rgba(23,105,224,.12); }
 .section-title { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
 .section-title > span { color: #738097; font-size: 13px; }
 .course-card-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 20px; }

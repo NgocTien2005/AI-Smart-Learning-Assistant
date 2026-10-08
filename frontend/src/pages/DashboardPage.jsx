@@ -14,6 +14,11 @@ function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
+  const normalizedSearch = searchQuery.trim().toLocaleLowerCase('vi')
+  const visibleCourses = normalizedSearch
+    ? courses.filter((course) => `${course.title} ${course.description} ${course.instructor?.name || ''}`.toLocaleLowerCase('vi').includes(normalizedSearch))
+    : courses
 
   useEffect(() => {
     let active = true
@@ -90,7 +95,8 @@ function DashboardPage() {
 
         <section className="course-library">
           <div className="section-title"><div><span className="eyebrow">THƯ VIỆN</span><h2>{isInstructor ? 'Khóa học đang giảng dạy' : 'Khóa học của tôi'}</h2></div><span>{courses.length} khóa học</span></div>
-          {loading ? <p className="empty-state">Đang tải khóa học…</p> : courses.length === 0 ? <div className="empty-state"><strong>Chưa có khóa học nào</strong><span>{isInstructor ? 'Hãy tạo khóa học đầu tiên ở biểu mẫu phía trên.' : 'Nhập mã tham gia để khóa học xuất hiện tại đây.'}</span></div> : <div className="course-card-grid">{courses.map((course) => <Link className="course-card" to={`/courses/${course.id}`} key={course.id}><div className="course-card-cover"><span>{initials(course.title)}</span></div><div className="course-card-body"><small>{isInstructor ? `Mã: ${course.joinCode}` : course.instructor.name}</small><h3>{course.title}</h3><p>{course.description || 'Khóa học chưa có mô tả.'}</p><div><span>{course._count.lessons} bài học</span><span>{course._count.enrollments} học viên</span></div></div></Link>)}</div>}
+          {courses.length > 0 && <label className="course-filter"><span className="sr-only">Tìm khóa học</span><input type="search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Tìm theo tên, mô tả hoặc giảng viên…" /></label>}
+          {loading ? <p className="empty-state">Đang tải khóa học…</p> : courses.length === 0 ? <div className="empty-state"><strong>Chưa có khóa học nào</strong><span>{isInstructor ? 'Hãy tạo khóa học đầu tiên ở biểu mẫu phía trên.' : 'Nhập mã tham gia để khóa học xuất hiện tại đây.'}</span></div> : visibleCourses.length === 0 ? <div className="empty-state"><strong>Không tìm thấy khóa học</strong><span>Thử một từ khóa khác.</span></div> : <div className="course-card-grid">{visibleCourses.map((course) => <Link className="course-card" to={`/courses/${course.id}`} key={course.id}><div className="course-card-cover"><span>{initials(course.title)}</span></div><div className="course-card-body"><small>{isInstructor ? `Mã: ${course.joinCode}` : course.instructor.name}</small><h3>{course.title}</h3><p>{course.description || 'Khóa học chưa có mô tả.'}</p><div><span>{course._count.lessons} bài học</span><span>{course._count.enrollments} học viên</span></div></div></Link>)}</div>}
         </section>
       </main>
     </div>
