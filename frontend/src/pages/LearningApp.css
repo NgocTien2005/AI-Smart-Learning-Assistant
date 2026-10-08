@@ -108,3 +108,11 @@
 .chat-pair .answer { background: #f0f3f7; color: #33445d; }
 .chat-form { display: flex; gap: 10px; padding: 18px 24px; border-top: 1px solid #e4e9f0; }
 .chat-form input { flex: 1; }
+.workspace-progress { display: grid; width: min(440px,100%); gap: 8px; margin-top: 20px; color: #e5edff; font-size: 13px; }
+.workspace-progress > div, .course-card-progress-track { height: 8px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.25); }
+.workspace-progress > div > span, .course-card-progress-track > span { display: block; height: 100%; border-radius: inherit; background: #80f0c0; transition: width .2s ease; }
+.course-card-body > .course-card-progress { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 12px; padding-top: 12px; }
+.course-card-progress-track { grid-column: 1 / -1; height: 6px; background: #e8eef7; }
+.course-card-progress-track > span { background: #2ca66f; }
+.lesson-card-complete { border-color: #b8e6ce; background: #f8fffb; }
+.lesson-card-complete .lesson-number { background: #dff7e9; color: #16814a; }

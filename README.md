@@ -57,6 +57,7 @@ Tài liệu upload được lưu trong Docker volume `uploads_data` và chỉ t�
 - Học viên tham gia bằng mã và chỉ truy cập khóa học đã tham gia.
 - Giảng viên thêm/xóa bài học, nhập nội dung hoặc upload tài liệu.
 - Người có quyền trong khóa học tải tài liệu, hỏi đáp theo nội dung text và xem lịch sử hỏi đáp.
+- Học viên đánh dấu hoặc bỏ hoàn thành từng bài học; dashboard hiển thị tiến độ khóa học và giảng viên xem tiến độ từng học viên.
 - Authorization được kiểm tra riêng cho từng thao tác khóa học và bài học.
 
 Các kiểm tra chính:

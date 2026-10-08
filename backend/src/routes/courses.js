@@ -56,6 +56,23 @@ const canAccessCourse = (course, user) => course && (
   || course.enrollments?.some((enrollment) => enrollment.userId === user.id)
 )
 
+const addStudentProgress = async (courses, userId) => {
+  if (!courses.length) return courses
+  const lessonProgress = await prisma.lessonProgress.findMany({
+    where: { userId, lesson: { courseId: { in: courses.map(({ id }) => id) } } },
+    select: { lesson: { select: { courseId: true } } },
+  })
+  const completedByCourse = new Map()
+  for (const { lesson } of lessonProgress) {
+    completedByCourse.set(lesson.courseId, (completedByCourse.get(lesson.courseId) || 0) + 1)
+  }
+  return courses.map((course) => {
+    const completedLessons = completedByCourse.get(course.id) || 0
+    const totalLessons = course._count.lessons
+    return { ...course, completedLessons, progressPercent: totalLessons ? Math.round(completedLessons / totalLessons * 100) : 0 }
+  })
+}
+
 const removeStoredFile = async (storedName) => {
   if (!storedName) return
 
@@ -91,7 +108,7 @@ router.get('/', async (request, response) => {
     orderBy: { updatedAt: 'desc' },
   })
 
-  return response.json({ courses })
+  return response.json({ courses: request.user.role === 'STUDENT' ? await addStudentProgress(courses, request.user.id) : courses })
 })
 
 router.post('/', authorizeRole('INSTRUCTOR'), async (request, response) => {
@@ -163,12 +180,34 @@ router.get('/:courseId/students', authorizeRole('INSTRUCTOR'), async (request, r
         orderBy: { createdAt: 'desc' },
         select: { createdAt: true, user: { select: { id: true, name: true, email: true } } },
       },
+      lessons: { select: { id: true } },
     },
   })
   if (!course) return response.status(404).json({ error: 'Không tìm thấy khóa học' })
   if (course.instructorId !== request.user.id) return response.status(403).json({ error: 'Bạn không sở hữu khóa học này' })
 
-  const students = course.enrollments.map(({ user, createdAt }) => ({ ...user, enrolledAt: createdAt }))
+  const progressRows = course.lessons.length && course.enrollments.length
+    ? await prisma.lessonProgress.findMany({
+      where: {
+        lessonId: { in: course.lessons.map(({ id }) => id) },
+        userId: { in: course.enrollments.map(({ user }) => user.id) },
+      },
+      select: { userId: true },
+    })
+    : []
+  const completedByStudent = new Map()
+  for (const { userId } of progressRows) completedByStudent.set(userId, (completedByStudent.get(userId) || 0) + 1)
+  const totalLessons = course.lessons.length
+  const students = course.enrollments.map(({ user, createdAt }) => {
+    const completedLessons = completedByStudent.get(user.id) || 0
+    return {
+      ...user,
+      enrolledAt: createdAt,
+      completedLessons,
+      totalLessons,
+      progressPercent: totalLessons ? Math.round(completedLessons / totalLessons * 100) : 0,
+    }
+  })
   return response.json({ students })
 })
 
@@ -181,14 +220,54 @@ router.get('/:courseId', async (request, response) => {
     include: {
       ...courseInclude,
       enrollments: { where: { userId: request.user.id }, select: { userId: true } },
-      lessons: { select: lessonSelect, orderBy: [{ order: 'asc' }, { createdAt: 'asc' }] },
+      lessons: {
+        select: { ...lessonSelect, progress: { where: { userId: request.user.id }, select: { completedAt: true } } },
+        orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
+      },
     },
   })
 
   if (!course) return response.status(404).json({ error: 'Không tìm thấy khóa học' })
   if (!canAccessCourse(course, request.user)) return response.status(403).json({ error: 'Bạn chưa tham gia khóa học này' })
 
-  return response.json({ course })
+  const lessons = course.lessons.map(({ progress, ...lesson }) => request.user.role === 'STUDENT'
+    ? { ...lesson, isCompleted: progress.length > 0, completedAt: progress[0]?.completedAt || null }
+    : lesson)
+  return response.json({ course: { ...course, lessons } })
+})
+
+router.put('/lessons/:lessonId/progress', authorizeRole('STUDENT'), async (request, response) => {
+  const lessonId = parseId(request.params.lessonId)
+  if (!lessonId) return response.status(400).json({ error: 'ID bài học không hợp lệ' })
+
+  const lesson = await prisma.lesson.findUnique({
+    where: { id: lessonId },
+    include: { course: { include: { enrollments: { where: { userId: request.user.id }, select: { userId: true } } } } },
+  })
+  if (!lesson) return response.status(404).json({ error: 'Không tìm thấy bài học' })
+  if (!canAccessCourse(lesson.course, request.user)) return response.status(403).json({ error: 'Bạn chưa tham gia khóa học này' })
+
+  const progress = await prisma.lessonProgress.upsert({
+    where: { userId_lessonId: { userId: request.user.id, lessonId } },
+    create: { userId: request.user.id, lessonId },
+    update: {},
+  })
+  return response.json({ isCompleted: true, completedAt: progress.completedAt })
+})
+
+router.delete('/lessons/:lessonId/progress', authorizeRole('STUDENT'), async (request, response) => {
+  const lessonId = parseId(request.params.lessonId)
+  if (!lessonId) return response.status(400).json({ error: 'ID bài học không hợp lệ' })
+
+  const lesson = await prisma.lesson.findUnique({
+    where: { id: lessonId },
+    include: { course: { include: { enrollments: { where: { userId: request.user.id }, select: { userId: true } } } } },
+  })
+  if (!lesson) return response.status(404).json({ error: 'Không tìm thấy bài học' })
+  if (!canAccessCourse(lesson.course, request.user)) return response.status(403).json({ error: 'Bạn chưa tham gia khóa học này' })
+
+  await prisma.lessonProgress.deleteMany({ where: { userId: request.user.id, lessonId } })
+  return response.json({ isCompleted: false, completedAt: null })
 })
 
 router.patch('/:courseId', authorizeRole('INSTRUCTOR'), async (request, response) => {

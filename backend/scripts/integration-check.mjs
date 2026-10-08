@@ -122,6 +122,30 @@ try {
 
   const detail = await request(`/courses/${courseId}`, { headers: { Authorization: `Bearer ${student.token}` } })
   if (detail.course.lessons.length !== 2) throw new Error('Student cannot see both lessons')
+  const progressLessonId = createdLesson.lesson.id
+  if (detail.course.lessons.find(({ id }) => id === progressLessonId).isCompleted) throw new Error('New lesson should start incomplete')
+  const completed = await request(`/courses/lessons/${progressLessonId}/progress`, {
+    method: 'PUT', headers: { Authorization: `Bearer ${student.token}` },
+  })
+  if (!completed.isCompleted) throw new Error('Lesson completion was not recorded')
+  const instructorProgress = await fetch(`${baseUrl}/courses/lessons/${progressLessonId}/progress`, {
+    method: 'PUT', headers: { Authorization: `Bearer ${instructorToken}` },
+  })
+  if (instructorProgress.status !== 403) throw new Error(`Instructor progress update returned ${instructorProgress.status}, expected 403`)
+  const studentCourses = await request('/courses', { headers: { Authorization: `Bearer ${student.token}` } })
+  const courseProgress = studentCourses.courses.find(({ id }) => id === courseId)
+  if (courseProgress.completedLessons !== 1 || courseProgress.progressPercent !== 50) throw new Error('Course progress summary is incorrect')
+  const updatedRoster = await request(`/courses/${courseId}/students`, { headers: { Authorization: `Bearer ${instructorToken}` } })
+  if (updatedRoster.students[0].completedLessons !== 1 || updatedRoster.students[0].progressPercent !== 50) throw new Error('Instructor student progress is incorrect')
+  const progressDetail = await request(`/courses/${courseId}`, { headers: { Authorization: `Bearer ${student.token}` } })
+  if (!progressDetail.course.lessons.find(({ id }) => id === progressLessonId).isCompleted) throw new Error('Lesson completion did not persist')
+  const uncompleted = await request(`/courses/lessons/${progressLessonId}/progress`, {
+    method: 'DELETE', headers: { Authorization: `Bearer ${student.token}` },
+  })
+  if (uncompleted.isCompleted) throw new Error('Lesson completion could not be undone')
+  await request(`/courses/lessons/${progressLessonId}/progress`, {
+    method: 'PUT', headers: { Authorization: `Bearer ${student.token}` },
+  })
 
   const chat = await request(`/courses/lessons/${createdLesson.lesson.id}/chat`, jsonOptions('POST', {
     question: 'Machine Learning học từ đâu?',
@@ -163,7 +187,7 @@ try {
 
   await request(`/courses/${courseId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${instructorToken}` } })
   courseId = null
-  console.log('Integration flow passed: auth, password reset, authorization, course, enrollment, lesson, upload, assistant and cascade delete.')
+  console.log('Integration flow passed: auth, password reset, authorization, course, enrollment, lesson progress, upload, assistant and cascade delete.')
 } finally {
   if (courseId && instructorToken) {
     await fetch(`${baseUrl}/courses/${courseId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${instructorToken}` } }).catch(() => {})

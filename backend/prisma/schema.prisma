@@ -31,6 +31,7 @@ model User {
   courses                  Course[] // các khóa học mình dạy (nếu là INSTRUCTOR)
   enrollments              Enrollment[] // các khóa học mình đã tham gia (nếu là STUDENT)
   chatMessages             ChatMessage[] // lịch sử chat với AI
+  lessonProgress           LessonProgress[]
 }
 
 model Course {
@@ -71,6 +72,17 @@ model Lesson {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   chatMessages  ChatMessage[]
+  progress      LessonProgress[]
+}
+
+model LessonProgress {
+  userId      Int
+  lessonId    Int
+  completedAt DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@id([userId, lessonId])
 }
 
 model ChatMessage {
