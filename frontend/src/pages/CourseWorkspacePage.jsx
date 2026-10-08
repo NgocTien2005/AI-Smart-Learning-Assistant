@@ -118,6 +118,16 @@ function CourseWorkspacePage() {
     }
   }
 
+  const leaveCourse = async () => {
+    if (!window.confirm('Rời khóa học này? Lịch sử hỏi đáp của bạn vẫn được giữ nếu tham gia lại.')) return
+    try {
+      await apiRequest(`/api/courses/${courseId}/enrollment`, { method: 'DELETE' })
+      navigate('/dashboard', { replace: true })
+    } catch (error) {
+      setNotice(error.message)
+    }
+  }
+
   const openAssistant = async (lesson) => {
     setSelectedLesson(lesson)
     setQuestion('')
@@ -163,7 +173,7 @@ function CourseWorkspacePage() {
     <div className="learning-page">
       <header className="learning-header"><Link className="learning-brand" to="/dashboard"><span>L</span><strong>Lumina LMS</strong></Link><nav><Link to="/dashboard">← Dashboard</Link></nav></header>
       <main className="workspace-main">
-        <section className="workspace-hero"><div><span className="eyebrow">{isInstructor ? 'KHÓA HỌC ĐANG GIẢNG DẠY' : `GIẢNG VIÊN: ${course.instructor.name}`}</span><h1>{course.title}</h1><p>{course.description || 'Khóa học chưa có mô tả.'}</p><div className="workspace-meta"><span>{course.lessons.length} bài học</span><span>{course._count.enrollments} học viên</span>{isInstructor && <strong>Mã tham gia: {course.joinCode}</strong>}</div></div></section>
+        <section className="workspace-hero"><div><span className="eyebrow">{isInstructor ? 'KHÓA HỌC ĐANG GIẢNG DẠY' : `GIẢNG VIÊN: ${course.instructor.name}`}</span><h1>{course.title}</h1><p>{course.description || 'Khóa học chưa có mô tả.'}</p><div className="workspace-meta"><span>{course.lessons.length} bài học</span><span>{course._count.enrollments} học viên</span>{isInstructor && <strong>Mã tham gia: {course.joinCode}</strong>}</div>{!isInstructor && <button className="leave-course-button" type="button" onClick={leaveCourse}>Rời khóa học</button>}</div></section>
         {notice && <p className="workspace-notice" role="status">{notice}<button type="button" onClick={() => setNotice('')}>×</button></p>}
 
         {isInstructor && <div className="instructor-grid"><section className="management-card"><h2>Thông tin khóa học</h2><form onSubmit={updateCourse}><label>Tên khóa học<input value={editForm.title} onChange={(event) => setEditForm({ ...editForm, title: event.target.value })} minLength="3" maxLength="120" required /></label><label>Mô tả<textarea value={editForm.description} onChange={(event) => setEditForm({ ...editForm, description: event.target.value })} rows="4" maxLength="4000" /></label><div className="form-actions"><button className="primary-button" disabled={submitting}>Lưu thay đổi</button><button className="danger-button" type="button" onClick={deleteCourse}>Xóa khóa học</button></div></form></section><section className="management-card"><h2>Thêm bài học</h2><form onSubmit={createLesson}><label>Tiêu đề<input value={lessonForm.title} onChange={(event) => setLessonForm({ ...lessonForm, title: event.target.value })} minLength="2" maxLength="160" required /></label><label>Nội dung text<textarea value={lessonForm.content} onChange={(event) => setLessonForm({ ...lessonForm, content: event.target.value })} rows="5" maxLength="100000" placeholder="Nội dung này dùng cho học viên và trợ lý tài liệu…" /></label><div className="form-row"><label>Thứ tự<input type="number" min="0" max="10000" value={lessonForm.order} onChange={(event) => setLessonForm({ ...lessonForm, order: event.target.value })} /></label><label>Tài liệu<input type="file" accept=".pdf,.txt,.md,.csv,application/pdf,text/plain,text/markdown,text/csv" onChange={(event) => setLessonForm({ ...lessonForm, document: event.target.files[0] || null })} /></label></div><small>PDF được lưu để tải xuống. TXT, Markdown và CSV còn được dùng cho trợ lý tài liệu cục bộ. Tối đa 10 MB.</small><button className="primary-button" disabled={submitting}>{submitting ? 'Đang thêm…' : 'Thêm bài học'}</button></form></section></div>}

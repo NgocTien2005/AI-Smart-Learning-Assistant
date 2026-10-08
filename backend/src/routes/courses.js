@@ -139,6 +139,18 @@ router.post('/join', authorizeRole('STUDENT'), async (request, response) => {
   return response.json({ course: enrolledCourse })
 })
 
+router.delete('/:courseId/enrollment', authorizeRole('STUDENT'), async (request, response) => {
+  const courseId = parseId(request.params.courseId)
+  if (!courseId) return response.status(400).json({ error: 'ID khóa học không hợp lệ' })
+
+  const result = await prisma.enrollment.deleteMany({
+    where: { courseId, userId: request.user.id },
+  })
+  if (result.count === 0) return response.status(404).json({ error: 'Bạn chưa tham gia khóa học này' })
+
+  return response.status(204).end()
+})
+
 router.get('/:courseId', async (request, response) => {
   const courseId = parseId(request.params.courseId)
   if (!courseId) return response.status(400).json({ error: 'ID khóa học không hợp lệ' })

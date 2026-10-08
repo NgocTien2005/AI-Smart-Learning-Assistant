@@ -42,6 +42,8 @@
 .workspace-hero { padding: 40px; border-radius: 22px; background: linear-gradient(130deg,#172b54,#245db5); color: #fff; }
 .workspace-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 .workspace-meta span, .workspace-meta strong { padding: 7px 11px; border-radius: 8px; background: rgba(255,255,255,.12); font-size: 12px; }
+.leave-course-button { margin-top: 20px; padding: 9px 14px; border: 1px solid rgba(255,255,255,.7); border-radius: 9px; background: rgba(255,255,255,.12); color: #fff; cursor: pointer; font-weight: 700; }
+.leave-course-button:hover { background: rgba(255,255,255,.22); }
 .workspace-notice { display: flex; justify-content: space-between; margin-top: 18px; }
 .workspace-notice button { border: 0; background: transparent; color: inherit; cursor: pointer; }
 .instructor-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 22px; }

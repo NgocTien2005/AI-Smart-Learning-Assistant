@@ -119,6 +119,10 @@ try {
   }, student.token))
   if (forbiddenResponse.status !== 403) throw new Error(`Student update returned ${forbiddenResponse.status}, expected 403`)
 
+  await request(`/courses/${courseId}/enrollment`, { method: 'DELETE', headers: { Authorization: `Bearer ${student.token}` } })
+  const afterLeaving = await fetch(`${baseUrl}/courses/${courseId}`, { headers: { Authorization: `Bearer ${student.token}` } })
+  if (afterLeaving.status !== 403) throw new Error(`Course access after leaving returned ${afterLeaving.status}, expected 403`)
+
   const resetToken = 'a'.repeat(64)
   const newPassword = 'NewTestPass456'
   seedResetToken(studentEmail, resetToken)
