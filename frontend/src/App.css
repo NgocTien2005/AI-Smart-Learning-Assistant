@@ -60,6 +60,7 @@
 .social-buttons b { margin-right: 8px; }
 .switch-copy { margin: 0; color: #424754; font-size: 16px; text-align: center; }
 .terms { margin: 0; color: #727785; font-size: 12px; line-height: 16px; text-align: center; }
+.terms a { color: #0058be; }
 .register-page { background: #f9fafb; }
 .register-page::before, .register-page::after { position: fixed; z-index: 0; content: ''; width: 420px; height: 300px; border-radius: 50%; background: #d8e2ff; filter: blur(70px); opacity: .35; pointer-events: none; }
 .register-page::before { top: -120px; left: -100px; }.register-page::after { right: -100px; bottom: -100px; background: #e1e0ff; }

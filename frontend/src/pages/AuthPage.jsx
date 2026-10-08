@@ -153,9 +153,8 @@ function AuthPage() {
             {message && <p className={`form-message ${messageType}`} aria-live="polite">{message}</p>}
             {currentUser && <div className="signed-in-user"><span>Xin chào, {currentUser.name || currentUser.email}</span><button type="button" onClick={() => navigate('/dashboard')}>Vào dashboard</button><button type="button" onClick={logout}>Đăng xuất</button></div>}
 
-            {!isForgot && <><div className="divider"><span>Đăng nhập mạng xã hội · Sắp có</span></div><div className="social-buttons" aria-label="Đăng nhập mạng xã hội đang được phát triển"><button type="button" disabled><b>G</b> Google</button><button type="button" disabled><b>⊞</b> Microsoft</button></div></>}
             <p className="switch-copy">{isForgot ? 'Đã nhớ mật khẩu?' : isRegister ? 'Đã có tài khoản?' : 'Chưa có tài khoản?'} <button type="button" onClick={() => switchMode(isForgot || isRegister ? 'login' : 'register')}>{isForgot || isRegister ? 'Đăng nhập' : 'Đăng ký ngay'}</button></p>
-            {isRegister && <p className="terms">Bằng việc đăng ký, bạn đồng ý với <u>Điều khoản dịch vụ</u> và <u>Chính sách bảo mật</u><br />của chúng tôi.</p>}
+            {isRegister && <p className="terms">Bằng việc đăng ký, bạn đồng ý với <a href="/terms">Điều khoản dịch vụ</a> và <a href="/privacy">Chính sách bảo mật</a><br />của chúng tôi.</p>}
           </form>
         </section>
       </div>

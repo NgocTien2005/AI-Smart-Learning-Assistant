@@ -5,6 +5,7 @@ import AccountPage from '../pages/AccountPage.jsx'
 import CourseDetailPage from '../pages/CourseDetailPage.jsx'
 import CourseWorkspacePage from '../pages/CourseWorkspacePage.jsx'
 import DashboardPage from '../pages/DashboardPage.jsx'
+import LegalPage from '../pages/LegalPage.jsx'
 import ResetPasswordPage from '../pages/ResetPasswordPage.jsx'
 import '../App.css'
 
@@ -20,6 +21,8 @@ function App() {
         <Route path="/courses/ai-101" element={<Navigate to="/demo" replace />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/terms" element={<LegalPage type="terms" />} />
+        <Route path="/privacy" element={<LegalPage type="privacy" />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>

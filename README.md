@@ -75,4 +75,4 @@ npm run build
 
 `npm run test:integration` yêu cầu Docker stack đang chạy. Script tạo dữ liệu riêng, kiểm tra toàn bộ luồng qua `http://localhost:8080/api` rồi xóa dữ liệu kiểm thử.
 
-Đăng nhập Google/Microsoft hiện được đánh dấu “Sắp có” và cần cấu hình OAuth trước khi triển khai.
+Đăng nhập hiện dùng email và mật khẩu. OAuth Google/Microsoft chưa được bật vì repository chưa có OAuth client và callback domain cho môi trường triển khai.
