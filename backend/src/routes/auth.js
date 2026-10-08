@@ -202,6 +202,32 @@ router.post('/reset-password', async (request, response) => {
   }
 })
 
+router.post('/change-password', authenticate, async (request, response) => {
+  const { currentPassword, newPassword } = request.body
+  if (!isValidPassword(currentPassword) || !isValidPassword(newPassword)) {
+    return response.status(400).json({ error: 'Mật khẩu phải từ 6 đến 72 ký tự' })
+  }
+  if (currentPassword === newPassword) {
+    return response.status(400).json({ error: 'Mật khẩu mới phải khác mật khẩu hiện tại' })
+  }
+
+  try {
+    const user = await prisma.user.findUnique({ where: { id: request.user.id } })
+    if (!user || !await bcrypt.compare(currentPassword, user.password)) {
+      return response.status(401).json({ error: 'Mật khẩu hiện tại không đúng' })
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { password: await bcrypt.hash(newPassword, 10), authVersion: { increment: 1 } },
+    })
+    return response.json({ message: 'Mật khẩu đã được thay đổi. Vui lòng đăng nhập lại.' })
+  } catch (error) {
+    console.error('Change password error:', error)
+    return response.status(500).json({ error: 'Không thể thay đổi mật khẩu' })
+  }
+})
+
 router.get('/me', authenticate, (request, response) => {
   response.json({ user: publicUser(request.user) })
 })

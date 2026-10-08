@@ -138,6 +138,12 @@ try {
   if (!newLogin.token) throw new Error('New password login did not return a token')
   const reusedToken = await fetch(`${baseUrl}/auth/reset-password`, jsonOptions('POST', { token: resetToken, password }))
   if (reusedToken.status !== 400) throw new Error(`Reused reset token returned ${reusedToken.status}, expected 400`)
+  const finalPassword = 'FinalTestPass789'
+  await request('/auth/change-password', jsonOptions('POST', { currentPassword: newPassword, newPassword: finalPassword }, newLogin.token))
+  const invalidatedSession = await fetch(`${baseUrl}/auth/me`, { headers: { Authorization: `Bearer ${newLogin.token}` } })
+  if (invalidatedSession.status !== 401) throw new Error(`Session after password change returned ${invalidatedSession.status}, expected 401`)
+  const finalLogin = await request('/auth/login', jsonOptions('POST', { email: studentEmail, password: finalPassword }))
+  if (!finalLogin.token) throw new Error('Changed password login did not return a token')
 
   await request(`/courses/${courseId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${instructorToken}` } })
   courseId = null
