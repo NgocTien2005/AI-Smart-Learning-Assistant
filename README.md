@@ -5,7 +5,6 @@ AI-Powered LMS là nền tảng quản lý học tập trực tuyến giúp gi�
 
 - `frontend/src/app`: application shell và route composition.
 - `frontend/src/pages`: các màn hình React và style theo trang.
-- `frontend/src/data`: dữ liệu prototype cho giao diện khóa học.
 - `backend/src/config`: cấu hình runtime và biến môi trường.
 - `backend/src/routes`: các route HTTP theo nhóm tính năng.
 - `backend/src/middleware`: middleware dùng chung như authentication.
