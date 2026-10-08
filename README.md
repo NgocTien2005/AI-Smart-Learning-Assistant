@@ -75,3 +75,18 @@ npm run build
 `npm run test:integration` yêu cầu Docker stack đang chạy. Script tạo dữ liệu riêng, kiểm tra toàn bộ luồng qua `http://localhost:8080/api` rồi xóa dữ liệu kiểm thử.
 
 Đăng nhập hiện dùng email và mật khẩu. OAuth Google/Microsoft chưa được bật vì repository chưa có OAuth client và callback domain cho môi trường triển khai.
+
+## Dữ liệu trải nghiệm giao diện
+
+Sau khi khởi động Docker, có thể nạp dữ liệu demo vào database local để thử cả hai vai trò, khóa học, danh sách học viên, tạo/sửa/xóa bài học, tải tài liệu và trợ lý học tập:
+
+```powershell
+docker compose exec -e NODE_ENV=development backend npm run seed:demo
+```
+
+Đăng nhập bằng một trong hai tài khoản (mật khẩu chung `LuminaDemo123!`):
+
+- Giảng viên: `giangvien@lumina.local`
+- Học viên: `hocvien@lumina.local`
+
+Lệnh seed có thể chạy lại để cập nhật dữ liệu demo; lệnh từ chối chạy khi `NODE_ENV=production`. Chỉ dùng tài khoản mẫu trong môi trường local, không dùng chúng cho hệ thống triển khai thật.

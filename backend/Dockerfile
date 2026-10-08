@@ -7,6 +7,7 @@ RUN npm ci
 
 COPY server.js ./
 COPY src ./src
+COPY scripts ./scripts
 
 EXPOSE 3000
 CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]
