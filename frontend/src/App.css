@@ -86,8 +86,6 @@
 .success-mark { display: grid; width: 64px; height: 64px; place-items: center; border-radius: 50%; background: #e8f7ed; color: #16803c; font-size: 32px; }
 .role-badge { padding: 6px 12px; border-radius: 999px; background: #eff4ff; color: #0058be; font-size: 13px; font-weight: 600; }
 @keyframes spin { to { transform: rotate(360deg); } }
-@media (max-width: 900px) { .auth-page { padding: 16px; }.auth-layout { min-height: 0; }.brand-panel { min-height: 390px; }.form-panel, .register-form-panel { padding: 40px 24px; }.login-page .auth-layout, .register-page .auth-layout { flex-direction: column; }.register-page .brand-panel, .register-page .form-panel { flex-basis: auto; }.register-page .brand-panel { min-height: 400px; }.brand-content { padding: 32px; }.brand-content h1 { font-size: 36px; }.register-page .brand-content { align-items: center; }.glass-copy { width: min(448px, 100%); }.desktop-only { display: none; } }
-@media (max-width: 480px) { .auth-page { padding: 0; align-items: stretch; overflow-x: clip; }.auth-layout { width: 100%; border-radius: 0; }.brand-panel { width: 100%; min-height: 320px; }.form-panel, .register-form-panel { width: 100%; padding: 32px 20px; }.brand-content { padding: 24px; }.brand-logo { top: 24px; left: 24px; font-size: 20px; }.brand-content h1 { max-width: 100%; font-size: 30px; overflow-wrap: anywhere; }.brand-content p { max-width: 100%; font-size: 16px; line-height: 24px; overflow-wrap: anywhere; }.glass-copy { width: 100%; padding: 24px; }.glass-copy h1 { font-size: 36px; }.glass-copy h2 { font-size: 20px; }.form-options { flex-wrap: wrap; gap: 12px; font-size: 14px; }.divider span { white-space: normal; text-align: center; }.social-buttons { gap: 8px; }.reset-password-card { min-height: 100svh; justify-content: center; padding: 32px 20px; border: 0; border-radius: 0; }.reset-brand { position: static; } }
 
 /* Dashboard */
 .app-loading { min-height: 100svh; display: flex; align-items: center; justify-content: center; gap: 12px; background: #f8f9ff; color: #424754; }
@@ -107,7 +105,6 @@
 .sidebar-footer p { overflow: hidden; margin: 10px 12px 0; color: #727785; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
 .dashboard-page { min-width: 0; }
 .dashboard-topbar { height: 65px; display: flex; align-items: center; justify-content: flex-end; padding: 0 34px; border-bottom: 1px solid #e6eeff; background: rgba(255,255,255,.82); backdrop-filter: blur(12px); }
-.mobile-brand { display: none; color: #0058be; font: 700 18px Lexend, sans-serif; }
 .topbar-actions { display: flex; align-items: center; gap: 12px; }
 .topbar-actions button { width: 34px; height: 34px; border: 0; border-radius: 50%; background: transparent; color: #27313f; cursor: pointer; }
 .user-avatar { display: grid; width: 34px; height: 34px; place-items: center; border: 2px solid #0058be; border-radius: 50%; background: linear-gradient(145deg, #d8e2ff, #adc6ff); color: #001a42; font-weight: 700; }
@@ -178,33 +175,3 @@
 .grading article { padding: 13px 0; border-top: 1px solid #eff2f7; }
 .grading article p { margin: 0 0 10px; font-size: 10px; }.grading article p small { display: block; margin-top: 4px; color: #727785; font-size: 8px; }
 .grading article div { display: grid; grid-template-columns: 1fr auto; gap: 7px; }.grading article button { padding: 7px 10px; border: 1px solid #c2c6d6; border-radius: 4px; background: #fff; font-size: 8px; }.grading article button:first-child { border-color: #0058be; background: #2170e4; color: #fff; }
-
-@media (max-width: 1000px) {
-  .dashboard-shell { grid-template-columns: 190px minmax(0, 1fr); }
-  .dashboard-content { padding-inline: 24px; }
-  .student-dashboard-grid, .instructor-dashboard-grid { grid-template-columns: 1fr; }
-  .dashboard-side-column { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
-}
-@media (max-width: 720px) {
-  .dashboard-shell { display: block; }
-  .dashboard-sidebar { position: fixed; z-index: 5; right: 12px; bottom: 12px; top: auto; width: auto; height: auto; padding: 0; border: 0; border-radius: 999px; }
-  .dashboard-sidebar > :not(.sidebar-footer), .sidebar-footer > :not(button:last-of-type) { display: none; }
-  .sidebar-footer { margin: 0; }
-  .sidebar-footer > button:last-of-type { width: auto; padding: 11px 16px; border: 1px solid #d9e3f6; border-radius: 999px; background: #fff; box-shadow: 0 5px 18px rgba(31,41,55,.12); }
-  .dashboard-topbar { justify-content: space-between; padding: 0 18px; }
-  .mobile-brand { display: block; }
-  .dashboard-content { padding: 28px 16px 80px; }
-  .dashboard-welcome h1 { font-size: 22px; line-height: 30px; }
-  .instructor-welcome { align-items: flex-start; gap: 16px; }
-  .primary-action { white-space: nowrap; }
-  .dashboard-side-column { grid-template-columns: 1fr; }
-}
-@media (max-width: 520px) {
-  .course-grid, .stat-grid { grid-template-columns: 1fr; }
-  .stat-grid article { min-height: 0; }
-  .learning-path { padding: 18px; }
-  .instructor-welcome { flex-direction: column; }
-  .lesson-management > div { grid-template-columns: auto 1fr; }
-  .lesson-management > div button { grid-column: 1 / -1; }
-  .chart { gap: 8px; padding-inline: 14px; }.chart span { width: 24px; }
-}
