@@ -76,7 +76,7 @@ function DashboardPage() {
     <div className="learning-page">
       <header className="learning-header">
         <Link className="learning-brand" to="/dashboard"><span>L</span><strong>Lumina LMS</strong></Link>
-        <nav><Link to="/demo">Khám phá giao diện mẫu</Link><button type="button" onClick={logout}>Đăng xuất</button></nav>
+        <nav><Link to="/account">Tài khoản</Link><button type="button" onClick={logout}>Đăng xuất</button></nav>
       </header>
       <main className="dashboard-main">
         <section className="dashboard-welcome">

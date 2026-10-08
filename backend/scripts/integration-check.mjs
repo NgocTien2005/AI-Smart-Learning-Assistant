@@ -54,6 +54,8 @@ try {
   if ('password' in instructor.user) throw new Error('Password leaked in instructor response')
   const currentInstructor = await request('/auth/me', { headers: { Authorization: `Bearer ${instructorToken}` } })
   if (currentInstructor.user.email !== instructorEmail) throw new Error('/auth/me returned the wrong user')
+  const updatedProfile = await request('/auth/me', jsonOptions('PATCH', { name: 'Updated Integration Instructor' }, instructorToken))
+  if (updatedProfile.user.name !== 'Updated Integration Instructor') throw new Error('Profile update did not persist')
 
   const createdCourse = await request('/courses', jsonOptions('POST', {
     title: 'Integration Course', description: 'Course created by automated integration verification.',

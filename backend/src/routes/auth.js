@@ -206,4 +206,19 @@ router.get('/me', authenticate, (request, response) => {
   response.json({ user: publicUser(request.user) })
 })
 
+router.patch('/me', authenticate, async (request, response) => {
+  const name = typeof request.body.name === 'string' ? request.body.name.trim() : ''
+  if (name.length < 2 || name.length > 80) {
+    return response.status(400).json({ error: 'Họ và tên phải từ 2 đến 80 ký tự' })
+  }
+
+  try {
+    const user = await prisma.user.update({ where: { id: request.user.id }, data: { name } })
+    return response.json({ user: publicUser(user) })
+  } catch (error) {
+    console.error('Update profile error:', error)
+    return response.status(500).json({ error: 'Không thể cập nhật hồ sơ' })
+  }
+})
+
 export default router

@@ -20,6 +20,11 @@ export const clearSession = () => {
   }
 }
 
+export const updateStoredUser = (user) => {
+  const storage = localStorage.getItem('luminaToken') ? localStorage : sessionStorage
+  storage.setItem('luminaUser', JSON.stringify(user))
+}
+
 export const apiRequest = async (path, options = {}) => {
   const token = getToken()
   const headers = new Headers(options.headers)
