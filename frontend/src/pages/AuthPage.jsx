@@ -114,8 +114,8 @@ function AuthPage() {
               <div className="glass-copy">
                 <h1>Lumina LMS</h1>
                 <h2>Bắt đầu hành trình học tập<br />thông minh cùng AI.</h2>
-                <div className="benefit"><span className="benefit-icon">✦</span><span>Cá nhân hóa lộ trình học bằng AI.</span></div>
-                <div className="benefit"><span className="benefit-icon violet">⌁</span><span>Phân tích hiệu suất thời gian thực.</span></div>
+                <div className="benefit"><span className="benefit-icon">✦</span><span>Ôn tập nhanh từ nội dung bài học.</span></div>
+                <div className="benefit"><span className="benefit-icon violet">⌁</span><span>Theo dõi tiến độ, bài nộp và kết quả học tập.</span></div>
               </div>
             ) : (
               <>

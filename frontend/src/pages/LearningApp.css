@@ -139,3 +139,28 @@
 .assignment-edit-form label { display: grid; gap: 7px; color: #40506a; font-size: 13px; font-weight: 600; }
 .assignment-edit-form input, .assignment-edit-form textarea { width: 100%; padding: 11px 13px; border: 1px solid #ccd6e4; border-radius: 9px; background: #fff; color: #172033; font: inherit; }
 .assignment-heading .form-actions > button:not(.danger-button) { padding: 9px 14px; border: 1px solid #ccd6e4; border-radius: 9px; background: #fff; color: #40506a; cursor: pointer; }
+.practice-panel { display: grid; gap: 16px; margin-top: 32px; padding: 24px; border: 1px solid #cbdcf4; border-radius: 16px; background: #fff; }
+.practice-panel > header { display: flex; align-items: center; gap: 12px; }
+.practice-panel > header > div { display: flex; align-items: center; gap: 12px; }
+.practice-panel > header > button { margin-left: auto; border: 0; background: transparent; color: #60708a; font-size: 24px; cursor: pointer; }
+.practice-panel > header > div > span { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 10px; background: #eaf2ff; color: #1769e0; }
+.practice-panel h3, .practice-panel h4 { margin: 2px 0; font: 700 18px Lexend,sans-serif; }
+.practice-panel header small { color: #1769e0; font-size: 10px; font-weight: 700; letter-spacing: 1.3px; }
+.practice-note { margin: 0; color: #63728a; font-size: 13px; }
+.practice-questions { display: grid; gap: 16px; }
+.practice-questions fieldset { display: grid; gap: 9px; padding: 15px; border: 1px solid #e1e7f0; border-radius: 11px; }
+.practice-questions legend { padding: 0 5px; color: #24334a; font-weight: 700; }
+.practice-questions label { display: flex; gap: 9px; align-items: start; color: #43536c; line-height: 1.45; cursor: pointer; }
+.practice-questions input { margin-top: 4px; accent-color: #1769e0; }
+.practice-result { display: grid; gap: 10px; }
+.practice-result > strong { color: #1769e0; font: 700 22px Lexend,sans-serif; }
+.practice-result > div { display: grid; gap: 6px; }
+.practice-result p { margin: 0; padding: 10px 12px; border-radius: 8px; line-height: 1.5; }
+.practice-correct { background: #eaf8f0; color: #187747; }
+.practice-incorrect { background: #fff3e9; color: #9d4a0b; }
+.practice-result > button { width: fit-content; padding: 8px 12px; border: 1px solid #ccd6e4; border-radius: 8px; background: #fff; cursor: pointer; }
+.practice-history { border-top: 1px solid #e6ebf2; padding-top: 14px; }
+.practice-history h4 { font-size: 14px; }
+.practice-history ul { display: grid; gap: 8px; margin: 10px 0 0; padding: 0; list-style: none; }
+.practice-history li { display: flex; justify-content: space-between; gap: 15px; color: #66758b; font-size: 12px; }
+.practice-history li strong { color: #24334a; }

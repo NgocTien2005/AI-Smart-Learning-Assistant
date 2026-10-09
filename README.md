@@ -58,6 +58,7 @@ Tài liệu upload được lưu trong Docker volume `uploads_data` và chỉ t�
 - Giảng viên thêm/xóa bài học, nhập nội dung hoặc upload tài liệu.
 - Người có quyền trong khóa học tải tài liệu, hỏi đáp theo nội dung text và xem lịch sử hỏi đáp.
 - Học viên đánh dấu hoặc bỏ hoàn thành từng bài học; dashboard hiển thị tiến độ khóa học và giảng viên xem tiến độ từng học viên.
+- Học viên tạo bài ôn trắc nghiệm cục bộ từ nội dung bài học, nhận chấm điểm và xem lịch sử kết quả.
 - Giảng viên giao bài có hạn nộp và điểm tối đa; học viên nộp/cập nhật bài trước hạn, giảng viên chấm điểm và gửi nhận xét.
 - Authorization được kiểm tra riêng cho từng thao tác khóa học và bài học.
 
@@ -80,7 +81,7 @@ npm run build
 
 ## Dữ liệu trải nghiệm giao diện
 
-Sau khi khởi động Docker, có thể nạp dữ liệu demo vào database local để thử cả hai vai trò, khóa học, danh sách học viên, tạo/sửa/xóa bài học, tải tài liệu và trợ lý học tập:
+Sau khi khởi động Docker, có thể nạp dữ liệu demo vào database local để thử cả hai vai trò, khóa học, danh sách học viên, bài học, bài tập, bài ôn nhanh, tải tài liệu và trợ lý học tập:
 
 ```powershell
 docker compose exec -e NODE_ENV=development backend npm run seed:demo

@@ -33,6 +33,7 @@ model User {
   chatMessages             ChatMessage[] // lịch sử chat với AI
   lessonProgress           LessonProgress[]
   submissions              AssignmentSubmission[]
+  quizAttempts             QuizAttempt[]
 }
 
 model Course {
@@ -75,6 +76,7 @@ model Lesson {
   updatedAt     DateTime      @updatedAt
   chatMessages  ChatMessage[]
   progress      LessonProgress[]
+  quizAttempts  QuizAttempt[]
 }
 
 model Assignment {
@@ -103,6 +105,20 @@ model AssignmentSubmission {
 
   @@unique([assignmentId, studentId])
   @@index([studentId])
+}
+
+model QuizAttempt {
+  id          Int       @id @default(autoincrement())
+  questions   Json
+  score       Int?
+  submittedAt DateTime?
+  userId      Int
+  lessonId    Int
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+
+  @@index([userId, lessonId, createdAt])
 }
 
 model LessonProgress {

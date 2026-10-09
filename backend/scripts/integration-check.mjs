@@ -79,7 +79,7 @@ try {
 
   const createdLesson = await request(`/courses/${courseId}/lessons`, jsonOptions('POST', {
     title: 'Nền tảng Machine Learning',
-    content: 'Machine Learning giúp hệ thống học từ dữ liệu thay vì chỉ theo quy tắc. Mạng nơ-ron thường dùng trong nhận dạng hình ảnh.',
+    content: 'Machine Learning giúp hệ thống học từ dữ liệu thay vì chỉ theo quy tắc. Mạng nơ-ron thường dùng trong nhận dạng hình ảnh. Thuật toán phân loại gán nhãn cho dữ liệu đầu vào. Tập huấn luyện giúp mô hình điều chỉnh tham số. Tập kiểm tra dùng để đánh giá khả năng tổng quát.',
     order: 1,
   }, instructorToken))
   const updatedLesson = await request(`/courses/lessons/${createdLesson.lesson.id}`, jsonOptions('PATCH', {
@@ -186,6 +186,29 @@ try {
   })
   if (history.messages.length !== 1) throw new Error('Chat history was not persisted')
 
+  const quiz = await request(`/courses/lessons/${createdLesson.lesson.id}/quizzes`, jsonOptions('POST', { count: 5 }, student.token))
+  if (quiz.questions.length !== 5 || quiz.questions.some((question) => 'correctIndex' in question)) {
+    throw new Error('Practice quiz did not hide its answer key')
+  }
+  const quizOwnerCheck = await fetch(`${baseUrl}/courses/quiz-attempts/${quiz.attemptId}/submit`, jsonOptions('POST', {
+    answers: quiz.questions.map(() => 0),
+  }, instructorToken))
+  if (quizOwnerCheck.status !== 403) throw new Error(`Another user quiz submission returned ${quizOwnerCheck.status}, expected 403`)
+  const submittedQuiz = await request(`/courses/quiz-attempts/${quiz.attemptId}/submit`, jsonOptions('POST', {
+    answers: quiz.questions.map(() => 0),
+  }, student.token))
+  if (submittedQuiz.total !== 5 || submittedQuiz.score !== submittedQuiz.questions.filter(({ isCorrect }) => isCorrect).length) {
+    throw new Error('Practice quiz score did not match the answer review')
+  }
+  const quizHistory = await request(`/courses/lessons/${createdLesson.lesson.id}/quizzes`, {
+    headers: { Authorization: `Bearer ${student.token}` },
+  })
+  if (quizHistory.attempts[0].score !== submittedQuiz.score) throw new Error('Practice quiz result was not persisted')
+  const duplicateQuizSubmit = await fetch(`${baseUrl}/courses/quiz-attempts/${quiz.attemptId}/submit`, jsonOptions('POST', {
+    answers: quiz.questions.map(() => 0),
+  }, student.token))
+  if (duplicateQuizSubmit.status !== 409) throw new Error(`Repeated quiz submission returned ${duplicateQuizSubmit.status}, expected 409`)
+
   const forbiddenResponse = await fetch(`${baseUrl}/courses/${courseId}`, jsonOptions('PATCH', {
     title: 'Unauthorized change',
   }, student.token))
@@ -217,7 +240,7 @@ try {
 
   await request(`/courses/${courseId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${instructorToken}` } })
   courseId = null
-  console.log('Integration flow passed: auth, password reset, authorization, course, enrollment, lesson progress, assignments, grading, upload, assistant and cascade delete.')
+  console.log('Integration flow passed: auth, password reset, authorization, course, enrollment, lesson progress, assignments, grading, practice quiz, upload, assistant and cascade delete.')
 } finally {
   if (courseId && instructorToken) {
     await fetch(`${baseUrl}/courses/${courseId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${instructorToken}` } }).catch(() => {})

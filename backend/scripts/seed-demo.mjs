@@ -3,6 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { uploadDirectory, isProduction } from '../src/config/env.js'
 import { prisma } from '../src/lib/prisma.js'
+import { createPracticeQuestions } from '../src/utils/studyQuiz.js'
 
 if (isProduction) {
   throw new Error('Demo seed is disabled in production.')
@@ -16,7 +17,7 @@ const users = [
 const lessonContent = [
   {
     title: 'Bắt đầu với tư duy lập trình',
-    content: 'Lập trình là cách diễn đạt các bước giải quyết vấn đề để máy tính thực hiện. Một chương trình thường nhận dữ liệu đầu vào, xử lý theo quy tắc và tạo kết quả đầu ra. Hãy chia bài toán lớn thành các bước nhỏ, đặt tên biến rõ nghĩa và kiểm tra từng bước bằng ví dụ.',
+    content: 'Lập trình là cách diễn đạt các bước giải quyết vấn đề để máy tính thực hiện. Một chương trình thường nhận dữ liệu đầu vào, xử lý theo quy tắc và tạo kết quả đầu ra. Hãy chia bài toán lớn thành các bước nhỏ, đặt tên biến rõ nghĩa và kiểm tra từng bước bằng ví dụ. Mỗi bước nhỏ giúp tìm lỗi và xác nhận kết quả dễ dàng hơn. Ví dụ nhỏ giúp người học hiểu rõ từng bước.',
   },
   {
     title: 'Biến, kiểu dữ liệu và điều kiện',
@@ -98,8 +99,10 @@ try {
       create: { userId: student.id, courseId: course.id },
     })
   }
+  let firstLesson = null
   for (let index = 0; index < lessonContent.length; index += 1) {
     const lesson = await upsertLesson(courses[0].id, lessonContent[index], index + 1)
+    if (index === 0) firstLesson = lesson
     if (index === 2) {
       const question = 'Vòng lặp for dùng khi nào?'
       const existingMessage = await prisma.chatMessage.findFirst({
@@ -118,8 +121,22 @@ try {
   }
   await upsertLesson(courses[1].id, {
     title: 'Tổ chức thời gian học',
-    content: 'Chia mục tiêu lớn thành các phiên học ngắn. Sau mỗi phiên, tự nhớ lại kiến thức mà không nhìn tài liệu, rồi ghi lại điều còn chưa rõ.',
+    content: 'Chia mục tiêu lớn thành các phiên học ngắn. Sau mỗi phiên, tự nhớ lại kiến thức mà không nhìn tài liệu. Ghi lại điều còn chưa rõ để tìm câu trả lời sau đó. Nghỉ ngắn giữa các phiên giúp duy trì sự tập trung.',
   }, 1)
+
+  const practiceQuiz = createPracticeQuestions(firstLesson.extractedText, 5)
+  if (!practiceQuiz.error) {
+    const demoAttempt = await prisma.quizAttempt.findFirst({
+      where: { userId: student.id, lessonId: firstLesson.id },
+      orderBy: { createdAt: 'asc' },
+    })
+    const quizData = { questions: practiceQuiz.questions, score: practiceQuiz.questions.length - 1, submittedAt: new Date() }
+    if (demoAttempt) {
+      await prisma.quizAttempt.update({ where: { id: demoAttempt.id }, data: quizData })
+    } else {
+      await prisma.quizAttempt.create({ data: { ...quizData, userId: student.id, lessonId: firstLesson.id } })
+    }
+  }
 
   const existingAssignment = await prisma.assignment.findFirst({
     where: { courseId: courses[0].id, title: 'Bài tập: tính tổng bằng vòng lặp' },
