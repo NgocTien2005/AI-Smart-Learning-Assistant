@@ -10,8 +10,6 @@ function CourseWorkspacePage() {
   const navigate = useNavigate()
   const user = getStoredUser()
   const isInstructor = user?.role === 'INSTRUCTOR'
-  const completedLessonsCount = course?.lessons.filter((lesson) => lesson.isCompleted).length || 0
-  const courseProgressPercent = course?.lessons.length ? Math.round(completedLessonsCount / course.lessons.length * 100) : 0
   const [course, setCourse] = useState(null)
   const [lessonForm, setLessonForm] = useState({ title: '', content: '', order: 0, document: null })
   const [editForm, setEditForm] = useState({ title: '', description: '' })
@@ -24,6 +22,8 @@ function CourseWorkspacePage() {
   const [submitting, setSubmitting] = useState(false)
   const [notice, setNotice] = useState('')
   const [students, setStudents] = useState([])
+  const completedLessonsCount = course?.lessons.filter((lesson) => lesson.isCompleted).length || 0
+  const courseProgressPercent = course?.lessons.length ? Math.round(completedLessonsCount / course.lessons.length * 100) : 0
 
   useEffect(() => {
     let active = true
