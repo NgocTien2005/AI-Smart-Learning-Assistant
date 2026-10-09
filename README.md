@@ -88,7 +88,7 @@ Sau khi khởi động Docker, có thể nạp dữ liệu demo vào database lo
 docker compose exec -e NODE_ENV=development backend npm run seed:demo
 ```
 
-Đăng nhập bằng một trong hai tài khoản (mật khẩu chung `LuminaDemo123!`):
+Đăng nhập bằng các tài khoản demo (mật khẩu chung `123456789`):
 
 - Giảng viên: `giangvien@lumina.local`
 - Học viên: `hocvien@lumina.local`

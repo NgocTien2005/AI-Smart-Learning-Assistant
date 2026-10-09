@@ -9,7 +9,7 @@ if (isProduction) {
   throw new Error('Demo seed is disabled in production.')
 }
 
-const demoPassword = 'LuminaDemo123!'
+const demoPassword = '123456789'
 const users = [
   { name: 'Nguyễn Minh Anh', email: 'giangvien@lumina.local', role: 'INSTRUCTOR' },
   { name: 'Trần Gia Bảo', email: 'hocvien@lumina.local', role: 'STUDENT' },
@@ -166,7 +166,7 @@ try {
     },
   })
 
-  console.log('Demo data is ready. Sign in with either demo account; password: LuminaDemo123!')
+  console.log('Demo data is ready. Sign in with either demo account; password: 123456789')
   console.log(`Instructor: ${users[0].email} | Student: ${users[1].email} | Admin: ${users[2].email}`)
 } finally {
   await prisma.$disconnect()
