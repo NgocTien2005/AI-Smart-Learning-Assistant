@@ -9,7 +9,7 @@ export const authenticate = async (request, response, next) => {
     : null
 
   if (!token) {
-    return response.status(401).json({ error: 'Bạn chưa đăng nhập' })
+    return response.status(401).json({ code: 'AUTH_REQUIRED', error: 'Bạn chưa đăng nhập' })
   }
 
   let payload
@@ -17,11 +17,11 @@ export const authenticate = async (request, response, next) => {
   try {
     payload = jwt.verify(token, jwtSecret)
   } catch {
-    return response.status(401).json({ error: 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn' })
+    return response.status(401).json({ code: 'SESSION_INVALID', error: 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn' })
   }
 
   if (!Number.isInteger(payload.userId)) {
-    return response.status(401).json({ error: 'Phiên đăng nhập không hợp lệ' })
+    return response.status(401).json({ code: 'SESSION_INVALID', error: 'Phiên đăng nhập không hợp lệ' })
   }
 
   try {
@@ -31,7 +31,7 @@ export const authenticate = async (request, response, next) => {
     })
 
     if (!user || !user.isActive || payload.authVersion !== user.authVersion) {
-      return response.status(401).json({ error: 'Phiên đăng nhập không hợp lệ' })
+      return response.status(401).json({ code: 'SESSION_INVALID', error: 'Phiên đăng nhập không hợp lệ' })
     }
 
     request.user = user

@@ -62,6 +62,17 @@ const seedResetToken = (email, token) => {
   if (result.status !== 0) throw new Error('Không thể chuẩn bị token đặt lại mật khẩu cho integration test')
 }
 
+const seedChatHistory = (email, lessonId, count) => {
+  const timestamp = '2099-01-01T00:00:00.000Z'
+  const sql = `INSERT INTO "ChatMessage" (question, answer, "userId", "lessonId", "createdAt") SELECT 'history-' || n, 'answer-' || n, u.id, ${lessonId}, '${timestamp}'::timestamptz FROM "User" u CROSS JOIN generate_series(1, ${count}) AS n WHERE u.email = '${email}';`
+  const result = spawnSync('docker', ['compose', 'exec', '-T', 'db', 'psql', '-q', '-U', 'postgres', '-d', 'lumina_lms', '-c', sql], {
+    cwd: new URL('../..', import.meta.url),
+    stdio: 'pipe',
+    shell: false,
+  })
+  if (result.status !== 0) throw new Error('Could not prepare deterministic chat history')
+}
+
 try {
   const instructor = await request('/auth/register', jsonOptions('POST', {
     name: 'Integration Instructor', email: instructorEmail, password, role: 'INSTRUCTOR',
@@ -120,6 +131,7 @@ try {
     joinCode: createdCourse.course.joinCode,
   }, student.token))
   if (joined.course.id !== courseId) throw new Error('Joined course does not match')
+  if (joined.course.completedLessons !== 0 || joined.course.progressPercent !== 0) throw new Error('New course join returned an inconsistent progress summary')
   const roster = await request(`/courses/${courseId}/students`, { headers: { Authorization: `Bearer ${instructorToken}` } })
   if (roster.students.length !== 1 || roster.students[0].email !== studentEmail) throw new Error('Instructor roster is incorrect')
 
@@ -138,9 +150,7 @@ try {
   const uploadBody = new FormData()
   uploadBody.set('title', 'Tài liệu kiểm thử')
   uploadBody.set('order', '2')
-  uploadBody.set('document', new Blob([
-    'Machine Learning giúp hệ thống học từ dữ liệu. Mạng nơ-ron được dùng để nhận dạng hình ảnh.',
-  ], { type: 'text/plain' }), 'integration.txt')
+  uploadBody.set('document', new Blob([Buffer.alloc(1024 * 1024 + 1, 65)], { type: 'text/plain' }), 'integration.txt')
   const uploadedLesson = await request(`/courses/${courseId}/lessons`, {
     method: 'POST', headers: { Authorization: `Bearer ${instructorToken}` }, body: uploadBody,
   })
@@ -157,6 +167,39 @@ try {
   if (!downloadResponse.ok || !(await downloadResponse.text()).includes('Replacement document content')) {
     throw new Error('Protected document download did not return the uploaded content')
   }
+
+  const allowedLimitBody = new FormData()
+  allowedLimitBody.set('document', new Blob([Buffer.alloc(10 * 1024 * 1024, 66)], { type: 'text/plain' }), 'allowed-limit.txt')
+  const allowedLimitResponse = await fetch(`${baseUrl}/courses/lessons/${uploadedLesson.lesson.id}/document`, {
+    method: 'PATCH', headers: { Authorization: `Bearer ${instructorToken}` }, body: allowedLimitBody,
+  })
+  if (allowedLimitResponse.status !== 200) {
+    throw new Error(`A 10 MiB replacement returned ${allowedLimitResponse.status}, expected 200`)
+  }
+  const allowedLimitResult = await allowedLimitResponse.json()
+  if (allowedLimitResult.lesson.documentName !== 'allowed-limit.txt') throw new Error('The 10 MiB replacement was not stored')
+
+  const backendOversizeBody = new FormData()
+  backendOversizeBody.set('title', 'Oversized upload')
+  backendOversizeBody.set('document', new Blob([Buffer.alloc(10 * 1024 * 1024 + 1, 67)], { type: 'text/plain' }), 'oversized.txt')
+  const backendOversizeResponse = await fetch(`${baseUrl}/courses/${courseId}/lessons`, {
+    method: 'POST', headers: { Authorization: `Bearer ${instructorToken}` }, body: backendOversizeBody,
+  })
+  const backendOversizeText = await backendOversizeResponse.text()
+  if (backendOversizeResponse.status !== 413 || !backendOversizeText.includes('10 MiB')) {
+    throw new Error(`A file over 10 MiB returned ${backendOversizeResponse.status} without the size error`)
+  }
+
+  const proxyOversizeBody = new FormData()
+  proxyOversizeBody.set('document', new Blob([Buffer.alloc(12 * 1024 * 1024 + 1, 68)], { type: 'text/plain' }), 'proxy-oversized.txt')
+  const proxyOversizeResponse = await fetch(`${baseUrl}/courses/lessons/${uploadedLesson.lesson.id}/document`, {
+    method: 'PATCH', headers: { Authorization: `Bearer ${instructorToken}` }, body: proxyOversizeBody,
+  })
+  const proxyOversizeText = await proxyOversizeResponse.text()
+  if (proxyOversizeResponse.status !== 413 || !proxyOversizeResponse.headers.get('content-type')?.includes('text/html') || !proxyOversizeText.length) {
+    throw new Error(`Nginx oversized body was not rejected with its expected non-JSON 413 response (${proxyOversizeResponse.status})`)
+  }
+
   const removedDocument = await request(`/courses/lessons/${uploadedLesson.lesson.id}/document`, {
     method: 'DELETE', headers: { Authorization: `Bearer ${instructorToken}` },
   })
@@ -166,8 +209,53 @@ try {
   })
   if (removedDownload.status !== 404) throw new Error(`Removed document download returned ${removedDownload.status}, expected 404`)
 
+  const textSource = [
+    'The document source marker describes a stable study method for this lesson.',
+    'Students compare each concept with a clear example before the next exercise.',
+    'Short review sessions help learners remember the important steps.',
+    'A final reflection connects the new knowledge to a practical task.',
+  ].join(' ')
+  const fallbackSource = [
+    'The updated PDF fallback marker explains the revised lesson content clearly.',
+    'Every learner can use this paragraph to understand a central concept.',
+    'Practice questions use these sentences when no PDF extractor is configured.',
+    'Reviewing the lesson helps prepare for the next activity.',
+  ].join(' ')
+  const sourceLesson = await request(`/courses/${courseId}/lessons`, jsonOptions('POST', {
+    title: 'Source transition checks', content: 'Original PDF fallback content is available.', order: 3,
+  }, instructorToken))
+  const pdfBody = new FormData()
+  pdfBody.set('document', new Blob([Buffer.from('%PDF-1.4\nnot extracted')], { type: 'application/pdf' }), 'source.pdf')
+  await request(`/courses/lessons/${sourceLesson.lesson.id}/document`, {
+    method: 'PATCH', headers: { Authorization: `Bearer ${instructorToken}` }, body: pdfBody,
+  })
+  await request(`/courses/lessons/${sourceLesson.lesson.id}`, jsonOptions('PATCH', { content: fallbackSource }, instructorToken))
+  const pdfFallbackChat = await request(`/courses/lessons/${sourceLesson.lesson.id}/chat`, jsonOptions('POST', {
+    question: 'updated PDF fallback marker',
+  }, student.token))
+  if (!pdfFallbackChat.message.answer.includes('updated PDF fallback marker')) throw new Error('Editing PDF fallback content did not update assistant text')
+  const textBody = new FormData()
+  textBody.set('document', new Blob([textSource], { type: 'text/markdown' }), 'source.md')
+  await request(`/courses/lessons/${sourceLesson.lesson.id}/document`, {
+    method: 'PATCH', headers: { Authorization: `Bearer ${instructorToken}` }, body: textBody,
+  })
+  await request(`/courses/lessons/${sourceLesson.lesson.id}`, jsonOptions('PATCH', { content: 'Edited HTML fallback is not the Markdown document source.' }, instructorToken))
+  const markdownChat = await request(`/courses/lessons/${sourceLesson.lesson.id}/chat`, jsonOptions('POST', {
+    question: 'document source marker',
+  }, student.token))
+  if (!markdownChat.message.answer.includes('document source marker') || markdownChat.message.answer.includes('Edited HTML fallback')) {
+    throw new Error('Editing lesson metadata replaced document-derived Markdown text')
+  }
+  await request(`/courses/lessons/${sourceLesson.lesson.id}/document`, {
+    method: 'DELETE', headers: { Authorization: `Bearer ${instructorToken}` },
+  })
+  const removedMarkdownChat = await request(`/courses/lessons/${sourceLesson.lesson.id}/chat`, jsonOptions('POST', {
+    question: 'Edited HTML fallback',
+  }, student.token))
+  if (!removedMarkdownChat.message.answer.includes('Edited HTML fallback')) throw new Error('Removing Markdown did not restore lesson content as assistant text')
+
   const detail = await request(`/courses/${courseId}`, { headers: { Authorization: `Bearer ${student.token}` } })
-  if (detail.course.lessons.length !== 2) throw new Error('Student cannot see both lessons')
+  if (detail.course.lessons.length !== 3) throw new Error('Student cannot see all course lessons')
   const progressLessonId = createdLesson.lesson.id
   if (detail.course.lessons.find(({ id }) => id === progressLessonId).isCompleted) throw new Error('New lesson should start incomplete')
   const completed = await request(`/courses/lessons/${progressLessonId}/progress`, {
@@ -180,9 +268,9 @@ try {
   if (instructorProgress.status !== 403) throw new Error(`Instructor progress update returned ${instructorProgress.status}, expected 403`)
   const studentCourses = await request('/courses', { headers: { Authorization: `Bearer ${student.token}` } })
   const courseProgress = studentCourses.courses.find(({ id }) => id === courseId)
-  if (courseProgress.completedLessons !== 1 || courseProgress.progressPercent !== 50) throw new Error('Course progress summary is incorrect')
+  if (courseProgress.completedLessons !== 1 || courseProgress.progressPercent !== 33) throw new Error('Course progress summary is incorrect')
   const updatedRoster = await request(`/courses/${courseId}/students`, { headers: { Authorization: `Bearer ${instructorToken}` } })
-  if (updatedRoster.students[0].completedLessons !== 1 || updatedRoster.students[0].progressPercent !== 50) throw new Error('Instructor student progress is incorrect')
+  if (updatedRoster.students[0].completedLessons !== 1 || updatedRoster.students[0].progressPercent !== 33) throw new Error('Instructor student progress is incorrect')
   const progressDetail = await request(`/courses/${courseId}`, { headers: { Authorization: `Bearer ${student.token}` } })
   if (!progressDetail.course.lessons.find(({ id }) => id === progressLessonId).isCompleted) throw new Error('Lesson completion did not persist')
   const uncompleted = await request(`/courses/lessons/${progressLessonId}/progress`, {
@@ -192,6 +280,13 @@ try {
   await request(`/courses/lessons/${progressLessonId}/progress`, {
     method: 'PUT', headers: { Authorization: `Bearer ${student.token}` },
   })
+  await request(`/courses/${courseId}/enrollment`, { method: 'DELETE', headers: { Authorization: `Bearer ${student.token}` } })
+  const rejoined = await request('/courses/join', jsonOptions('POST', {
+    joinCode: createdCourse.course.joinCode,
+  }, student.token))
+  if (rejoined.course.completedLessons !== 1 || rejoined.course.progressPercent !== 33) {
+    throw new Error('Leave and rejoin did not retain and immediately return course progress')
+  }
 
   const createdAssignment = await request(`/courses/${courseId}/assignments`, jsonOptions('POST', {
     title: 'Integration Assignment',
@@ -211,10 +306,36 @@ try {
     content: 'The loop adds each even number from 2 through 20, for a total of 110.',
   }, student.token))
   if (!submittedWork.submission.id) throw new Error('Student submission was not saved')
-  const gradedWork = await request(`/courses/assignments/${createdAssignment.assignment.id}/submissions/${student.user.id}`, jsonOptions('PATCH', {
-    grade: 18, feedback: 'Correct method and result; explain the stop condition more clearly next time.',
-  }, instructorToken))
+  const raceResponses = await Promise.all([
+    fetch(`${baseUrl}/courses/assignments/${createdAssignment.assignment.id}/submission`, jsonOptions('PUT', {
+      content: 'Concurrent edited submission content.',
+    }, student.token)),
+    fetch(`${baseUrl}/courses/assignments/${createdAssignment.assignment.id}/submissions/${student.user.id}`, jsonOptions('PATCH', {
+      grade: 18, feedback: 'Correct method and result; explain the stop condition more clearly next time.',
+    }, instructorToken)),
+  ])
+  const concurrentSubmission = raceResponses[0]
+  const concurrentGrade = raceResponses[1]
+  if (![200, 409].includes(concurrentSubmission.status) || ![200, 409].includes(concurrentGrade.status)) {
+    throw new Error(`Concurrent submission/grading statuses were ${concurrentSubmission.status}/${concurrentGrade.status}`)
+  }
+  let gradedWork
+  if (concurrentGrade.status === 409) {
+    gradedWork = await request(`/courses/assignments/${createdAssignment.assignment.id}/submissions/${student.user.id}`, jsonOptions('PATCH', {
+      grade: 18, feedback: 'Correct method and result; explain the stop condition more clearly next time.',
+    }, instructorToken))
+  } else {
+    gradedWork = await concurrentGrade.json()
+  }
   if (gradedWork.submission.grade !== 18) throw new Error('Instructor grade did not persist')
+  if (concurrentSubmission.status === 409) {
+    const finalSubmissionState = await request(`/courses/${courseId}`, { headers: { Authorization: `Bearer ${student.token}` } })
+    if (finalSubmissionState.course.assignments[0].submissions[0].content !== submittedWork.submission.content) {
+      throw new Error('A rejected concurrent submission changed already-graded content')
+    }
+  }
+  const lowerPoints = await fetch(`${baseUrl}/courses/assignments/${createdAssignment.assignment.id}`, jsonOptions('PATCH', { points: 17 }, instructorToken))
+  if (lowerPoints.status !== 409) throw new Error(`Lowering assignment points beneath an awarded grade returned ${lowerPoints.status}, expected 409`)
   const gradedAssignment = await request(`/courses/${courseId}`, { headers: { Authorization: `Bearer ${student.token}` } })
   const studentResult = gradedAssignment.course.assignments[0].submissions[0]
   if (studentResult.grade !== 18 || !studentResult.feedback) throw new Error('Student cannot see grade and feedback')
@@ -227,10 +348,13 @@ try {
     question: 'Machine Learning học từ đâu?',
   }, student.token))
   if (!chat.message.answer.includes('dữ liệu')) throw new Error('Study assistant did not return the relevant passage')
+  seedChatHistory(studentEmail, createdLesson.lesson.id, 55)
   const history = await request(`/courses/lessons/${createdLesson.lesson.id}/chat`, {
     headers: { Authorization: `Bearer ${student.token}` },
   })
-  if (history.messages.length !== 1) throw new Error('Chat history was not persisted')
+  if (history.messages.length !== 50 || history.messages[0].question !== 'history-6' || history.messages.at(-1).question !== 'history-55') {
+    throw new Error('Chat history did not return the latest 50 rows in deterministic chronological order')
+  }
 
   const quiz = await request(`/courses/lessons/${createdLesson.lesson.id}/quizzes`, jsonOptions('POST', { count: 5 }, student.token))
   if (quiz.questions.length !== 5 || quiz.questions.some((question) => 'correctIndex' in question)) {
@@ -270,17 +394,37 @@ try {
   await request('/auth/reset-password', jsonOptions('POST', { token: resetToken, password: newPassword }))
 
   const oldSession = await fetch(`${baseUrl}/auth/me`, { headers: { Authorization: `Bearer ${student.token}` } })
-  if (oldSession.status !== 401) throw new Error(`Old session returned ${oldSession.status}, expected 401`)
+  if (oldSession.status !== 401 || (await oldSession.json()).code !== 'SESSION_INVALID') throw new Error('Password reset did not return a revoked-session error')
+  const expiredDocumentDownload = await fetch(`${baseUrl}/courses/lessons/${createdLesson.lesson.id}/document`, {
+    headers: { Authorization: `Bearer ${student.token}` },
+  })
+  if (expiredDocumentDownload.status !== 401 || (await expiredDocumentDownload.json()).code !== 'SESSION_INVALID') {
+    throw new Error('Protected document download did not identify the expired session')
+  }
   const oldLogin = await fetch(`${baseUrl}/auth/login`, jsonOptions('POST', { email: studentEmail, password }))
   if (oldLogin.status !== 401) throw new Error(`Old password returned ${oldLogin.status}, expected 401`)
+  const oldLoginError = await oldLogin.json()
+  if (oldLoginError.code !== 'INVALID_CREDENTIALS') throw new Error('Invalid login did not return a distinct authentication error code')
   const newLogin = await request('/auth/login', jsonOptions('POST', { email: studentEmail, password: newPassword }))
   if (!newLogin.token) throw new Error('New password login did not return a token')
   const reusedToken = await fetch(`${baseUrl}/auth/reset-password`, jsonOptions('POST', { token: resetToken, password }))
   if (reusedToken.status !== 400) throw new Error(`Reused reset token returned ${reusedToken.status}, expected 400`)
   const finalPassword = 'FinalTestPass789'
+  const wrongCurrentPassword = await fetch(`${baseUrl}/auth/change-password`, jsonOptions('POST', {
+    currentPassword: 'IncorrectPass456', newPassword: finalPassword,
+  }, newLogin.token))
+  if (wrongCurrentPassword.status !== 400 || (await wrongCurrentPassword.json()).code !== 'CURRENT_PASSWORD_INVALID') {
+    throw new Error('Incorrect current password did not return a distinct non-session error')
+  }
+  const sessionAfterWrongPassword = await fetch(`${baseUrl}/auth/me`, { headers: { Authorization: `Bearer ${newLogin.token}` } })
+  if (sessionAfterWrongPassword.status !== 200) throw new Error('Incorrect current password invalidated a valid session')
+  const outstandingResetToken = 'b'.repeat(64)
+  seedResetToken(studentEmail, outstandingResetToken)
   await request('/auth/change-password', jsonOptions('POST', { currentPassword: newPassword, newPassword: finalPassword }, newLogin.token))
   const invalidatedSession = await fetch(`${baseUrl}/auth/me`, { headers: { Authorization: `Bearer ${newLogin.token}` } })
-  if (invalidatedSession.status !== 401) throw new Error(`Session after password change returned ${invalidatedSession.status}, expected 401`)
+  if (invalidatedSession.status !== 401 || (await invalidatedSession.json()).code !== 'SESSION_INVALID') throw new Error('Password change did not invalidate the prior session')
+  const invalidatedResetToken = await fetch(`${baseUrl}/auth/reset-password`, jsonOptions('POST', { token: outstandingResetToken, password }))
+  if (invalidatedResetToken.status !== 400) throw new Error('Password change did not invalidate the outstanding reset link')
   const finalLogin = await request('/auth/login', jsonOptions('POST', { email: studentEmail, password: finalPassword }))
   if (!finalLogin.token) throw new Error('Changed password login did not return a token')
 

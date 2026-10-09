@@ -9,6 +9,7 @@ import { authorizeRole } from '../middleware/authorizeRole.js'
 import { prisma } from '../lib/prisma.js'
 import { answerFromDocument } from '../utils/studyAssistant.js'
 import { createPracticeQuestions } from '../utils/studyQuiz.js'
+import { lessonTextAfterContentEdit, lessonTextAfterDocumentRemoval, uploadedLessonText } from '../utils/lessonText.js'
 
 const router = Router()
 const maxDocumentSize = 10 * 1024 * 1024
@@ -18,7 +19,6 @@ const supportedDocumentTypes = new Set([
   'text/markdown',
   'text/csv',
 ])
-const textDocumentTypes = new Set(['text/plain', 'text/markdown', 'text/csv'])
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: maxDocumentSize, files: 1 },
@@ -154,7 +154,8 @@ router.post('/join', authorizeRole('STUDENT'), async (request, response) => {
   }
 
   const enrolledCourse = await prisma.course.findUnique({ where: { id: course.id }, include: courseInclude })
-  return response.json({ course: enrolledCourse })
+  const [courseWithProgress] = await addStudentProgress([enrolledCourse], request.user.id)
+  return response.json({ course: courseWithProgress })
 })
 
 router.delete('/:courseId/enrollment', authorizeRole('STUDENT'), async (request, response) => {
@@ -298,7 +299,30 @@ router.patch('/assignments/:assignmentId', authorizeRole('INSTRUCTOR'), async (r
     data.dueAt = dueAt
   }
   if (!Object.keys(data).length) return response.status(400).json({ error: 'Không có dữ liệu cần cập nhật' })
-  const updated = await prisma.assignment.update({ where: { id: assignmentId }, data })
+  let updated
+  try {
+    updated = await prisma.$transaction(async (transaction) => {
+      const currentAssignment = await transaction.assignment.findUnique({
+        where: { id: assignmentId },
+        select: { points: true },
+      })
+      if (!currentAssignment) return null
+      if ('points' in data && data.points < currentAssignment.points) {
+        const highestGrade = await transaction.assignmentSubmission.aggregate({
+          where: { assignmentId, grade: { not: null } },
+          _max: { grade: true },
+        })
+        if (highestGrade._max.grade !== null && highestGrade._max.grade > data.points) return null
+      }
+      return transaction.assignment.update({ where: { id: assignmentId }, data })
+    }, { isolationLevel: 'Serializable' })
+  } catch (error) {
+    if (error?.code === 'P2034') {
+      return response.status(409).json({ error: 'Bài tập vừa được thay đổi. Hãy tải lại rồi thử lại.' })
+    }
+    throw error
+  }
+  if (!updated) return response.status(409).json({ error: 'Không thể giảm điểm tối đa thấp hơn điểm đã chấm' })
   return response.json({ assignment: updated })
 })
 
@@ -324,13 +348,24 @@ router.put('/assignments/:assignmentId/submission', authorizeRole('STUDENT'), as
   if (!assignment) return response.status(404).json({ error: 'Không tìm thấy bài tập' })
   if (!canAccessCourse(assignment.course, request.user)) return response.status(403).json({ error: 'Bạn chưa tham gia khóa học này' })
   if (assignment.dueAt && assignment.dueAt < new Date()) return response.status(409).json({ error: 'Đã quá hạn nộp bài' })
-  const existing = await prisma.assignmentSubmission.findUnique({ where: { assignmentId_studentId: { assignmentId, studentId: request.user.id } } })
-  if (existing?.grade !== null && existing?.grade !== undefined) return response.status(409).json({ error: 'Bài đã được chấm và không thể sửa' })
-  const submission = await prisma.assignmentSubmission.upsert({
-    where: { assignmentId_studentId: { assignmentId, studentId: request.user.id } },
-    create: { assignmentId, studentId: request.user.id, content },
-    update: { content, submittedAt: new Date() },
-  })
+  const submissionKey = { assignmentId_studentId: { assignmentId, studentId: request.user.id } }
+  const existing = await prisma.assignmentSubmission.findUnique({ where: submissionKey, select: { id: true } })
+  let submission
+  if (existing) {
+    const updated = await prisma.assignmentSubmission.updateMany({
+      where: { id: existing.id, grade: null },
+      data: { content, submittedAt: new Date() },
+    })
+    if (updated.count !== 1) return response.status(409).json({ error: 'Bài đã được chấm và không thể sửa' })
+    submission = await prisma.assignmentSubmission.findUnique({ where: { id: existing.id } })
+  } else {
+    try {
+      submission = await prisma.assignmentSubmission.create({ data: { assignmentId, studentId: request.user.id, content } })
+    } catch (error) {
+      if (error?.code === 'P2002') return response.status(409).json({ error: 'Bài nộp vừa được cập nhật. Hãy tải lại rồi thử lại.' })
+      throw error
+    }
+  }
   return response.json({ submission })
 })
 
@@ -338,19 +373,37 @@ router.patch('/assignments/:assignmentId/submissions/:studentId', authorizeRole(
   const assignmentId = parseId(request.params.assignmentId)
   const studentId = parseId(request.params.studentId)
   if (!assignmentId || !studentId) return response.status(400).json({ error: 'ID bài tập hoặc học viên không hợp lệ' })
-  const assignment = await prisma.assignment.findUnique({ where: { id: assignmentId }, include: { course: { select: { instructorId: true } } } })
-  if (!assignment) return response.status(404).json({ error: 'Không tìm thấy bài tập' })
-  if (assignment.course.instructorId !== request.user.id) return response.status(403).json({ error: 'Bạn không có quyền chấm bài tập này' })
-  const submission = await prisma.assignmentSubmission.findUnique({ where: { assignmentId_studentId: { assignmentId, studentId } } })
-  if (!submission) return response.status(404).json({ error: 'Học viên chưa nộp bài' })
   const grade = request.body.grade === null ? null : Number(request.body.grade)
   const feedback = typeof request.body.feedback === 'string' ? request.body.feedback.trim() : ''
-  if (grade !== null && (!Number.isInteger(grade) || grade < 0 || grade > assignment.points)) {
-    return response.status(400).json({ error: `Điểm phải từ 0 đến ${assignment.points}` })
-  }
   if (feedback.length > 5000) return response.status(400).json({ error: 'Nhận xét không được vượt quá 5000 ký tự' })
-  const updated = await prisma.assignmentSubmission.update({ where: { id: submission.id }, data: { grade, feedback: feedback || null } })
-  return response.json({ submission: updated })
+  let result
+  try {
+    result = await prisma.$transaction(async (transaction) => {
+      const assignment = await transaction.assignment.findUnique({
+        where: { id: assignmentId },
+        include: { course: { select: { instructorId: true } } },
+      })
+      if (!assignment) return { status: 404, error: 'Không tìm thấy bài tập' }
+      if (assignment.course.instructorId !== request.user.id) return { status: 403, error: 'Bạn không có quyền chấm bài tập này' }
+      const submission = await transaction.assignmentSubmission.findUnique({
+        where: { assignmentId_studentId: { assignmentId, studentId } },
+      })
+      if (!submission) return { status: 404, error: 'Học viên chưa nộp bài' }
+      if (grade !== null && (!Number.isInteger(grade) || grade < 0 || grade > assignment.points)) {
+        return { status: 400, error: `Điểm phải từ 0 đến ${assignment.points}` }
+      }
+      const updated = await transaction.assignmentSubmission.update({
+        where: { id: submission.id },
+        data: { grade, feedback: feedback || null },
+      })
+      return { submission: updated }
+    }, { isolationLevel: 'Serializable' })
+  } catch (error) {
+    if (error?.code === 'P2034') return response.status(409).json({ error: 'Bài nộp hoặc bài tập vừa được thay đổi. Hãy tải lại rồi thử lại.' })
+    throw error
+  }
+  if (result.error) return response.status(result.status).json({ error: result.error })
+  return response.json({ submission: result.submission })
 })
 
 router.put('/lessons/:lessonId/progress', authorizeRole('STUDENT'), async (request, response) => {
@@ -530,8 +583,8 @@ router.post('/:courseId/lessons', authorizeRole('INSTRUCTOR'), upload.single('do
       await writeFile(resolve(uploadDirectory, storedName), request.file.buffer)
     }
 
-    const extractedText = request.file && textDocumentTypes.has(request.file.mimetype)
-      ? request.file.buffer.toString('utf8').slice(0, 100000)
+    const extractedText = request.file
+      ? uploadedLessonText({ mimetype: request.file.mimetype, buffer: request.file.buffer, content })
       : content || null
     const lesson = await prisma.lesson.create({
       data: {
@@ -571,7 +624,7 @@ router.patch('/lessons/:lessonId', authorizeRole('INSTRUCTOR'), async (request, 
     const content = typeof request.body.content === 'string' ? request.body.content.trim() : ''
     if (content.length > 100000) return response.status(400).json({ error: 'Nội dung bài học không được vượt quá 100.000 ký tự' })
     data.content = content || null
-    if (!lesson.documentUrl) data.extractedText = content || null
+    data.extractedText = lessonTextAfterContentEdit(lesson, content)
   }
   if ('order' in request.body) {
     const order = Number(request.body.order)
@@ -602,9 +655,11 @@ router.patch('/lessons/:lessonId/document', authorizeRole('INSTRUCTOR'), upload.
   try {
     await mkdir(uploadDirectory, { recursive: true })
     await writeFile(resolve(uploadDirectory, storedName), request.file.buffer)
-    const extractedText = textDocumentTypes.has(request.file.mimetype)
-      ? request.file.buffer.toString('utf8').slice(0, 100000)
-      : lesson.content || null
+    const extractedText = uploadedLessonText({
+      mimetype: request.file.mimetype,
+      buffer: request.file.buffer,
+      content: lesson.content,
+    })
     const updatedLesson = await prisma.lesson.update({
       where: { id: lessonId },
       data: { documentUrl: storedName, documentName: request.file.originalname.slice(0, 255), extractedText },
@@ -629,7 +684,7 @@ router.delete('/lessons/:lessonId/document', authorizeRole('INSTRUCTOR'), async 
 
   const updatedLesson = await prisma.lesson.update({
     where: { id: lessonId },
-    data: { documentUrl: null, documentName: null, extractedText: lesson.content || null },
+    data: { documentUrl: null, documentName: null, extractedText: lessonTextAfterDocumentRemoval(lesson.content) },
     select: lessonSelect,
   })
   await removeStoredFile(lesson.documentUrl)
@@ -678,15 +733,17 @@ router.get('/lessons/:lessonId/chat', async (request, response) => {
 
   const lesson = await prisma.lesson.findUnique({
     where: { id: lessonId },
-    include: {
-      course: { include: { enrollments: { where: { userId: request.user.id }, select: { userId: true } } } },
-      chatMessages: { where: { userId: request.user.id }, orderBy: { createdAt: 'asc' }, take: 50 },
-    },
+    include: { course: { include: { enrollments: { where: { userId: request.user.id }, select: { userId: true } } } } },
   })
   if (!lesson) return response.status(404).json({ error: 'Không tìm thấy bài học' })
   if (!canAccessCourse(lesson.course, request.user)) return response.status(403).json({ error: 'Bạn không có quyền xem lịch sử này' })
 
-  return response.json({ messages: lesson.chatMessages })
+  const latestMessages = await prisma.chatMessage.findMany({
+    where: { lessonId, userId: request.user.id },
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    take: 50,
+  })
+  return response.json({ messages: latestMessages.reverse() })
 })
 
 router.post('/lessons/:lessonId/chat', async (request, response) => {
