@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import AssignmentsPanel from '../components/AssignmentsPanel.jsx'
 import PracticeQuizPanel from '../components/PracticeQuizPanel.jsx'
 import { apiRequest, downloadDocument, getStoredUser } from '../services/api.js'
+import { LessonRequestGuard } from '../services/lessonRequestGuard.js'
 import './LearningApp.css'
 
 function CourseWorkspacePage() {
@@ -17,11 +18,13 @@ function CourseWorkspacePage() {
   const [practiceLesson, setPracticeLesson] = useState(null)
   const [editingLesson, setEditingLesson] = useState(null)
   const [messages, setMessages] = useState([])
+  const [historyLoading, setHistoryLoading] = useState(false)
   const [question, setQuestion] = useState('')
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [notice, setNotice] = useState('')
   const [students, setStudents] = useState([])
+  const assistantRequestGuard = useRef(new LessonRequestGuard())
   const completedLessonsCount = course?.lessons.filter((lesson) => lesson.isCompleted).length || 0
   const courseProgressPercent = course?.lessons.length ? Math.round(completedLessonsCount / course.lessons.length * 100) : 0
 
@@ -169,30 +172,37 @@ function CourseWorkspacePage() {
   }
 
   const openAssistant = async (lesson) => {
+    const request = assistantRequestGuard.current.select(lesson.id)
     setSelectedLesson(lesson)
     setQuestion('')
+    setMessages([])
+    setHistoryLoading(true)
     try {
       const data = await apiRequest(`/api/courses/lessons/${lesson.id}/chat`)
-      setMessages(data.messages)
+      if (assistantRequestGuard.current.isCurrent(request)) setMessages(data.messages)
     } catch (error) {
-      setMessages([])
-      setNotice(error.message)
+      if (assistantRequestGuard.current.isCurrent(request)) setNotice(error.message)
+    } finally {
+      if (assistantRequestGuard.current.isCurrent(request)) setHistoryLoading(false)
     }
   }
 
   const askQuestion = async (event) => {
     event.preventDefault()
     if (!selectedLesson) return
+    const request = assistantRequestGuard.current.select(selectedLesson.id)
     setSubmitting(true)
     try {
       const data = await apiRequest(`/api/courses/lessons/${selectedLesson.id}/chat`, {
         method: 'POST',
         body: JSON.stringify({ question }),
       })
-      setMessages((current) => [...current, data.message])
-      setQuestion('')
+      if (assistantRequestGuard.current.isCurrent(request)) {
+        setMessages((current) => [...current, data.message])
+        setQuestion('')
+      }
     } catch (error) {
-      setNotice(error.message)
+      if (assistantRequestGuard.current.isCurrent(request)) setNotice(error.message)
     } finally {
       setSubmitting(false)
     }
@@ -261,7 +271,7 @@ function CourseWorkspacePage() {
 
         {practiceLesson && <PracticeQuizPanel key={practiceLesson.id} lesson={practiceLesson} onClose={() => setPracticeLesson(null)} />}
 
-        {selectedLesson && <section className="assistant-panel"><header><div><span>✦</span><div><small>TRỢ LÝ TÀI LIỆU CỤC BỘ</small><h2>{selectedLesson.title}</h2></div></div><button type="button" aria-label="Đóng" onClick={() => setSelectedLesson(null)}>×</button></header><p className="assistant-note">Câu trả lời chỉ trích xuất từ nội dung bài học và không gửi dữ liệu tới dịch vụ bên ngoài.</p><div className="chat-history">{messages.length === 0 ? <p>Chưa có câu hỏi nào. Hãy hỏi bằng một từ khóa cụ thể trong bài.</p> : messages.map((message) => <div className="chat-pair" key={message.id}><p className="question"><strong>Bạn</strong>{message.question}</p><p className="answer"><strong>Lumina</strong>{message.answer}</p></div>)}</div><form className="chat-form" onSubmit={askQuestion}><label className="sr-only" htmlFor="lesson-question">Câu hỏi</label><input id="lesson-question" value={question} onChange={(event) => setQuestion(event.target.value)} minLength="3" maxLength="1000" placeholder="Ví dụ: Mạng nơ-ron được dùng để làm gì?" required /><button className="primary-button" disabled={submitting}>Gửi</button></form></section>}
+        {selectedLesson && <section className="assistant-panel"><header><div><span>✦</span><div><small>TRỢ LÝ TÀI LIỆU CỤC BỘ</small><h2>{selectedLesson.title}</h2></div></div><button type="button" aria-label="Đóng" onClick={() => { assistantRequestGuard.current.clear(); setSelectedLesson(null); setMessages([]); setQuestion(''); setHistoryLoading(false) }}>×</button></header><p className="assistant-note">Câu trả lời chỉ trích xuất từ nội dung bài học và không gửi dữ liệu tới dịch vụ bên ngoài.</p><div className="chat-history">{historyLoading ? <p>Đang tải lịch sử trò chuyện…</p> : messages.length === 0 ? <p>Chưa có câu hỏi nào. Hãy hỏi bằng một từ khóa cụ thể trong bài.</p> : messages.map((message) => <div className="chat-pair" key={message.id}><p className="question"><strong>Bạn</strong>{message.question}</p><p className="answer"><strong>Lumina</strong>{message.answer}</p></div>)}</div><form className="chat-form" onSubmit={askQuestion}><label className="sr-only" htmlFor="lesson-question">Câu hỏi</label><input id="lesson-question" value={question} onChange={(event) => setQuestion(event.target.value)} minLength="3" maxLength="1000" placeholder="Ví dụ: Mạng nơ-ron được dùng để làm gì?" disabled={historyLoading} required /><button className="primary-button" disabled={submitting || historyLoading}>Gửi</button></form></section>}
       </main>
     </div>
   )

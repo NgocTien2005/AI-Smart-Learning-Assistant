@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { API_URL } from '../services/api.js'
 
 function AuthPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [mode, setMode] = useState('login')
   const [role, setRole] = useState('STUDENT')
   const [showPassword, setShowPassword] = useState(false)
@@ -11,8 +12,8 @@ function AuthPage() {
   const [rememberMe, setRememberMe] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [currentUser, setCurrentUser] = useState(null)
-  const [message, setMessage] = useState('')
-  const [messageType, setMessageType] = useState('')
+  const [message, setMessage] = useState(location.state?.sessionExpired ? 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.' : '')
+  const [messageType, setMessageType] = useState(location.state?.sessionExpired ? 'error' : '')
   const isRegister = mode === 'register'
   const isForgot = mode === 'forgot'
 

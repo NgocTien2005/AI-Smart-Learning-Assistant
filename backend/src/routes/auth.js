@@ -100,7 +100,7 @@ router.post('/login', async (request, response) => {
     const passwordMatches = user && await bcrypt.compare(password, user.password)
 
     if (!passwordMatches || !user.isActive) {
-      return response.status(401).json({ error: 'Email hoặc mật khẩu không đúng' })
+      return response.status(401).json({ code: 'INVALID_CREDENTIALS', error: 'Email hoặc mật khẩu không đúng' })
     }
 
     return response.json({ user: publicUser(user), token: createToken(user) })
@@ -214,12 +214,18 @@ router.post('/change-password', authenticate, async (request, response) => {
   try {
     const user = await prisma.user.findUnique({ where: { id: request.user.id } })
     if (!user || !await bcrypt.compare(currentPassword, user.password)) {
-      return response.status(401).json({ error: 'Mật khẩu hiện tại không đúng' })
+      return response.status(400).json({ code: 'CURRENT_PASSWORD_INVALID', error: 'Mật khẩu hiện tại không đúng' })
     }
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { password: await bcrypt.hash(newPassword, 10), authVersion: { increment: 1 } },
+      data: {
+        password: await bcrypt.hash(newPassword, 10),
+        authVersion: { increment: 1 },
+        passwordResetTokenHash: null,
+        passwordResetExpiresAt: null,
+        passwordResetRequestedAt: null,
+      },
     })
     return response.json({ message: 'Mật khẩu đã được thay đổi. Vui lòng đăng nhập lại.' })
   } catch (error) {

@@ -1,3 +1,5 @@
+import { isSessionExpiration, readApiError, SESSION_EXPIRED_EVENT } from './apiErrors.js'
+
 export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
 
 export const getToken = () => localStorage.getItem('luminaToken') || sessionStorage.getItem('luminaToken')
@@ -20,6 +22,12 @@ export const clearSession = () => {
   }
 }
 
+const handleSessionError = (error) => {
+  if (!isSessionExpiration(error)) return
+  clearSession()
+  window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT))
+}
+
 export const updateStoredUser = (user) => {
   const storage = localStorage.getItem('luminaToken') ? localStorage : sessionStorage
   storage.setItem('luminaUser', JSON.stringify(user))
@@ -39,13 +47,13 @@ export const apiRequest = async (path, options = {}) => {
   }
 
   if (response.status === 204) return null
-  const data = await response.json().catch(() => ({}))
   if (!response.ok) {
-    if (response.status === 401) clearSession()
-    throw new Error(data.error || 'Yêu cầu không thành công')
+    const error = await readApiError(response)
+    handleSessionError(error)
+    throw error
   }
 
-  return data
+  return response.json()
 }
 
 export const downloadDocument = async (lessonId, fallbackName) => {
@@ -54,8 +62,9 @@ export const downloadDocument = async (lessonId, fallbackName) => {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   })
   if (!response.ok) {
-    const data = await response.json().catch(() => ({}))
-    throw new Error(data.error || 'Không thể tải tài liệu')
+    const error = await readApiError(response, 'Không thể tải tài liệu')
+    handleSessionError(error)
+    throw error
   }
 
   const blob = await response.blob()

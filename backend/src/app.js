@@ -29,10 +29,10 @@ export const createApp = () => {
   })
   app.use((error, _request, response, _next) => {
     if (error instanceof multer.MulterError) {
-      const message = error.code === 'LIMIT_FILE_SIZE'
-        ? 'Tài liệu không được vượt quá 10 MB'
-        : 'Tài liệu upload không hợp lệ'
-      return response.status(400).json({ error: message })
+      if (error.code === 'LIMIT_FILE_SIZE') {
+        return response.status(413).json({ code: 'UPLOAD_TOO_LARGE', error: 'Tài liệu không được vượt quá 10 MiB' })
+      }
+      return response.status(400).json({ code: 'INVALID_UPLOAD', error: 'Tài liệu upload không hợp lệ' })
     }
 
     if (error instanceof SyntaxError && error.status === 400 && 'body' in error) {

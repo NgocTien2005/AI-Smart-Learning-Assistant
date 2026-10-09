@@ -2,14 +2,9 @@
 
 ## Mục tiêu của repository
 
-Đây là dự án **AI Smart Learning Assistant (Lumina LMS)**, một LMS hướng tới hai vai trò `INSTRUCTOR` và `STUDENT`.
+Đây là dự án **AI Smart Learning Assistant (Lumina LMS)**, một LMS có ba vai trò `ADMIN`, `INSTRUCTOR` và `STUDENT`.
 
-Trạng thái hiện tại là một prototype authentication:
-
-- Frontend React/Vite có giao diện đăng nhập và đăng ký.
-- Backend Express cung cấp API đăng ký, đăng nhập và lấy người dùng hiện tại.
-- PostgreSQL/Prisma đã mô hình hóa `User`, `Course`, `Enrollment`, `Lesson` và `ChatMessage`.
-- Chức năng khóa học, bài học, upload tài liệu và AI chưa có API/UI hoàn chỉnh.
+Repository hiện có authentication, quản trị người dùng, khóa học, bài học/tài liệu, tiến độ, bài tập/chấm điểm, bài ôn trắc nghiệm và trợ lý tài liệu cục bộ. Đây là ứng dụng đang phát triển; cần kiểm tra cả API, authorization, dữ liệu và UI trước khi kết luận tính năng hoạt động.
 
 Mọi thay đổi phải giúp dự án tiến gần hơn tới một hệ thống có thể hiểu, kiểm thử và vận hành được; không chỉ làm cho màn hình “trông như đã chạy”.
 
@@ -17,17 +12,27 @@ Mọi thay đổi phải giúp dự án tiến gần hơn tới một hệ thố
 
 ```text
 .
-├── frontend/                 React 19 + Vite 8
-│   ├── src/main.jsx          Điểm khởi tạo React
-│   ├── src/App.jsx           UI và logic authentication hiện tại
-│   ├── src/App.css           Style của trang authentication
-│   └── src/index.css         Global style
+├── frontend/                 React 19 + Vite 8, app served by Nginx in Docker
+│   ├── nginx.conf            Reverse proxy /api and upload body limit
+│   └── src/
+│       ├── app/              Router and application shell
+│       ├── components/       Reusable LMS panels and route guards
+│       ├── pages/            Authentication, dashboard, course and admin pages
+│       └── services/         API client and request helpers
 └── backend/                  Express 5 + Prisma 7 + PostgreSQL
-    ├── server.js             HTTP server, middleware và auth routes
-    ├── prisma.config.ts      Prisma CLI configuration
+    ├── server.js             Runtime entry point; imports src/app.js
+    ├── app.js                Legacy auth-only test harness used by test/auth.test.js
+    ├── src/
+    │   ├── app.js            Middleware and route mounting
+    │   ├── routes/           Auth, admin, course and health APIs
+    │   ├── middleware/       Authentication and role authorization
+    │   ├── services/         Email integrations
+    │   └── utils/            Auth, password reset, lesson text and study logic
+    ├── scripts/              Demo seed and Docker integration verification
+    ├── test/                 Node test runner unit/small app tests
     └── prisma/
         ├── schema.prisma     Database schema
-        └── migrations/       Lịch sử migration đã commit
+        └── migrations/       Immutable migration history
 ```
 
 Frontend và backend là hai package npm độc lập. Repository chưa có workspace hoặc script điều phối ở thư mục gốc.
@@ -173,30 +178,33 @@ npx prisma generate
 
 ## Contract hiện tại cần giữ nhất quán
 
-Các endpoint đang tồn tại:
+Các API hiện được mount dưới `/api`. Nhóm endpoint chính đang tồn tại:
 
 - `GET /api/health`
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `GET /api/auth/me` với header `Authorization: Bearer <token>`
+- `/api/auth`: đăng ký, đăng nhập, hồ sơ `/me`, quên/đặt lại và đổi mật khẩu.
+- `/api/admin/users`: Admin tìm kiếm, cập nhật vai trò/thông tin và khóa/mở tài khoản.
+- `/api/courses`: tạo/list/xem/sửa/xóa khóa học, tham gia bằng mã và rời khóa học.
+- `/api/courses/:courseId/lessons` và `/api/courses/lessons/:lessonId`: bài học, tiến độ, tài liệu, lịch sử chat và bài ôn.
+- `/api/courses/:courseId/assignments` và `/api/courses/assignments/:assignmentId`: bài tập, bài nộp và chấm điểm.
 
-Role hợp lệ là `INSTRUCTOR` và `STUDENT`.
+Role hợp lệ là `ADMIN`, `INSTRUCTOR` và `STUDENT`. Đăng ký công khai chỉ cho phép `INSTRUCTOR` hoặc `STUDENT`; tạo Admin bằng lệnh bootstrap được mô tả trong README.
 
-Lưu ý baseline đã biết: form đăng ký frontend hiện thu thập `name` nhưng payload không gửi `name`, trong khi backend bắt buộc field này. Vì vậy đăng ký từ UI hiện trả lỗi `400`. Khi công việc chạm vào authentication, phải xử lý hoặc ít nhất kiểm thử hồi quy contract này; không được coi luồng đăng ký hiện tại là hoạt động.
-
-Các nút social login, quên mật khẩu, điều khoản và chính sách hiện chỉ là UI placeholder. Không mô tả chúng là tính năng đã triển khai.
+Đăng ký frontend gửi `name`, `email`, `password` và role đã chọn; giữ kiểm thử contract này khi sửa authentication. Quên/đặt lại mật khẩu dùng email SMTP nếu được cấu hình. Social login chưa được cấu hình. Nội dung tài liệu TXT/Markdown/CSV được dùng cục bộ cho trợ lý và bài ôn; PDF chỉ có nội dung fallback do giảng viên nhập, không có OCR/extraction hoặc dịch vụ AI bên ngoài.
 
 ## Kiểm thử và xác minh
 
-Repository hiện chưa có automated test suite. Khi thêm business logic đáng kể, ưu tiên bổ sung test thay vì chỉ kiểm thử thủ công.
+Repository có automated tests dùng Node built-in test runner ở cả hai package. Backend integration script cần Docker stack và thực hiện luồng API trên `http://localhost:8080`; script tạo dữ liệu riêng rồi dọn tài khoản kiểm thử.
 
 Mức kiểm chứng tối thiểu theo loại thay đổi:
 
 - Frontend: `npm run lint` và `npm run build`.
+- Frontend regression tests: `npm test` trong `frontend/`.
+- Backend unit/regression tests: `npm test` trong `backend/`.
+- Backend tích hợp HTTP/database, gồm quyền truy cập, upload và luồng LMS: `npm run test:integration` trong `backend/` khi Docker stack healthy.
 - Backend không đổi schema: khởi động server và kiểm tra endpoint liên quan; tối thiểu kiểm tra `/api/health` khi có database khả dụng.
 - Prisma/schema: `npx prisma validate`, xem migration diff/SQL, generate client và kiểm tra migration status trên database mục tiêu phù hợp.
 - Authentication: kiểm tra đăng ký, đăng nhập sai/đúng, `/api/auth/me`, token thiếu/hết hạn và bảo đảm password không xuất hiện trong response.
-- UI responsive: kiểm tra ít nhất desktop và mobile khi thay đổi layout.
+- UI layout: kiểm tra desktop khi thay đổi giao diện; chỉ thêm mobile behavior khi người dùng yêu cầu.
 
 Nếu không thể chạy một bước vì thiếu database, secret, network hoặc dependency, ghi rõ bước nào chưa chạy và lý do. Không thay thế kết quả thực bằng phỏng đoán.
 
