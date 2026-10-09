@@ -27,10 +27,10 @@ export const authenticate = async (request, response, next) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: payload.userId },
-      select: { id: true, name: true, email: true, role: true, authVersion: true },
+      select: { id: true, name: true, email: true, role: true, authVersion: true, isActive: true },
     })
 
-    if (!user || payload.authVersion !== user.authVersion) {
+    if (!user || !user.isActive || payload.authVersion !== user.authVersion) {
       return response.status(401).json({ error: 'Phiên đăng nhập không hợp lệ' })
     }
 

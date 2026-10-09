@@ -61,7 +61,7 @@ function AccountPage() {
       <main className="account-main">
         <section className="account-heading"><span className="eyebrow">TÀI KHOẢN</span><h1>Hồ sơ cá nhân</h1><p>Cập nhật tên hiển thị của bạn trên Lumina LMS.</p></section>
         <section className="management-card account-card">
-          <dl><div><dt>Email</dt><dd>{user?.email}</dd></div><div><dt>Vai trò</dt><dd>{user?.role === 'INSTRUCTOR' ? 'Giảng viên' : 'Học viên'}</dd></div></dl>
+          <dl><div><dt>Email</dt><dd>{user?.email}</dd></div><div><dt>Vai trò</dt><dd>{user?.role === 'ADMIN' ? 'Quản trị viên' : user?.role === 'INSTRUCTOR' ? 'Giảng viên' : 'Học viên'}</dd></div></dl>
           <form onSubmit={updateProfile}><label htmlFor="profile-name">Họ và tên<input id="profile-name" value={name} onChange={(event) => { setName(event.target.value); setMessage('') }} minLength="2" maxLength="80" required /></label><button className="primary-button" disabled={submitting}>{submitting ? 'Đang lưu…' : 'Lưu hồ sơ'}</button></form>
           {message && <p className="inline-message" role="status">{message}</p>}
         </section>

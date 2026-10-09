@@ -164,3 +164,24 @@
 .practice-history ul { display: grid; gap: 8px; margin: 10px 0 0; padding: 0; list-style: none; }
 .practice-history li { display: flex; justify-content: space-between; gap: 15px; color: #66758b; font-size: 12px; }
 .practice-history li strong { color: #24334a; }
+.admin-main { width: min(1080px,90vw); margin: 0 auto; padding: 48px 0 80px; }
+.admin-main .account-heading h1 { margin: 7px 0; font: 700 34px Lexend,sans-serif; }
+.admin-main .account-heading p { color: #66758c; }
+.admin-toolbar { display: flex; justify-content: space-between; gap: 20px; align-items: end; margin: 28px 0 18px; padding: 20px; border: 1px solid #e2e8f1; border-radius: 14px; background: #fff; }
+.admin-toolbar label, .admin-user-fields label { display: grid; gap: 7px; color: #40506a; font-size: 13px; font-weight: 600; }
+.admin-toolbar input, .admin-user-fields input, .admin-user-fields select { min-width: 280px; padding: 10px 12px; border: 1px solid #ccd6e4; border-radius: 8px; background: #fbfcfe; color: #172033; font: inherit; }
+.admin-toolbar > strong { color: #63728a; font-size: 13px; }
+.admin-user-list { display: grid; gap: 14px; }
+.admin-user-card { display: grid; gap: 18px; padding: 22px; border: 1px solid #e0e7f0; border-radius: 14px; background: #fff; }
+.admin-user-heading { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+.admin-user-heading > div { display: flex; gap: 10px; align-items: center; }
+.admin-user-heading > small { color: #738097; }
+.account-status { padding: 5px 9px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+.account-status.active { background: #e7f8ee; color: #16814a; }
+.account-status.inactive { background: #fff0f1; color: #bd2735; }
+.admin-user-fields { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 14px; align-items: end; }
+.admin-user-stats { display: grid; grid-template-columns: auto 1fr; gap: 4px 9px; align-items: center; color: #738097; font-size: 12px; }
+.admin-user-stats span { color: #172033; font-size: 15px; font-weight: 700; }
+.admin-pagination { display: flex; justify-content: center; gap: 18px; align-items: center; margin-top: 24px; }
+.admin-pagination button { padding: 9px 13px; border: 1px solid #ccd6e4; border-radius: 8px; background: #fff; cursor: pointer; }
+.admin-pagination button:disabled { opacity: .5; cursor: not-allowed; }

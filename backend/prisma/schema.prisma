@@ -15,6 +15,7 @@ datasource db {
 enum Role {
   INSTRUCTOR
   STUDENT
+  ADMIN
 }
 
 model User {
@@ -23,6 +24,7 @@ model User {
   email                    String        @unique
   password                 String
   role                     Role
+  isActive                 Boolean       @default(true)
   authVersion              Int           @default(0)
   passwordResetTokenHash   String?       @unique
   passwordResetExpiresAt   DateTime?

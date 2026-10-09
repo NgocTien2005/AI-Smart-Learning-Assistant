@@ -8,6 +8,7 @@ const initials = (name = '') => name.split(/\s+/).slice(-2).map((part) => part[0
 function DashboardPage() {
   const navigate = useNavigate()
   const user = getStoredUser()
+  const isAdmin = user?.role === 'ADMIN'
   const isInstructor = user?.role === 'INSTRUCTOR'
   const [courses, setCourses] = useState([])
   const [form, setForm] = useState({ title: '', description: '', joinCode: '' })
@@ -22,6 +23,10 @@ function DashboardPage() {
 
   useEffect(() => {
     let active = true
+    if (isAdmin) {
+      navigate('/admin', { replace: true })
+      return () => { active = false }
+    }
     apiRequest('/api/courses')
       .then((data) => {
         if (!active) return
@@ -36,7 +41,7 @@ function DashboardPage() {
       .finally(() => { if (active) setLoading(false) })
 
     return () => { active = false }
-  }, [navigate])
+  }, [navigate, isAdmin])
 
   const submit = async (event) => {
     event.preventDefault()
@@ -71,6 +76,8 @@ function DashboardPage() {
     clearSession()
     navigate('/auth', { replace: true })
   }
+
+  if (isAdmin) return <div className="page-feedback">Đang mở trang quản trị…</div>
 
   return (
     <div className="learning-page">

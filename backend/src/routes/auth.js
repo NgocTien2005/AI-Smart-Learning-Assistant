@@ -99,7 +99,7 @@ router.post('/login', async (request, response) => {
     const user = await prisma.user.findUnique({ where: { email: email.trim().toLowerCase() } })
     const passwordMatches = user && await bcrypt.compare(password, user.password)
 
-    if (!passwordMatches) {
+    if (!passwordMatches || !user.isActive) {
       return response.status(401).json({ error: 'Email hoặc mật khẩu không đúng' })
     }
 
@@ -127,7 +127,7 @@ router.post('/forgot-password', forgotPasswordRateLimit, async (request, respons
     const user = await prisma.user.findUnique({ where: { email: normalizedEmail } })
     const cooldownStartedAt = new Date(Date.now() - 60 * 1000)
 
-    if (!user || (user.passwordResetRequestedAt && user.passwordResetRequestedAt > cooldownStartedAt)) {
+    if (!user || !user.isActive || (user.passwordResetRequestedAt && user.passwordResetRequestedAt > cooldownStartedAt)) {
       return response.json({ message: forgotPasswordMessage })
     }
 

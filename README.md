@@ -60,6 +60,7 @@ Tài liệu upload được lưu trong Docker volume `uploads_data` và chỉ t�
 - Học viên đánh dấu hoặc bỏ hoàn thành từng bài học; dashboard hiển thị tiến độ khóa học và giảng viên xem tiến độ từng học viên.
 - Học viên tạo bài ôn trắc nghiệm cục bộ từ nội dung bài học, nhận chấm điểm và xem lịch sử kết quả.
 - Giảng viên giao bài có hạn nộp và điểm tối đa; học viên nộp/cập nhật bài trước hạn, giảng viên chấm điểm và gửi nhận xét.
+- Quản trị viên tìm tài khoản, sửa họ tên, đổi vai trò giảng viên/học viên và khóa/mở quyền truy cập.
 - Authorization được kiểm tra riêng cho từng thao tác khóa học và bài học.
 
 Các kiểm tra chính:
@@ -91,5 +92,8 @@ docker compose exec -e NODE_ENV=development backend npm run seed:demo
 
 - Giảng viên: `giangvien@lumina.local`
 - Học viên: `hocvien@lumina.local`
+- Quản trị viên: `quantri@lumina.local`
 
 Lệnh seed có thể chạy lại để cập nhật dữ liệu demo; lệnh từ chối chạy khi `NODE_ENV=production`. Chỉ dùng tài khoản mẫu trong môi trường local, không dùng chúng cho hệ thống triển khai thật.
+
+Tài khoản quản trị môi trường triển khai không thể đăng ký từ giao diện. Hãy đặt `ADMIN_BOOTSTRAP_NAME`, `ADMIN_BOOTSTRAP_EMAIL` và `ADMIN_BOOTSTRAP_PASSWORD` trong `.env`, khởi động lại backend rồi chạy `docker compose exec backend npm run admin:create`. Sau khi tạo xong, xóa ba biến này khỏi `.env` và khởi động lại backend. Mật khẩu bootstrap cần từ 12 đến 72 ký tự; lệnh chỉ tạo tài khoản mới và không sửa tài khoản đã tồn tại.

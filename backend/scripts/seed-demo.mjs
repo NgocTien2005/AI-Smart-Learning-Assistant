@@ -13,6 +13,7 @@ const demoPassword = 'LuminaDemo123!'
 const users = [
   { name: 'Nguyễn Minh Anh', email: 'giangvien@lumina.local', role: 'INSTRUCTOR' },
   { name: 'Trần Gia Bảo', email: 'hocvien@lumina.local', role: 'STUDENT' },
+  { name: 'Quản trị Lumina', email: 'quantri@lumina.local', role: 'ADMIN' },
 ]
 const lessonContent = [
   {
@@ -44,8 +45,8 @@ async function upsertUser(user) {
   const password = await bcrypt.hash(demoPassword, 10)
   return prisma.user.upsert({
     where: { email: user.email },
-    update: { name: user.name, role: user.role, password },
-    create: { ...user, password },
+    update: { name: user.name, role: user.role, password, isActive: true },
+    create: { ...user, password, isActive: true },
   })
 }
 
@@ -166,7 +167,7 @@ try {
   })
 
   console.log('Demo data is ready. Sign in with either demo account; password: LuminaDemo123!')
-  console.log(`Instructor: ${users[0].email} | Student: ${users[1].email}`)
+  console.log(`Instructor: ${users[0].email} | Student: ${users[1].email} | Admin: ${users[2].email}`)
 } finally {
   await prisma.$disconnect()
 }

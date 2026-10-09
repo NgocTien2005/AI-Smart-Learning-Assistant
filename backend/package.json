@@ -10,7 +10,8 @@
     "postinstall": "npm run prisma:generate",
     "test": "node --test",
     "test:integration": "node scripts/integration-check.mjs",
-    "seed:demo": "node scripts/seed-demo.mjs"
+    "seed:demo": "node scripts/seed-demo.mjs",
+    "admin:create": "node scripts/create-admin.mjs"
   },
   "keywords": [],
   "author": "",

@@ -26,6 +26,9 @@ services:
       APP_ORIGIN: ${APP_ORIGIN:-http://localhost:8080}
       SMTP_USER: ${SMTP_USER:-}
       SMTP_APP_PASSWORD: ${SMTP_APP_PASSWORD:-}
+      ADMIN_BOOTSTRAP_NAME: ${ADMIN_BOOTSTRAP_NAME:-}
+      ADMIN_BOOTSTRAP_EMAIL: ${ADMIN_BOOTSTRAP_EMAIL:-}
+      ADMIN_BOOTSTRAP_PASSWORD: ${ADMIN_BOOTSTRAP_PASSWORD:-}
     depends_on:
       db:
         condition: service_healthy

@@ -9,7 +9,7 @@ const prisma = {
       where.id !== undefined ? user.id === where.id : user.email === where.email
     )) ?? null,
     create: async ({ data }) => {
-      const user = { id: users.length + 1, ...data }
+      const user = { id: users.length + 1, isActive: true, ...data }
       users.push(user)
       return user
     },
@@ -66,6 +66,20 @@ test('authentication flow', async (t) => {
     assert.equal('password' in body.user, false)
     assert.equal(typeof body.token, 'string')
     token = body.token
+  })
+
+  await t.test('does not allow public registration as an administrator', async () => {
+    const { response } = await request('/api/auth/register', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Public Administrator',
+        email: 'public-admin@example.com',
+        password: 'secret123',
+        role: 'ADMIN',
+      }),
+    })
+    assert.equal(response.status, 400)
   })
 
   await t.test('rejects a duplicate email', async () => {

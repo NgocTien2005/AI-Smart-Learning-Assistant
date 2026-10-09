@@ -1,13 +1,18 @@
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
+import bcrypt from 'bcryptjs'
 
 const baseUrl = process.env.TEST_API_URL || 'http://localhost:8080/api'
 const stamp = Date.now()
 const instructorEmail = `integration-instructor-${stamp}@example.com`
 const studentEmail = `integration-student-${stamp}@example.com`
+const managedEmail = `integration-managed-${stamp}@example.com`
+const adminEmail = `integration-admin-${stamp}@example.com`
 const password = 'TestPass123'
+const adminPassword = 'AdminTestPass123!'
 let courseId = null
 let instructorToken = null
+let adminToken = null
 
 const request = async (path, options = {}) => {
   const response = await fetch(`${baseUrl}${path}`, options)
@@ -26,13 +31,24 @@ const jsonOptions = (method, body, token) => ({
 })
 
 const cleanupUsers = () => {
-  const sql = `DELETE FROM "User" WHERE email IN ('${instructorEmail}', '${studentEmail}');`
+  const sql = `DELETE FROM "User" WHERE email IN ('${instructorEmail}', '${studentEmail}', '${managedEmail}', '${adminEmail}');`
   const result = spawnSync('docker', ['compose', 'exec', '-T', 'db', 'psql', '-q', '-U', 'postgres', '-d', 'lumina_lms', '-c', sql], {
     cwd: new URL('../..', import.meta.url),
     stdio: 'pipe',
     shell: false,
   })
   if (result.status !== 0) process.stderr.write('Không thể dọn tài khoản integration test.\n')
+}
+
+const createAdmin = async () => {
+  const passwordHash = await bcrypt.hash(adminPassword, 10)
+  const sql = `INSERT INTO "User" (name, email, password, role, "isActive") VALUES ('Integration Admin', '${adminEmail}', '${passwordHash}', 'ADMIN', TRUE);`
+  const result = spawnSync('docker', ['compose', 'exec', '-T', 'db', 'psql', '-q', '-U', 'postgres', '-d', 'lumina_lms', '-c', sql], {
+    cwd: new URL('../..', import.meta.url),
+    stdio: 'pipe',
+    shell: false,
+  })
+  if (result.status !== 0) throw new Error('Could not provision integration admin account')
 }
 
 const seedResetToken = (email, token) => {
@@ -66,6 +82,36 @@ try {
     name: 'Integration Student', email: studentEmail, password, role: 'STUDENT',
   }))
   if ('password' in student.user) throw new Error('Password leaked in student response')
+
+  const publicAdminRegistration = await fetch(`${baseUrl}/auth/register`, jsonOptions('POST', {
+    name: 'Public Admin', email: `public-admin-${stamp}@example.com`, password, role: 'ADMIN',
+  }))
+  if (publicAdminRegistration.status !== 400) throw new Error(`Public admin registration returned ${publicAdminRegistration.status}, expected 400`)
+  const managedUser = await request('/auth/register', jsonOptions('POST', {
+    name: 'Managed Account', email: managedEmail, password, role: 'STUDENT',
+  }))
+  await createAdmin()
+  const adminLogin = await request('/auth/login', jsonOptions('POST', { email: adminEmail, password: adminPassword }))
+  adminToken = adminLogin.token
+  const filteredUsers = await request(`/admin/users?q=${encodeURIComponent(instructorEmail)}`, {
+    headers: { Authorization: `Bearer ${adminToken}` },
+  })
+  if (filteredUsers.total !== 1 || filteredUsers.users[0].email !== instructorEmail || 'password' in filteredUsers.users[0]) {
+    throw new Error('Admin user search or password privacy is incorrect')
+  }
+  const selfLock = await fetch(`${baseUrl}/admin/users/${adminLogin.user.id}`, jsonOptions('PATCH', { isActive: false }, adminToken))
+  if (selfLock.status !== 403) throw new Error(`Admin self-lock returned ${selfLock.status}, expected 403`)
+  const promoted = await request(`/admin/users/${managedUser.user.id}`, jsonOptions('PATCH', { role: 'INSTRUCTOR' }, adminToken))
+  if (promoted.user.role !== 'INSTRUCTOR') throw new Error('Admin could not update an unlinked user role')
+  const locked = await request(`/admin/users/${managedUser.user.id}`, jsonOptions('PATCH', { isActive: false }, adminToken))
+  if (locked.user.isActive) throw new Error('Admin could not disable a user account')
+  const lockedLogin = await fetch(`${baseUrl}/auth/login`, jsonOptions('POST', { email: managedEmail, password }))
+  if (lockedLogin.status !== 401) throw new Error(`Disabled user login returned ${lockedLogin.status}, expected 401`)
+  const reactivated = await request(`/admin/users/${managedUser.user.id}`, jsonOptions('PATCH', { isActive: true, role: 'STUDENT' }, adminToken))
+  if (!reactivated.user.isActive || reactivated.user.role !== 'STUDENT') throw new Error('Admin could not reactivate and restore user role')
+
+  const protectedRoleChange = await fetch(`${baseUrl}/admin/users/${instructor.user.id}`, jsonOptions('PATCH', { role: 'STUDENT' }, adminToken))
+  if (protectedRoleChange.status !== 409) throw new Error(`Linked instructor role change returned ${protectedRoleChange.status}, expected 409`)
 
   const beforeJoin = await fetch(`${baseUrl}/courses/${courseId}`, { headers: { Authorization: `Bearer ${student.token}` } })
   if (beforeJoin.status !== 403) throw new Error(`Course access before enrollment returned ${beforeJoin.status}, expected 403`)
