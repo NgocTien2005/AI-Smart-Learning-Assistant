@@ -1,13 +1,16 @@
 ﻿import { afterEach, test, vi } from 'vitest'
 import assert from 'node:assert/strict'
 import React from 'react'
-import { act, cleanup, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SessionProvider, useSession } from '../app/SessionContext.jsx'
 import { MemoryRouter, Route, Routes, Link, useParams } from 'react-router-dom'
+import AppLayout from '../components/AppLayout.jsx'
 import CourseWorkspacePage from '../pages/CourseWorkspacePage.jsx'
+import DashboardPage from '../pages/DashboardPage.jsx'
 import AdminPage from '../pages/AdminPage.jsx'
 import AuthPage from '../pages/AuthPage.jsx'
+import AccountPage from '../pages/AccountPage.jsx'
 import { useLocation } from 'react-router-dom'
 import PracticeQuizPanel from '../components/PracticeQuizPanel.jsx'
 import AssignmentsPanel from '../components/AssignmentsPanel.jsx'
@@ -129,6 +132,147 @@ test('instructor course overview uses role-specific actions and URL-backed style
   await user.click(screen.getByRole('button', { name: 'Thêm bài học' }))
   await screen.findByText('Đã thêm bài học.')
   assert.equal(lessonPosts.length, 1)
+})
+
+function CurrentPath() { return h('span', { 'data-testid': 'current-path' }, useLocation().pathname) }
+
+test.each([
+  [{ id: 1, name: 'Đặng Ngọc Tiên', email: 'student@example.test', role: 'STUDENT' }, 'Học viên', 'ĐT'],
+  [{ id: 2, name: 'Nguyễn Minh Anh', email: 'teacher@example.test', role: 'INSTRUCTOR' }, 'Giảng viên', 'NA'],
+  [{ id: 3, name: 'Quản trị Lumina', email: 'admin@example.test', role: 'ADMIN' }, 'Quản trị viên', 'QL'],
+  [{ id: 4, name: 'Nguyễn Thị Phương Thảo có tên hiển thị rất dài', email: 'long@example.test', role: 'STUDENT' }, 'Học viên', 'ND'],
+])('renders an accessible compact profile for %s', async (userData, roleLabel, avatarText) => {
+  localStorage.setItem('luminaToken', 'test-session')
+  globalThis.fetch = async (url) => String(url).endsWith('/api/auth/me')
+    ? new Response(JSON.stringify({ user: userData }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    : new Response(JSON.stringify({ courses: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+  render(h(MemoryRouter, { initialEntries: ['/dashboard'] }, h(SessionProvider, null, h(AppLayout, null, h(CurrentPath)))))
+
+  const profile = await screen.findByRole('group', { name: `${userData.name}, ${roleLabel}` })
+  assert.ok(profile)
+  assert.equal(within(profile).getByText(avatarText).getAttribute('aria-hidden'), 'true')
+  const profileName = within(profile).getByText(userData.name)
+  assert.equal(profileName.title, userData.name)
+  assert.ok(within(profile).getByText(roleLabel))
+  assert.equal(screen.getByRole('link', { name: 'Tài khoản' }).getAttribute('href'), '/account')
+
+  await userEvent.setup().click(screen.getByRole('button', { name: 'Đăng xuất' }))
+  await waitFor(() => assert.equal(screen.getByTestId('current-path').textContent, '/auth'))
+  assert.equal(localStorage.getItem('luminaToken'), null)
+})
+
+test('dashboard omits its redundant breadcrumb and keeps course search and progress filtering aligned', async () => {
+  localStorage.setItem('luminaToken', 'test-session')
+  const user = userEvent.setup()
+  const courses = [
+    { id: 1, title: 'Python cơ bản', description: 'Nhập môn Python', instructor: { name: 'Giảng viên' }, _count: { lessons: 2, enrollments: 1 }, completedLessons: 2, progressPercent: 100, createdAt: '2026-01-01T00:00:00.000Z' },
+    { id: 2, title: 'Cấu trúc dữ liệu', description: 'Danh sách và cây', instructor: { name: 'Giảng viên' }, _count: { lessons: 3, enrollments: 1 }, completedLessons: 1, progressPercent: 33, createdAt: '2026-01-02T00:00:00.000Z' },
+  ]
+  globalThis.fetch = async (url) => {
+    const payload = String(url).endsWith('/api/auth/me')
+      ? { user: { id: 10, name: 'Học viên kiểm thử', email: 'student@example.test', role: 'STUDENT' } }
+      : { courses }
+    return new Response(JSON.stringify(payload), { status: 200, headers: { 'Content-Type': 'application/json' } })
+  }
+  render(h(MemoryRouter, { initialEntries: ['/dashboard'] }, h(SessionProvider, null, h(Routes, null,
+    h(Route, { path: '/dashboard', element: h(AppLayout, null, h(DashboardPage)) }),
+    h(Route, { path: '/courses/:courseId', element: h(AppLayout, null, h('main', null, 'Chi tiết khóa học')) }),
+  ))))
+
+  await screen.findByRole('heading', { name: 'Khóa học của tôi' })
+  assert.equal(screen.getAllByRole('link', { name: 'Tổng quan' }).length, 1)
+  assert.equal(screen.queryByRole('navigation', { name: 'Đường dẫn' }), null)
+  const search = screen.getByRole('searchbox', { name: 'Tìm kiếm' })
+  assert.equal(search.placeholder, 'Tìm khóa học…')
+  assert.ok(screen.getByRole('combobox', { name: 'Tiến độ' }))
+  assert.ok(screen.getByText('Python cơ bản'))
+  assert.ok(screen.getByText('Cấu trúc dữ liệu'))
+
+  await user.selectOptions(screen.getByRole('combobox', { name: 'Tiến độ' }), 'complete')
+  assert.ok(screen.getByText('Python cơ bản'))
+  assert.equal(screen.queryByText('Cấu trúc dữ liệu'), null)
+  await user.selectOptions(screen.getByRole('combobox', { name: 'Tiến độ' }), 'all')
+  await user.type(search, 'khong co ket qua')
+  assert.ok(await screen.findByText('Không tìm thấy khóa học'))
+})
+
+test('nested course routes keep useful breadcrumbs', async () => {
+  localStorage.setItem('luminaToken', 'test-session')
+  globalThis.fetch = async () => new Response(JSON.stringify({ user: { id: 10, name: 'Học viên', email: 'student@example.test', role: 'STUDENT' } }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+  render(h(MemoryRouter, { initialEntries: ['/courses/15?section=lessons'] }, h(SessionProvider, null, h(AppLayout, null, h(CurrentPath)))))
+
+  await screen.findByRole('group', { name: 'Học viên, Học viên' })
+  const breadcrumbs = screen.getByRole('navigation', { name: 'Đường dẫn' })
+  assert.ok(within(breadcrumbs).getByRole('link', { name: 'Tổng quan' }))
+  assert.ok(within(breadcrumbs).getByText('Khóa học'))
+})
+
+test('account route has no redundant overview breadcrumb and only marks account active', async () => {
+  localStorage.setItem('luminaToken', 'test-session')
+  globalThis.fetch = async () => new Response(JSON.stringify({ user: { id: 10, name: 'Học viên', email: 'student@example.test', role: 'STUDENT' } }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+  render(h(MemoryRouter, { initialEntries: ['/account'] }, h(SessionProvider, null, h(AppLayout, null, h(AccountPage)))))
+
+  await screen.findByRole('heading', { name: 'Hồ sơ cá nhân' })
+  assert.equal(screen.queryByRole('navigation', { name: 'Đường dẫn' }), null)
+  assert.equal(screen.getByRole('link', { name: 'Tài khoản' }).getAttribute('aria-current'), 'page')
+  assert.equal(screen.getByRole('link', { name: 'Tổng quan' }).getAttribute('aria-current'), null)
+})
+
+test('course cards use compact non-nested actions and honest student progress states', async () => {
+  localStorage.setItem('luminaToken', 'test-session')
+  const courses = [
+    { id: 20, title: 'Khóa học chưa có bài', description: '...', instructor: { name: 'Giảng viên có tên dài để kiểm tra cách hiển thị không tràn khỏi thẻ' }, _count: { lessons: 0, enrollments: 2 }, completedLessons: 0, progressPercent: 0 },
+    { id: 21, title: 'Chưa bắt đầu', description: '', instructor: { name: 'Giảng viên' }, _count: { lessons: 3, enrollments: 1 }, completedLessons: 0, progressPercent: 0 },
+    { id: 22, title: 'Đang học', description: 'Mô tả khóa học.', instructor: { name: 'Giảng viên' }, _count: { lessons: 3, enrollments: 1 }, completedLessons: 1, progressPercent: 33 },
+    { id: 23, title: 'Đã học xong', description: 'Đã hoàn thành.', instructor: { name: 'Giảng viên' }, _count: { lessons: 2, enrollments: 1 }, completedLessons: 2, progressPercent: 100 },
+    { id: 24, title: 'Thiếu dữ liệu tiến độ', description: null, instructor: { name: 'Giảng viên' }, _count: { lessons: 4, enrollments: 1 } },
+  ]
+  globalThis.fetch = async (url) => {
+    const payload = String(url).endsWith('/api/auth/me')
+      ? { user: { id: 10, name: 'Học viên', email: 'student@example.test', role: 'STUDENT' } }
+      : { courses }
+    return new Response(JSON.stringify(payload), { status: 200, headers: { 'Content-Type': 'application/json' } })
+  }
+  render(h(MemoryRouter, { initialEntries: ['/dashboard'] }, h(SessionProvider, null, h(DashboardPage))))
+
+  await screen.findByRole('heading', { name: 'Khóa học chưa có bài' })
+  const cards = document.querySelectorAll('.dashboard-main .course-card')
+  assert.equal(cards.length, 5)
+  const noLessons = [...cards].find((card) => card.textContent.includes('Khóa học chưa có bài'))
+  assert.ok(noLessons)
+  assert.ok(within(noLessons).getByText('Chưa có bài học'))
+  assert.ok(within(noLessons).getByText('Giảng viên chưa đăng nội dung'))
+  assert.equal(within(noLessons).queryByText(/0\/0/), null)
+  assert.equal(within(noLessons).getByRole('link', { name: 'Xem khóa học' }).getAttribute('href'), '/courses/20')
+  assert.ok(within(noLessons).getByText('Chưa có mô tả.'))
+  assert.ok(within(noLessons).queryByRole('button', { name: 'Tiếp tục học' }) === null)
+  assert.ok(within(cards[1]).getByRole('button', { name: 'Bắt đầu học' }))
+  assert.ok(within(cards[2]).getByRole('button', { name: 'Tiếp tục học' }))
+  assert.equal(within(cards[3]).getByRole('link', { name: 'Ôn tập lại' }).getAttribute('href'), '/courses/23?section=lessons')
+  assert.ok(within(cards[4]).getByText('Tiến độ chưa có dữ liệu'))
+  assert.equal(within(cards[4]).getByRole('link', { name: 'Xem khóa học' }).getAttribute('href'), '/courses/24')
+  for (const card of cards) assert.equal(card.querySelector('a a, a button, button a'), null)
+})
+
+test('instructor cards link to course management and keep personal progress out', async () => {
+  localStorage.setItem('luminaToken', 'test-session')
+  const writeText = vi.fn().mockResolvedValue(undefined)
+  Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } })
+  globalThis.fetch = async (url) => {
+    const payload = String(url).endsWith('/api/auth/me')
+      ? { user: { id: 4, name: 'Giảng viên', email: 'teacher@example.test', role: 'INSTRUCTOR' } }
+      : { courses: [{ id: 31, title: 'Khóa học giảng viên', description: '', joinCode: 'ABCD1234', _count: { lessons: 2, enrollments: 7 } }] }
+    return new Response(JSON.stringify(payload), { status: 200, headers: { 'Content-Type': 'application/json' } })
+  }
+  render(h(MemoryRouter, { initialEntries: ['/dashboard'] }, h(SessionProvider, null, h(DashboardPage))))
+
+  const title = await screen.findByRole('link', { name: 'Khóa học giảng viên' })
+  const card = title.closest('article')
+  assert.equal(within(card).getByRole('link', { name: 'Quản lý khóa học' }).getAttribute('href'), '/courses/31?section=overview')
+  assert.ok(within(card).getByText('7 học viên đang tham gia'))
+  assert.equal(within(card).queryByText(/Tiến độ|bài hoàn thành/), null)
+  await userEvent.setup().click(within(card).getByRole('button', { name: 'Sao chép mã tham gia' }))
+  await screen.findByText('Đã sao chép mã ABCD1234.')
 })
 
 test('admin ignores an obsolete search response after a faster newer result', async () => {
