@@ -42,8 +42,12 @@ export const apiRequest = async (path, options = {}) => {
   let response
   try {
     response = await fetch(`${API_URL}${path}`, { ...options, headers })
-  } catch {
-    throw new Error('Không thể kết nối tới máy chủ')
+  } catch (cause) {
+    if (cause?.name === 'AbortError') throw cause
+    const error = new Error('Không thể kết nối tới máy chủ. Hãy kiểm tra kết nối và thử lại.')
+    error.code = 'NETWORK_ERROR'
+    error.status = 0
+    throw error
   }
 
   if (response.status === 204) return null
@@ -56,7 +60,7 @@ export const apiRequest = async (path, options = {}) => {
   return response.json()
 }
 
-export const downloadDocument = async (lessonId, fallbackName) => {
+export const fetchDocument = async (lessonId) => {
   const token = getToken()
   const response = await fetch(`${API_URL}/api/courses/lessons/${lessonId}/document`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -66,8 +70,11 @@ export const downloadDocument = async (lessonId, fallbackName) => {
     handleSessionError(error)
     throw error
   }
+  return response.blob()
+}
 
-  const blob = await response.blob()
+export const downloadDocument = async (lessonId, fallbackName) => {
+  const blob = await fetchDocument(lessonId)
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
   anchor.href = url

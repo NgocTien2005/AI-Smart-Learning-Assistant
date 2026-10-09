@@ -105,3 +105,14 @@ docker compose exec -e NODE_ENV=development backend npm run seed:demo
 Lệnh seed có thể chạy lại để cập nhật dữ liệu demo; lệnh từ chối chạy khi `NODE_ENV=production`. Chỉ dùng tài khoản mẫu trong môi trường local, không dùng chúng cho hệ thống triển khai thật.
 
 Tài khoản quản trị môi trường triển khai không thể đăng ký từ giao diện. Hãy đặt `ADMIN_BOOTSTRAP_NAME`, `ADMIN_BOOTSTRAP_EMAIL` và `ADMIN_BOOTSTRAP_PASSWORD` trong `.env`, khởi động lại backend rồi chạy `docker compose exec backend npm run admin:create`. Sau khi tạo xong, xóa ba biến này khỏi `.env` và khởi động lại backend. Mật khẩu bootstrap cần từ 12 đến 72 ký tự; lệnh chỉ tạo tài khoản mới và không sửa tài khoản đã tồn tại.
+
+
+## Frontend workflows
+
+The React UI supports ADMIN, INSTRUCTOR, and STUDENT sessions. It provides role-aware dashboards, course workspace sections stored in the URL, lesson reading, authenticated document preview/download, progress, assignments and grading, local source lookup, and resumable practice quizzes. Session identity is checked through `/api/auth/me`; network and server failures remain recoverable.
+
+PDF preview displays the uploaded document but does not extract PDF text. Assistant lookup uses locally available lesson text. Quiz generation uses supported local definition patterns and may return fewer questions when the source has too few suitable candidates. Drafts use server versions to resolve concurrent tabs.
+
+Run frontend checks from `frontend/`: `npm test`, `npm run lint`, and `npm run build`.
+
+Backend-dependent backlog: PDF text extraction/OCR, summaries, learning recommendations, notifications, OAuth, and global analytics need supported APIs and authorization contracts before UI implementation.

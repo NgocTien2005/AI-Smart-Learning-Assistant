@@ -195,12 +195,12 @@ Bài ôn tập dùng generator cục bộ dựa trên các mẫu câu định ng
 
 ## Kiểm thử và xác minh
 
-Repository có automated tests dùng Node built-in test runner ở cả hai package. Backend integration script cần Docker stack và thực hiện luồng API trên `http://localhost:8080`; script tạo dữ liệu riêng rồi dọn tài khoản kiểm thử.
+Backend tests use Node built-in test runner. Frontend tests use Vitest, jsdom, and React Testing Library to render actual components.
 
 Mức kiểm chứng tối thiểu theo loại thay đổi:
 
 - Frontend: `npm run lint` và `npm run build`.
-- Frontend regression tests: `npm test` trong `frontend/`.
+- Frontend component regression tests: `npm test` trong `frontend/` (Vitest + jsdom + React Testing Library).
 - Backend unit/regression tests: `npm test` trong `backend/`.
 - Quiz route regression tests: `npm test -- --test-name-pattern="quiz"` trong `backend/` (các handler production qua router với Prisma injection hẹp).
 - Backend tích hợp HTTP/database, gồm quyền truy cập, upload và luồng LMS: `npm run test:integration` trong `backend/` khi Docker stack healthy.
@@ -230,3 +230,12 @@ Nếu không thể chạy một bước vì thiếu database, secret, network ho
 - Không thêm mock/fake success vào production path.
 - Không đổi API response hoặc schema theo cách breaking mà không nêu rõ và cập nhật mọi consumer.
 - Không triển khai AI bằng cách gửi tài liệu hoặc dữ liệu người dùng sang dịch vụ bên ngoài khi chưa có yêu cầu, cấu hình và đánh giá quyền riêng tư rõ ràng.
+
+
+## Frontend workflows and API gaps
+
+- Session and current user are managed through React Router and `GET /api/auth/me`; network and 5xx errors remain recoverable. The UI supports ADMIN, INSTRUCTOR, and STUDENT roles.
+- Dashboard, course sections, lesson reading, protected document preview/download, progress, assignments/grading, local assistant lookup, resumable quiz, and account management use mounted APIs. Course section and selected lesson are URL-backed.
+- Quiz autosave is debounced and versioned. In-app leave flows flush pending drafts or ask whether to stay or discard; browser unload warns without promising network persistence. Server remains authoritative for access and grading.
+- Frontend checks: `npm test`, `npm run lint`, and `npm run build` from `frontend/`.
+- No API currently supports OAuth, OCR/PDF text extraction, document summaries, learning recommendations, notifications, or system-wide analytics. Do not fabricate UI success or data for these workflows.

@@ -9,15 +9,17 @@ function ResetPasswordPage() {
   const [confirmation, setConfirmation] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [message, setMessage] = useState('')
-  const [messageType, setMessageType] = useState('')
+  const validToken = /^[a-f\d]{64}$/i.test(token)
+  const [message, setMessage] = useState(validToken ? '' : 'Liên kết đặt lại mật khẩu bị thiếu hoặc sai định dạng. Hãy yêu cầu một liên kết mới.')
+  const [messageType, setMessageType] = useState(validToken ? '' : 'error')
   const [completed, setCompleted] = useState(false)
+  const [invalidLink, setInvalidLink] = useState(!validToken)
 
   const submit = async (event) => {
     event.preventDefault()
     setMessage('')
 
-    if (!token) {
+    if (!validToken) {
       setMessageType('error')
       setMessage('Liên kết đặt lại mật khẩu không hợp lệ.')
       return
@@ -38,11 +40,13 @@ function ResetPasswordPage() {
       setMessageType('success')
       setMessage(data.message)
       setCompleted(true)
+      setInvalidLink(false)
       setPassword('')
       setConfirmation('')
     } catch (error) {
       setMessageType('error')
       setMessage(error.message)
+      if (error.status === 400) setInvalidLink(true)
     } finally {
       setIsSubmitting(false)
     }
@@ -62,8 +66,9 @@ function ResetPasswordPage() {
             <label htmlFor="new-password">Mật khẩu mới<div className="input-wrap"><span aria-hidden="true">▣</span><input id="new-password" type={showPassword ? 'text' : 'password'} autoComplete="new-password" value={password} onChange={(event) => { setPassword(event.target.value); setMessage('') }} minLength="6" maxLength="72" disabled={completed} required /><button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'} aria-pressed={showPassword}>{showPassword ? '◌' : '◉'}</button></div></label>
             <label htmlFor="confirm-password">Xác nhận mật khẩu<div className="input-wrap"><span aria-hidden="true">▣</span><input id="confirm-password" type={showPassword ? 'text' : 'password'} autoComplete="new-password" value={confirmation} onChange={(event) => { setConfirmation(event.target.value); setMessage('') }} minLength="6" maxLength="72" disabled={completed} required /></div></label>
           </div>
-          {!completed && <button className="submit-button" type="submit" disabled={isSubmitting || !token}>{isSubmitting ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}</button>}
+          {!completed && !invalidLink && <button className="submit-button" type="submit" disabled={isSubmitting}>{isSubmitting ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}</button>}
           {message && <p className={`form-message ${messageType}`} aria-live="polite">{message}</p>}
+          {invalidLink && <Link className="submit-button reset-request-link" to="/auth?mode=forgot">Yêu cầu liên kết mới</Link>}
           <p className="switch-copy"><Link to="/auth">Quay lại đăng nhập</Link></p>
         </form>
       </div>
