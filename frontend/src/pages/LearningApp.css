@@ -164,6 +164,23 @@
 .practice-history ul { display: grid; gap: 8px; margin: 10px 0 0; padding: 0; list-style: none; }
 .practice-history li { display: flex; justify-content: space-between; gap: 15px; color: #66758b; font-size: 12px; }
 .practice-history li strong { color: #24334a; }
+.practice-create { display: flex; flex-wrap: wrap; align-items: end; gap: 14px; }
+.practice-create label { display: grid; gap: 7px; color: #40506a; font-size: 13px; font-weight: 600; }
+.practice-create select { min-width: 150px; padding: 10px 12px; border: 1px solid #ccd6e4; border-radius: 9px; background: #fbfcfe; color: #172033; font: inherit; }
+.practice-save-status { color: #52627a; font-size: 13px; }
+.practice-result article { padding: 14px; border-radius: 10px; }
+.practice-result article p { padding: 0; }
+.practice-result article blockquote { margin: 8px 0 0; padding-left: 12px; border-left: 3px solid #94add0; color: #52627a; }
+.practice-history li button, .practice-result > button { min-height: 36px; padding: 7px 12px; border: 1px solid #ccd6e4; border-radius: 8px; background: #fff; color: #1959ad; font: inherit; cursor: pointer; }
+.practice-history li button:hover, .practice-result > button:hover { background: #edf4ff; }
+@media (max-width: 640px) {
+  .practice-panel { padding: 17px; }
+  .practice-history li { align-items: start; }
+  .practice-history li button { flex: 0 0 auto; }
+  .practice-questions fieldset { min-width: 0; padding: 12px; }
+  .practice-create { align-items: stretch; }
+  .practice-create label, .practice-create select, .practice-create .primary-button { width: 100%; }
+}
 .admin-main { width: min(1080px,90vw); margin: 0 auto; padding: 48px 0 80px; }
 .admin-main .account-heading h1 { margin: 7px 0; font: 700 34px Lexend,sans-serif; }
 .admin-main .account-heading p { color: #66758c; }

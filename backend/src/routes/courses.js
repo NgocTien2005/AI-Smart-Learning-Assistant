@@ -8,7 +8,7 @@ import { authenticate } from '../middleware/authenticate.js'
 import { authorizeRole } from '../middleware/authorizeRole.js'
 import { prisma } from '../lib/prisma.js'
 import { answerFromDocument } from '../utils/studyAssistant.js'
-import { createPracticeQuestions } from '../utils/studyQuiz.js'
+import quizAttemptsRouter from './quizAttempts.js'
 import { lessonTextAfterContentEdit, lessonTextAfterDocumentRemoval, uploadedLessonText } from '../utils/lessonText.js'
 
 const router = Router()
@@ -98,6 +98,7 @@ const createJoinCode = async () => {
 }
 
 router.use(authenticate)
+router.use(quizAttemptsRouter)
 
 router.get('/', async (request, response) => {
   const where = request.user.role === 'INSTRUCTOR'
@@ -438,79 +439,6 @@ router.delete('/lessons/:lessonId/progress', authorizeRole('STUDENT'), async (re
 
   await prisma.lessonProgress.deleteMany({ where: { userId: request.user.id, lessonId } })
   return response.json({ isCompleted: false, completedAt: null })
-})
-
-router.get('/lessons/:lessonId/quizzes', async (request, response) => {
-  const lessonId = parseId(request.params.lessonId)
-  if (!lessonId) return response.status(400).json({ error: 'ID bài học không hợp lệ' })
-  const lesson = await prisma.lesson.findUnique({
-    where: { id: lessonId },
-    include: { course: { include: { enrollments: { where: { userId: request.user.id }, select: { userId: true } } } } },
-  })
-  if (!lesson) return response.status(404).json({ error: 'Không tìm thấy bài học' })
-  if (!canAccessCourse(lesson.course, request.user)) return response.status(403).json({ error: 'Bạn không có quyền xem bài học này' })
-  const attempts = await prisma.quizAttempt.findMany({
-    where: { userId: request.user.id, lessonId },
-    orderBy: { createdAt: 'desc' },
-    take: 10,
-    select: { id: true, score: true, questions: true, createdAt: true, submittedAt: true },
-  })
-  return response.json({ attempts: attempts.map(({ questions, ...attempt }) => ({ ...attempt, questionCount: questions.length })) })
-})
-
-router.post('/lessons/:lessonId/quizzes', async (request, response) => {
-  const lessonId = parseId(request.params.lessonId)
-  if (!lessonId) return response.status(400).json({ error: 'ID bài học không hợp lệ' })
-  const lesson = await prisma.lesson.findUnique({
-    where: { id: lessonId },
-    include: { course: { include: { enrollments: { where: { userId: request.user.id }, select: { userId: true } } } } },
-  })
-  if (!lesson) return response.status(404).json({ error: 'Không tìm thấy bài học' })
-  if (!canAccessCourse(lesson.course, request.user)) return response.status(403).json({ error: 'Bạn không có quyền ôn tập bài học này' })
-  if (!lesson.extractedText) return response.status(422).json({ error: 'Bài học chưa có nội dung text để tạo câu hỏi' })
-  const requestedCount = request.body.count === undefined ? 5 : Number(request.body.count)
-  if (!Number.isInteger(requestedCount) || requestedCount < 3 || requestedCount > 10) {
-    return response.status(400).json({ error: 'Số câu hỏi phải từ 3 đến 10' })
-  }
-  const { questions, error } = createPracticeQuestions(lesson.extractedText, requestedCount)
-  if (error) return response.status(422).json({ error })
-
-  const attempt = await prisma.quizAttempt.create({ data: { userId: request.user.id, lessonId, questions } })
-  return response.status(201).json({
-    attemptId: attempt.id,
-    questions: questions.map(({ prompt, options }, index) => ({ id: index, prompt, options })),
-  })
-})
-
-router.post('/quiz-attempts/:attemptId/submit', async (request, response) => {
-  const attemptId = parseId(request.params.attemptId)
-  if (!attemptId) return response.status(400).json({ error: 'ID bài ôn tập không hợp lệ' })
-  const attempt = await prisma.quizAttempt.findUnique({ where: { id: attemptId } })
-  if (!attempt) return response.status(404).json({ error: 'Không tìm thấy bài ôn tập' })
-  if (attempt.userId !== request.user.id) return response.status(403).json({ error: 'Bạn không có quyền nộp bài ôn tập này' })
-  if (attempt.submittedAt) return response.status(409).json({ error: 'Bài ôn tập đã được nộp' })
-
-  const { answers } = request.body
-  if (!Array.isArray(answers) || answers.length !== attempt.questions.length
-    || answers.some((answer, index) => !Number.isInteger(answer) || answer < 0 || answer >= attempt.questions[index].options.length)) {
-    return response.status(400).json({ error: 'Vui lòng chọn một đáp án hợp lệ cho từng câu hỏi' })
-  }
-  const questions = attempt.questions
-  const score = questions.reduce((total, question, index) => total + (question.correctIndex === answers[index] ? 1 : 0), 0)
-  const submittedAt = new Date()
-  const savedAttempt = await prisma.quizAttempt.updateMany({
-    where: { id: attemptId, submittedAt: null },
-    data: { score, submittedAt },
-  })
-  if (savedAttempt.count !== 1) return response.status(409).json({ error: 'Bài ôn tập đã được nộp' })
-  return response.json({
-    score,
-    total: questions.length,
-    questions: questions.map(({ prompt, options, correctIndex }, index) => ({
-      prompt, options, correctIndex, selectedIndex: answers[index], isCorrect: correctIndex === answers[index],
-    })),
-    submittedAt,
-  })
 })
 
 router.patch('/:courseId', authorizeRole('INSTRUCTOR'), async (request, response) => {

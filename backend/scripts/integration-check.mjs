@@ -137,7 +137,7 @@ try {
 
   const createdLesson = await request(`/courses/${courseId}/lessons`, jsonOptions('POST', {
     title: 'Nền tảng Machine Learning',
-    content: 'Machine Learning giúp hệ thống học từ dữ liệu thay vì chỉ theo quy tắc. Mạng nơ-ron thường dùng trong nhận dạng hình ảnh. Thuật toán phân loại gán nhãn cho dữ liệu đầu vào. Tập huấn luyện giúp mô hình điều chỉnh tham số. Tập kiểm tra dùng để đánh giá khả năng tổng quát.',
+    content: 'Machine Learning giúp hệ thống học từ dữ liệu thay vì chỉ theo quy tắc. Mạng nơ-ron là mô hình gồm các nút liên kết. Thuật toán phân loại mô tả cách gán nhãn cho dữ liệu đầu vào. Tập huấn luyện chứa ví dụ để mô hình điều chỉnh tham số. Học có giám sát cho phép mô hình học từ ví dụ đã gắn nhãn. Tập kiểm tra dùng để đánh giá khả năng tổng quát.',
     order: 1,
   }, instructorToken))
   const updatedLesson = await request(`/courses/lessons/${createdLesson.lesson.id}`, jsonOptions('PATCH', {
@@ -357,15 +357,25 @@ try {
   }
 
   const quiz = await request(`/courses/lessons/${createdLesson.lesson.id}/quizzes`, jsonOptions('POST', { count: 5 }, student.token))
-  if (quiz.questions.length !== 5 || quiz.questions.some((question) => 'correctIndex' in question)) {
+  if (quiz.questions.length !== 5 || quiz.questions.some((question) => 'correctIndex' in question || 'sourcePassage' in question || 'explanation' in question)) {
     throw new Error('Practice quiz did not hide its answer key')
   }
+  const reopenedQuiz = await request(`/courses/quiz-attempts/${quiz.attemptId}`, { headers: { Authorization: `Bearer ${student.token}` } })
+  if (reopenedQuiz.version !== 0 || reopenedQuiz.answers.length !== quiz.questions.length || reopenedQuiz.questions.some((question) => 'correctIndex' in question)) {
+    throw new Error('Practice quiz did not reopen as a protected draft')
+  }
+  const draftAnswers = quiz.questions.map(() => 0)
+  const savedDraft = await request(`/courses/quiz-attempts/${quiz.attemptId}/draft`, jsonOptions('PUT', {
+    answers: draftAnswers, version: reopenedQuiz.version,
+  }, student.token))
+  const resumedQuiz = await request(`/courses/quiz-attempts/${quiz.attemptId}`, { headers: { Authorization: `Bearer ${student.token}` } })
+  if (savedDraft.version !== 1 || resumedQuiz.answers.some((answer) => answer !== 0)) throw new Error('Practice quiz draft did not persist')
   const quizOwnerCheck = await fetch(`${baseUrl}/courses/quiz-attempts/${quiz.attemptId}/submit`, jsonOptions('POST', {
-    answers: quiz.questions.map(() => 0),
+    answers: draftAnswers, version: resumedQuiz.version,
   }, instructorToken))
-  if (quizOwnerCheck.status !== 403) throw new Error(`Another user quiz submission returned ${quizOwnerCheck.status}, expected 403`)
+  if (quizOwnerCheck.status !== 404) throw new Error(`Another user quiz submission returned ${quizOwnerCheck.status}, expected 404`)
   const submittedQuiz = await request(`/courses/quiz-attempts/${quiz.attemptId}/submit`, jsonOptions('POST', {
-    answers: quiz.questions.map(() => 0),
+    answers: draftAnswers, version: resumedQuiz.version,
   }, student.token))
   if (submittedQuiz.total !== 5 || submittedQuiz.score !== submittedQuiz.questions.filter(({ isCorrect }) => isCorrect).length) {
     throw new Error('Practice quiz score did not match the answer review')
@@ -374,8 +384,10 @@ try {
     headers: { Authorization: `Bearer ${student.token}` },
   })
   if (quizHistory.attempts[0].score !== submittedQuiz.score) throw new Error('Practice quiz result was not persisted')
+  const detailedQuizResult = await request(`/courses/quiz-attempts/${quiz.attemptId}`, { headers: { Authorization: `Bearer ${student.token}` } })
+  if (detailedQuizResult.questions.some((question) => !('selectedIndex' in question) || !question.sourcePassage)) throw new Error('Detailed practice quiz result did not persist')
   const duplicateQuizSubmit = await fetch(`${baseUrl}/courses/quiz-attempts/${quiz.attemptId}/submit`, jsonOptions('POST', {
-    answers: quiz.questions.map(() => 0),
+    answers: draftAnswers, version: resumedQuiz.version,
   }, student.token))
   if (duplicateQuizSubmit.status !== 409) throw new Error(`Repeated quiz submission returned ${duplicateQuizSubmit.status}, expected 409`)
 
@@ -387,6 +399,8 @@ try {
   await request(`/courses/${courseId}/enrollment`, { method: 'DELETE', headers: { Authorization: `Bearer ${student.token}` } })
   const afterLeaving = await fetch(`${baseUrl}/courses/${courseId}`, { headers: { Authorization: `Bearer ${student.token}` } })
   if (afterLeaving.status !== 403) throw new Error(`Course access after leaving returned ${afterLeaving.status}, expected 403`)
+  const quizAfterLeaving = await fetch(`${baseUrl}/courses/quiz-attempts/${quiz.attemptId}`, { headers: { Authorization: `Bearer ${student.token}` } })
+  if (quizAfterLeaving.status !== 403) throw new Error(`Quiz access after leaving returned ${quizAfterLeaving.status}, expected 403`)
 
   const resetToken = 'a'.repeat(64)
   const newPassword = 'NewTestPass456'

@@ -58,10 +58,18 @@ Tài liệu upload được lưu trong Docker volume `uploads_data` và chỉ t�
 - Giảng viên thêm/xóa bài học, nhập nội dung hoặc upload tài liệu.
 - Người có quyền trong khóa học tải tài liệu, hỏi đáp theo nội dung text và xem lịch sử hỏi đáp.
 - Học viên đánh dấu hoặc bỏ hoàn thành từng bài học; dashboard hiển thị tiến độ khóa học và giảng viên xem tiến độ từng học viên.
-- Học viên tạo bài ôn trắc nghiệm cục bộ từ nội dung bài học, nhận chấm điểm và xem lịch sử kết quả.
+- Học viên tạo bài ôn trắc nghiệm cục bộ từ các mẫu câu định nghĩa được hỗ trợ, lưu nháp tự động, tiếp tục bài chưa nộp và xem lại kết quả chi tiết. Generator không dùng AI bên ngoài và bỏ qua dạng câu không nhận diện được; số câu tạo thực tế có thể thấp hơn yêu cầu.
 - Giảng viên giao bài có hạn nộp và điểm tối đa; học viên nộp/cập nhật bài trước hạn, giảng viên chấm điểm và gửi nhận xét.
 - Quản trị viên tìm tài khoản, sửa họ tên, đổi vai trò giảng viên/học viên và khóa/mở quyền truy cập.
 - Authorization được kiểm tra riêng cho từng thao tác khóa học và bài học.
+
+### Bài ôn tập có thể tiếp tục
+
+- Số câu được yêu cầu từ 3 đến 10; API trả số câu thực tế và trả `422` khi không tìm thấy đủ khái niệm phù hợp. Generator hiện chỉ nhận diện câu định nghĩa có khái niệm đứng trước các mẫu `giúp`, `cho phép`, `lưu trữ`, `chứa`, `mô tả`, `biểu diễn`, `bao gồm`, `gồm` hoặc `là`. Đây là tạo câu hỏi theo mẫu cục bộ, không phải AI hiểu ngôn ngữ tổng quát.
+- `GET /api/courses/lessons/:lessonId/quizzes` liệt kê lịch sử; `POST` cùng đường dẫn tạo attempt.
+- `GET /api/courses/quiz-attempts/:attemptId` mở bản nháp hoặc kết quả; `PUT .../:attemptId/draft` lưu lựa chọn với `version`; `POST .../:attemptId/submit` chấm điểm và khóa attempt. Các thao tác đều cần quyền hiện tại với lesson/course.
+- Câu hỏi đã tạo lưu snapshot nguồn bất biến. Answer key chỉ được trả sau khi nộp. Attempt cũ vẫn giữ được; attempt đã nộp trước khi lưu lựa chọn sẽ hiện thông báo lịch sử không có đáp án đã chọn.
+- Migration `20261009150000_persist_quiz_attempt_lifecycle` bổ sung JSONB cho nháp/lựa chọn và bộ đếm version, không xóa hoặc sửa attempt cũ.
 
 Các kiểm tra chính:
 

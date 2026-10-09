@@ -191,6 +191,8 @@ Role hợp lệ là `ADMIN`, `INSTRUCTOR` và `STUDENT`. Đăng ký công khai c
 
 Đăng ký frontend gửi `name`, `email`, `password` và role đã chọn; giữ kiểm thử contract này khi sửa authentication. Quên/đặt lại mật khẩu dùng email SMTP nếu được cấu hình. Social login chưa được cấu hình. Nội dung tài liệu TXT/Markdown/CSV được dùng cục bộ cho trợ lý và bài ôn; PDF chỉ có nội dung fallback do giảng viên nhập, không có OCR/extraction hoặc dịch vụ AI bên ngoài.
 
+Bài ôn tập dùng generator cục bộ dựa trên các mẫu câu định nghĩa có khái niệm đứng trước `giúp`, `cho phép`, `lưu trữ`, `chứa`, `mô tả`, `biểu diễn`, `bao gồm`, `gồm` hoặc `là`. Generator bỏ qua câu không phù hợp; không coi đây là hiểu ngôn ngữ tổng quát hay dịch vụ AI. API cho phép 3–10 câu và báo số thực tế; attempt lưu snapshot, draft/selected answers và version. Mọi thao tác attempt kiểm tra lại quyền truy cập khóa học. Xem `README.md` để biết endpoint và lifecycle.
+
 ## Kiểm thử và xác minh
 
 Repository có automated tests dùng Node built-in test runner ở cả hai package. Backend integration script cần Docker stack và thực hiện luồng API trên `http://localhost:8080`; script tạo dữ liệu riêng rồi dọn tài khoản kiểm thử.
@@ -200,6 +202,7 @@ Mức kiểm chứng tối thiểu theo loại thay đổi:
 - Frontend: `npm run lint` và `npm run build`.
 - Frontend regression tests: `npm test` trong `frontend/`.
 - Backend unit/regression tests: `npm test` trong `backend/`.
+- Quiz route regression tests: `npm test -- --test-name-pattern="quiz"` trong `backend/` (các handler production qua router với Prisma injection hẹp).
 - Backend tích hợp HTTP/database, gồm quyền truy cập, upload và luồng LMS: `npm run test:integration` trong `backend/` khi Docker stack healthy.
 - Backend không đổi schema: khởi động server và kiểm tra endpoint liên quan; tối thiểu kiểm tra `/api/health` khi có database khả dụng.
 - Prisma/schema: `npx prisma validate`, xem migration diff/SQL, generate client và kiểm tra migration status trên database mục tiêu phù hợp.
