@@ -110,15 +110,18 @@ model AssignmentSubmission {
 }
 
 model QuizAttempt {
-  id          Int       @id @default(autoincrement())
-  questions   Json
-  score       Int?
-  submittedAt DateTime?
-  userId      Int
-  lessonId    Int
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
+  id              Int       @id @default(autoincrement())
+  questions       Json
+  draftAnswers    Json      @default("[]")
+  selectedAnswers Json?
+  version         Int       @default(0)
+  score           Int?
+  submittedAt     DateTime?
+  userId          Int
+  lessonId        Int
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson          Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  createdAt       DateTime  @default(now())
 
   @@index([userId, lessonId, createdAt])
 }

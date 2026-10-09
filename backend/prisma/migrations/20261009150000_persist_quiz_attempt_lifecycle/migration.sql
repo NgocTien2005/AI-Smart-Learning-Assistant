@@ -1,0 +1,4 @@
+ALTER TABLE "QuizAttempt"
+ADD COLUMN "draftAnswers" JSONB NOT NULL DEFAULT '[]'::jsonb,
+ADD COLUMN "selectedAnswers" JSONB,
+ADD COLUMN "version" INTEGER NOT NULL DEFAULT 0;
