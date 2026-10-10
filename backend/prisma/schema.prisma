@@ -70,7 +70,13 @@ model Lesson {
   content       String?       @db.Text
   documentUrl   String? // tên file PDF/text được lưu cục bộ
   documentName  String?
-  extractedText String?       @db.Text // nội dung trích xuất từ file, dùng làm context cho AI
+  extractedText String?       @db.Text // legacy field; never treat as PDF extraction
+  documentText String?        @db.Text
+  documentHash String?
+  extractionStatus String?
+  extractionErrorCode String?
+  extractionTruncated Boolean  @default(false)
+  sourceRevision Int           @default(0)
   order         Int           @default(0)
   courseId      Int
   course        Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)

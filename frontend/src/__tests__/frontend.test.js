@@ -14,12 +14,43 @@ import AccountPage from '../pages/AccountPage.jsx'
 import { useLocation } from 'react-router-dom'
 import PracticeQuizPanel from '../components/PracticeQuizPanel.jsx'
 import AssignmentsPanel from '../components/AssignmentsPanel.jsx'
+import LessonSummaryPanel from '../components/LessonSummaryPanel.jsx'
 import { resolvePostLoginDestination } from '../services/navigation.js'
 
 const nativeFetch = globalThis.fetch
 afterEach(() => { cleanup(); localStorage.clear(); sessionStorage.clear(); globalThis.fetch = nativeFetch; vi.useRealTimers() })
 const h = React.createElement
 function SessionStatus() { const session = useSession(); return h('div', null, h('span', null, session.status), h('button', { onClick: session.logout }, 'logout')) }
+
+test('lesson summary exposes retry and renders source points and page references', async () => {
+  let attempts = 0
+  globalThis.fetch = async () => {
+    attempts += 1
+    if (attempts === 1) return new Response(JSON.stringify({ error: 'offline' }), { status: 503, headers: { 'Content-Type': 'application/json' } })
+    return new Response(JSON.stringify({ title: 'Tóm tắt trích xuất', points: [{ text: 'Nguồn lưu trữ nội dung.', page: 3 }], sourceType: 'DOCUMENT', sourceRevision: 4, truncated: false }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+  }
+  render(h(LessonSummaryPanel, { lesson: { id: 41, title: 'Bài học' }, onClose: vi.fn() }))
+  await screen.findByText('Không tải được tóm tắt')
+  await userEvent.click(screen.getByRole('button', { name: 'Thử lại' }))
+  await screen.findByText('Nguồn lưu trữ nội dung.')
+  assert.ok(screen.getByText(/Trang 3/))
+  assert.equal(attempts, 2)
+})
+
+test('switching lessons ignores an older summary response', async () => {
+  const requests = []
+  globalThis.fetch = () => new Promise((resolve) => requests.push(resolve))
+  const view = render(h(LessonSummaryPanel, { lesson: { id: 1, title: 'Cũ' }, onClose: vi.fn() }))
+  await waitFor(() => assert.equal(requests.length, 1))
+  view.rerender(h(LessonSummaryPanel, { lesson: { id: 2, title: 'Mới' }, onClose: vi.fn() }))
+  await waitFor(() => assert.equal(requests.length, 2))
+  const result = (text) => new Response(JSON.stringify({ points: [{ text, page: null }], sourceType: 'LESSON_CONTENT', sourceRevision: 1, truncated: false }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+  requests[1](result('Nội dung bài mới.'))
+  await screen.findByText('Nội dung bài mới.')
+  requests[0](result('Nội dung bài cũ.'))
+  await new Promise((resolve) => setTimeout(resolve, 0))
+  assert.ok(screen.queryByText('Nội dung bài cũ.') === null)
+})
 
 test('startup /me network failure preserves the valid stored session token', async () => {
   localStorage.setItem('luminaToken', 'valid-session')

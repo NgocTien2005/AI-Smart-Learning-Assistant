@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { prisma as defaultPrisma } from '../lib/prisma.js'
 import { createPracticeQuestions, publicQuizQuestion } from '../utils/studyQuiz.js'
+import { resolveLessonSource } from '../utils/lessonText.js'
 
 const parseId = (value) => {
   const id = Number(value)
@@ -73,8 +74,8 @@ export const createQuizAttemptsRouter = ({ prisma = defaultPrisma, requireStuden
     if (!Number.isInteger(requestedCount) || requestedCount < 3 || requestedCount > 10) {
       return response.status(400).json({ error: 'Số câu hỏi phải từ 3 đến 10' })
     }
-    const source = lesson.extractedText || lesson.content || ''
-    const generated = createPracticeQuestions(source, requestedCount)
+    const source = resolveLessonSource(lesson)
+    const generated = createPracticeQuestions(source.text, requestedCount)
     if (generated.error || !generated.questions.length) return response.status(422).json({ error: generated.error })
     const attempt = await prisma.quizAttempt.create({
       data: { userId: request.user.id, lessonId, questions: generated.questions, draftAnswers: generated.questions.map(() => null), version: 0 },

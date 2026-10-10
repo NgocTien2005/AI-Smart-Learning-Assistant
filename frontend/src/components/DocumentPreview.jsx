@@ -5,13 +5,14 @@ import { ErrorState, LoadingState } from './ui/Feedback.jsx'
 /* eslint react-refresh/only-export-components: off */
 export const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024
 const acceptedExtensions = new Set(['.pdf', '.txt', '.md', '.markdown', '.csv'])
-const acceptedMimeTypes = new Set(['application/pdf', 'text/plain', 'text/markdown', 'text/csv'])
 
 export const validateDocumentFile = (file) => {
   if (!file) return 'Hãy chọn tài liệu.'
   if (file.size > MAX_DOCUMENT_BYTES) return 'Tài liệu vượt quá giới hạn 10 MiB.'
   const extension = `.${file.name.split('.').at(-1) || ''}`.toLocaleLowerCase('en')
-  if (!acceptedExtensions.has(extension) || !acceptedMimeTypes.has(file.type)) return 'Chỉ hỗ trợ PDF, TXT, Markdown hoặc CSV.'
+  const expected = extension === '.pdf' ? 'application/pdf' : ['.md', '.markdown'].includes(extension) ? 'text/markdown' : extension === '.csv' ? 'text/csv' : 'text/plain'
+  const variants = extension === '.csv' ? ['application/csv', 'application/vnd.ms-excel'] : ['.md', '.markdown'].includes(extension) ? ['text/x-markdown', 'text/plain'] : []
+  if (!acceptedExtensions.has(extension) || (file.type && file.type !== 'application/octet-stream' && file.type !== expected && !variants.includes(file.type))) return 'Chỉ hỗ trợ PDF, TXT, Markdown hoặc CSV.'
   return ''
 }
 
@@ -57,7 +58,7 @@ function DocumentPreview({ lesson, onClose }) {
   }
 
   return <section className="document-preview" aria-labelledby="document-preview-title"><header><div><span className="eyebrow">{isPdf ? 'XEM TRƯỚC PDF' : 'XEM NỘI DUNG VĂN BẢN'}</span><h3 id="document-preview-title" title={lesson.documentName}>{lesson.documentName}</h3></div><button type="button" aria-label="Đóng phần xem trước" onClick={onClose}>Đóng</button></header>
-    {loading ? <LoadingState>Đang tải tài liệu an toàn…</LoadingState> : error ? <ErrorState title="Không thể xem trước tài liệu">{error}<button type="button" className="ui-button ui-button-secondary" onClick={downloadFallback}>Tải xuống thay thế</button></ErrorState> : isPdf ? <><iframe className="pdf-preview-frame" title={`PDF: ${lesson.documentName}`} src={previewUrl} /><p className="preview-note">Đây là bản xem trước PDF. Lumina chưa trích xuất văn bản PDF cho trợ lý hoặc bài ôn.</p></> : <pre className="text-preview">{text || 'Tài liệu không có nội dung văn bản.'}</pre>}
+    {loading ? <LoadingState>Đang tải tài liệu an toàn…</LoadingState> : error ? <ErrorState title="Không thể xem trước tài liệu">{error}<button type="button" className="ui-button ui-button-secondary" onClick={downloadFallback}>Tải xuống thay thế</button></ErrorState> : isPdf ? <><iframe className="pdf-preview-frame" title={`PDF: ${lesson.documentName}`} src={previewUrl} /><p className="preview-note">PDF vẫn có thể xem và tải xuống khi không có lớp văn bản. Bản scan hoặc tệp không có chữ sẽ không dùng được cho tra cứu, tóm tắt hay tạo câu hỏi. Lumina không hỗ trợ OCR.</p></> : <pre className="text-preview">{text || 'Tài liệu không có nội dung văn bản.'}</pre>}
     {!loading && !error && <button className="ui-button ui-button-secondary" type="button" onClick={downloadFallback}>Tải tài liệu</button>}
   </section>
 }

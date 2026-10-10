@@ -5,6 +5,7 @@ import ConfirmDialog from '../components/ui/ConfirmDialog.jsx'
 import DocumentAssistantPanel from '../components/DocumentAssistantPanel.jsx'
 import DocumentPreview, { DocumentSelection, validateDocumentFile } from '../components/DocumentPreview.jsx'
 import PracticeQuizPanel from '../components/PracticeQuizPanel.jsx'
+import LessonSummaryPanel from '../components/LessonSummaryPanel.jsx'
 import { EmptyState, ErrorState, LoadingState, StatusMessage } from '../components/ui/Feedback.jsx'
 import { useSession } from '../app/SessionContext.jsx'
 import { apiRequest, downloadDocument } from '../services/api.js'
@@ -237,6 +238,16 @@ function CourseWorkspacePage() {
     }).finally(() => setPending(`document:${lesson.id}`, false))
   }
 
+  const reprocessDocument = async (lesson) => {
+    setPending(`document-process:${lesson.id}`, true)
+    try {
+      const data = await apiRequest(`/api/courses/lessons/${lesson.id}/document/process`, { method: 'POST' })
+      updateCourseState((current) => ({ ...current, lessons: current.lessons.map((item) => item.id === lesson.id ? data.lesson : item) }))
+      setNotice({ type: data.lesson.extractionStatus === 'SUCCESS' ? 'success' : 'error', text: data.lesson.extractionStatus === 'SUCCESS' ? 'Đã trích xuất văn bản tài liệu.' : 'Không tìm thấy lớp văn bản có thể trích xuất.' })
+    } catch (error) { setNotice({ type: 'error', text: error.message }) }
+    finally { setPending(`document-process:${lesson.id}`, false) }
+  }
+
   const removeDocument = async (lesson) => {
     setPending(`document-remove:${lesson.id}`, true)
     try {
@@ -317,12 +328,13 @@ function CourseWorkspacePage() {
     {visibleLessons.length === 0 ? <EmptyState title="Không có bài học phù hợp">Thử từ khóa hoặc bộ lọc khác.</EmptyState> : visibleLessons.map((lesson, index) => <button className={`lesson-list-item ${selectedLesson?.id === lesson.id ? 'selected' : ''}`} type="button" key={lesson.id} onClick={() => selectLesson(lesson.id)}><span>{String(index + 1).padStart(2, '0')}</span><span><strong>{lesson.title}</strong><small>{!isInstructor && lesson.isCompleted ? 'Đã hoàn thành' : lesson.documentName ? 'Có tài liệu' : 'Bài học'}</small></span></button>)}
   </aside>
   <div className="lesson-reader-column">{!selectedLesson ? <EmptyState title="Chọn một bài học">Chọn bài học trong danh sách để đọc nội dung và  mở các công cụ học tập.</EmptyState> : <article className="lesson-reader"><header><div><span className="eyebrow">BÀI {currentLessonIndex + 1}/{course.lessons.length}</span><h2>{selectedLesson.title}</h2></div><div className="reader-navigation"><button type="button" disabled={!previousLesson} onClick={() => previousLesson && selectLesson(previousLesson.id)}>← Bài trước</button><button type="button" disabled={!nextLesson} onClick={() => nextLesson && selectLesson(nextLesson.id)}>Bài tiếp →</button></div></header>
-    {selectedLesson.content ? <div className="lesson-reading-content">{selectedLesson.content}</div> : <EmptyState title="Chưa có nội dung nhập trực tiếp">Mở tài liệu đính kèm nếu có, hoặc hỏi giảng viên về nội dung bài học.</EmptyState>}
+    {selectedLesson.content ? <div className="lesson-reading-content">{selectedLesson.content}</div> : <EmptyState title="Chưa có nội dung nhập trực tiếp">Mở tài liệu đính kèm nếu có, hoặc hỏi giảng viên về nội dung bài học.</EmptyState>}{selectedLesson.documentName && <p className="preview-note">{selectedLesson.extractionStatus === 'SUCCESS' ? 'Nguồn tra cứu và tóm tắt: văn bản trích từ tài liệu.' : selectedLesson.extractionStatus === 'NO_TEXT' ? 'Tài liệu chưa có lớp văn bản dùng được; PDF vẫn xem và tải xuống được. Có thể là bản scan hoặc PDF không có chữ.' : selectedLesson.extractionStatus === 'FAILED' ? 'Chưa trích xuất được tài liệu. Có thể thử trích xuất lại hoặc dùng nội dung nhập trực tiếp.' : 'Tài liệu chưa được xử lý. Tra cứu và tóm tắt dùng nội dung nhập trực tiếp nếu có.'}</p>}
     {!isInstructor && <StatusMessage type={selectedLesson.isCompleted ? 'success' : 'info'}>{selectedLesson.isCompleted ? `Đã hoàn thành${selectedLesson.completedAt ? ` · ${new Date(selectedLesson.completedAt).toLocaleString('vi-VN')} (giờ địa phương)` : ''}` : 'Bài học chưa được đánh dấu hoàn thành.'}</StatusMessage>}
-    <div className="lesson-reader-actions">{!isInstructor && <button className="ui-button ui-button-secondary" type="button" disabled={operationPending[`progress:${selectedLesson.id}`]} onClick={() => toggleProgress(selectedLesson)}>{selectedLesson.isCompleted ? 'Bỏ hoàn thành' : 'Đánh dấu hoàn thành'}</button>}{selectedLesson.documentName && <><button type="button" className="ui-button ui-button-secondary" onClick={() => setPreviewLesson(selectedLesson)}>Xem tài liệu</button><button type="button" className="ui-button ui-button-secondary" disabled={operationPending[`document-download:${selectedLesson.id}`]} onClick={() => download(selectedLesson)}>{operationPending[`document-download:${selectedLesson.id}`] ? 'Đang tải…' : 'Tải xuống'}</button></>}<button type="button" className="ui-button ui-button-primary" onClick={() => openLessonPanel('quiz')}>Ôn tập nhanh</button><button type="button" className="ui-button ui-button-secondary" onClick={() => openLessonPanel('assistant')}>Tra cứu tài liệu</button></div>
+    <div className="lesson-reader-actions">{!isInstructor && <button className="ui-button ui-button-secondary" type="button" disabled={operationPending[`progress:${selectedLesson.id}`]} onClick={() => toggleProgress(selectedLesson)}>{selectedLesson.isCompleted ? 'Bỏ hoàn thành' : 'Đánh dấu hoàn thành'}</button>}{selectedLesson.documentName && <><button type="button" className="ui-button ui-button-secondary" onClick={() => setPreviewLesson(selectedLesson)}>Xem tài liệu</button><button type="button" className="ui-button ui-button-secondary" disabled={operationPending[`document-download:${selectedLesson.id}`]} onClick={() => download(selectedLesson)}>{operationPending[`document-download:${selectedLesson.id}`] ? 'Đang tải…' : 'Tải xuống'}</button>{isInstructor && <button type="button" className="ui-button ui-button-secondary" disabled={operationPending[`document-process:${selectedLesson.id}`]} onClick={() => reprocessDocument(selectedLesson)}>{operationPending[`document-process:${selectedLesson.id}`] ? 'Đang trích xuất…' : 'Trích xuất lại'}</button>}</>}<button type="button" className="ui-button ui-button-primary" onClick={() => openLessonPanel('quiz')}>Ôn tập nhanh</button><button type="button" className="ui-button ui-button-secondary" onClick={() => openLessonPanel('assistant')}>Tra cứu tài liệu</button><button type="button" className="ui-button ui-button-secondary" onClick={() => openLessonPanel('summary')}>Tóm tắt</button></div>
     {previewLesson?.id === selectedLesson.id && <DocumentPreview lesson={selectedLesson} onClose={() => setPreviewLesson(null)} />}
     {activePanel === 'quiz' && <PracticeQuizPanel key={`${courseId}-${selectedLesson.id}`} lesson={selectedLesson} onClose={closeLessonPanel} onRegisterBeforeLeave={(flush) => { quizFlushRef.current = flush }} />}
     {activePanel === 'assistant' && <DocumentAssistantPanel key={`${courseId}-${selectedLesson.id}`} lesson={selectedLesson} onClose={closeLessonPanel} />}
+    {activePanel === 'summary' && <LessonSummaryPanel key={`${courseId}-${selectedLesson.id}`} lesson={selectedLesson} onClose={closeLessonPanel} />}
   </article>}</div></div> : <EmptyState title="Chưa có bài học">{isInstructor ? 'Thêm bài học ngay trong phần này để bắt đầu.' : 'Giảng viên chưa đăng bài học nào.'}</EmptyState>
 
   return <main className="workspace-main">

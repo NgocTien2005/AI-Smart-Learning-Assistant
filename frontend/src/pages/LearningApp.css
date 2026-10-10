@@ -412,6 +412,12 @@ button.course-stat-card:hover { transform: translateY(-2px); border-color: #a9c5
 .breadcrumbs li + li::before { content: '/'; margin-right: 10px; color: #a3adbb; }
 .breadcrumbs a { color: inherit; }
 .document-selection, .selected-file { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.lesson-summary-panel { margin-top: 20px; padding: 20px 24px; border: 1px solid #dfe6ef; border-radius: 14px; background: #fff; box-shadow: 0 3px 14px #172b5408; }
+.lesson-summary-panel > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding-bottom: 12px; border-bottom: 1px solid #e8edf4; }
+.lesson-summary-panel h3 { margin: 4px 0 0; color: #142b54; font: 700 18px Lexend,sans-serif; }
+.lesson-summary-panel ol { display: grid; gap: 12px; padding-left: 22px; line-height: 1.65; }
+.lesson-summary-panel li small { color: #65758b; }
+.summary-source { color: #53657c; font-size: 13px; }
 .document-selection > label { display: grid; width: min(100%, 560px); gap: 7px; color: #40506a; font-size: 13px; font-weight: 600; }
 .document-selection input[type="file"] { box-sizing: border-box; width: 100%; min-width: 0; min-height: 44px; padding: 5px; border: 1px solid #ccd6e4; border-radius: 9px; background: #fff; color: #40506a; font: inherit; }
 .document-selection input[type="file"]::file-selector-button { min-height: 32px; padding: 6px 12px; margin-right: 10px; border: 0; border-radius: 6px; background: #edf4ff; color: #145dbb; font: inherit; font-weight: 600; cursor: pointer; }

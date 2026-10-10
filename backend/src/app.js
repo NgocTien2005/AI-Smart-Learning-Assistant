@@ -43,8 +43,8 @@ export const createApp = () => {
       return response.status(403).json({ error: 'Origin không được phép truy cập' })
     }
 
-    if (error.message === 'Chỉ hỗ trợ tài liệu PDF, TXT, Markdown hoặc CSV') {
-      return response.status(400).json({ error: error.message })
+    if (error.message === 'Unsupported document type') {
+      return response.status(400).json({ code: 'UNSUPPORTED_TYPE', error: 'Chỉ hỗ trợ PDF, TXT, Markdown hoặc CSV.' })
     }
 
     console.error('Unhandled request error:', error)
