@@ -189,7 +189,7 @@ Các API hiện được mount dưới `/api`. Nhóm endpoint chính đang tồn
 
 Role hợp lệ là `ADMIN`, `INSTRUCTOR` và `STUDENT`. Đăng ký công khai chỉ cho phép `INSTRUCTOR` hoặc `STUDENT`; tạo Admin bằng lệnh bootstrap được mô tả trong README.
 
-Đăng ký frontend gửi `name`, `email`, `password` và role đã chọn; giữ kiểm thử contract này khi sửa authentication. Quên/đặt lại mật khẩu dùng email SMTP nếu được cấu hình. Social login chưa được cấu hình. Nội dung tài liệu TXT/Markdown/CSV được dùng cục bộ cho trợ lý và bài ôn; PDF chỉ có nội dung fallback do giảng viên nhập, không có OCR/extraction hoặc dịch vụ AI bên ngoài.
+Đăng ký frontend gửi `name`, `email`, `password` và role đã chọn; giữ kiểm thử contract này khi sửa authentication. Quên/đặt lại mật khẩu dùng email SMTP nếu được cấu hình. Social login chưa được cấu hình. PDF/TXT/Markdown/CSV dùng xử lý cục bộ; PDF chỉ trích được lớp văn bản, không có OCR hoặc dịch vụ AI bên ngoài.
 
 Bài ôn tập dùng generator cục bộ dựa trên các mẫu câu định nghĩa có khái niệm đứng trước `giúp`, `cho phép`, `lưu trữ`, `chứa`, `mô tả`, `biểu diễn`, `bao gồm`, `gồm` hoặc `là`. Generator bỏ qua câu không phù hợp; không coi đây là hiểu ngôn ngữ tổng quát hay dịch vụ AI. API cho phép 3–10 câu và báo số thực tế; attempt lưu snapshot, draft/selected answers và version. Mọi thao tác attempt kiểm tra lại quyền truy cập khóa học. Xem `README.md` để biết endpoint và lifecycle.
 
@@ -231,6 +231,15 @@ Nếu không thể chạy một bước vì thiếu database, secret, network ho
 - Không đổi API response hoặc schema theo cách breaking mà không nêu rõ và cập nhật mọi consumer.
 - Không triển khai AI bằng cách gửi tài liệu hoặc dữ liệu người dùng sang dịch vụ bên ngoài khi chưa có yêu cầu, cấu hình và đánh giá quyền riêng tư rõ ràng.
 
+## Trích xuất tài liệu và tóm tắt cục bộ
+
+- PDF.js chạy ở backend trên PDF có lớp văn bản; tối đa 10 MiB, 250 trang và 100.000 ký tự đầu ra. Không hỗ trợ OCR. TXT, Markdown và CSV dùng tối đa 10 MiB.
+- Kiểm tra đồng thời phần mở rộng, MIME khi MIME được cung cấp và dấu hiệu/nội dung tệp; MIME trống hoặc `application/octet-stream` được chấp nhận sau khi kiểm tra nội dung.
+- Metadata extraction được thêm bằng migration mới. `documentText` tách khỏi nội dung nhập tay; `documentHash`, `extractionStatus`, `extractionErrorCode`, `extractionTruncated` và `sourceRevision` mô tả nguồn. Không tự xử lý dữ liệu lịch sử trong migration.
+- Nguồn chung cho assistant, summary và quiz mới ưu tiên document text ở trạng thái thành công, sau đó đến nội dung nhập tay. Thay/gỡ tài liệu xóa text/hash cũ và thay đổi revision; chỉnh nội dung không ghi đè document text thành công. Snapshot bài ôn cũ giữ nguyên.
+- `GET /api/courses/lessons/:lessonId/summary` tạo “Tóm tắt trích xuất” từ câu nguồn. `POST /api/courses/lessons/:lessonId/document/process` chỉ cho instructor sở hữu khóa học xử lý lại tài liệu lịch sử.
+- Trích xuất summary không phải diễn giải AI; quiz generator vẫn chỉ nhận dạng mẫu câu giới hạn và có thể không tạo đủ câu. Không gửi nội dung sang dịch vụ ngoài.
+
 
 ## Frontend workflows and API gaps
 
@@ -238,4 +247,4 @@ Nếu không thể chạy một bước vì thiếu database, secret, network ho
 - Dashboard, course sections, lesson reading, protected document preview/download, progress, assignments/grading, local assistant lookup, resumable quiz, and account management use mounted APIs. Course section and selected lesson are URL-backed.
 - Quiz autosave is debounced and versioned. In-app leave flows flush pending drafts or ask whether to stay or discard; browser unload warns without promising network persistence. Server remains authoritative for access and grading.
 - Frontend checks: `npm test`, `npm run lint`, and `npm run build` from `frontend/`.
-- No API currently supports OAuth, OCR/PDF text extraction, document summaries, learning recommendations, notifications, or system-wide analytics. Do not fabricate UI success or data for these workflows.
+- No API currently supports OAuth, OCR, learning recommendations, notifications, or system-wide analytics. Local PDF text-layer extraction and extractive lesson summaries are implemented; do not describe them as OCR or externally generated AI output.

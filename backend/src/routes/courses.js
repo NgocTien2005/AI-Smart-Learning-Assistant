@@ -1,4 +1,4 @@
-import { randomBytes, randomUUID } from 'node:crypto'
+import { createHash, randomBytes, randomUUID } from 'node:crypto'
 import { access, mkdir, unlink, writeFile } from 'node:fs/promises'
 import { extname, resolve } from 'node:path'
 import { Router } from 'express'
@@ -9,21 +9,16 @@ import { authorizeRole } from '../middleware/authorizeRole.js'
 import { prisma } from '../lib/prisma.js'
 import { answerFromDocument } from '../utils/studyAssistant.js'
 import quizAttemptsRouter from './quizAttempts.js'
-import { lessonTextAfterContentEdit, lessonTextAfterDocumentRemoval, uploadedLessonText } from '../utils/lessonText.js'
+import { lessonTextAfterContentEdit, resolveLessonSource, createExtractiveSummary } from '../utils/lessonText.js'
+import { processDocument } from '../services/documentProcessing.js'
 
 const router = Router()
 const maxDocumentSize = 10 * 1024 * 1024
-const supportedDocumentTypes = new Set([
-  'application/pdf',
-  'text/plain',
-  'text/markdown',
-  'text/csv',
-])
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: maxDocumentSize, files: 1 },
   fileFilter: (_request, file, callback) => {
-    if (!supportedDocumentTypes.has(file.mimetype)) {
+    if (!['.pdf', '.txt', '.md', '.markdown', '.csv'].includes(extname(file.originalname).toLowerCase())) {
       return callback(new Error('Chỉ hỗ trợ tài liệu PDF, TXT, Markdown hoặc CSV'))
     }
 
@@ -46,6 +41,10 @@ const lessonSelect = {
   title: true,
   content: true,
   documentName: true,
+  extractionStatus: true,
+  extractionErrorCode: true,
+  extractionTruncated: true,
+  sourceRevision: true,
   order: true,
   courseId: true,
   createdAt: true,
@@ -84,6 +83,14 @@ const removeStoredFile = async (storedName) => {
     await unlink(filePath)
   } catch (error) {
     if (error.code !== 'ENOENT') console.error('Document cleanup error:', error)
+  }
+}
+
+const processUploadForStorage = async (file) => {
+  try { return await processDocument({ name: file.originalname, mimetype: file.mimetype, buffer: file.buffer }) }
+  catch (error) {
+    if (!['ENCRYPTED_PDF', 'PAGE_LIMIT', 'EXTRACTION_TIMEOUT'].includes(error.code)) throw error
+    return { status: 'FAILED', text: null, hash: createHash('sha256').update(file.buffer).digest('hex'), truncated: false, errorCode: error.code }
   }
 }
 
@@ -511,16 +518,20 @@ router.post('/:courseId/lessons', authorizeRole('INSTRUCTOR'), upload.single('do
       await writeFile(resolve(uploadDirectory, storedName), request.file.buffer)
     }
 
-    const extractedText = request.file
-      ? uploadedLessonText({ mimetype: request.file.mimetype, buffer: request.file.buffer, content })
-      : content || null
+    const processed = request.file ? await processUploadForStorage(request.file) : null
     const lesson = await prisma.lesson.create({
       data: {
         title,
         content: content || null,
         documentUrl: storedName,
         documentName: request.file?.originalname.slice(0, 255) || null,
-        extractedText,
+        extractedText: null,
+        documentText: processed?.text || null,
+        documentHash: processed?.hash || null,
+        extractionStatus: processed?.status || null,
+        extractionErrorCode: processed?.status === 'NO_TEXT' ? 'NO_TEXT' : null,
+        extractionTruncated: Boolean(processed?.truncated),
+        sourceRevision: 0,
         order,
         courseId,
       },
@@ -553,6 +564,7 @@ router.patch('/lessons/:lessonId', authorizeRole('INSTRUCTOR'), async (request, 
     if (content.length > 100000) return response.status(400).json({ error: 'Nội dung bài học không được vượt quá 100.000 ký tự' })
     data.content = content || null
     data.extractedText = lessonTextAfterContentEdit(lesson, content)
+    if (!(lesson.extractionStatus === 'SUCCESS' && lesson.documentText)) data.sourceRevision = { increment: 1 }
   }
   if ('order' in request.body) {
     const order = Number(request.body.order)
@@ -574,25 +586,25 @@ router.patch('/lessons/:lessonId/document', authorizeRole('INSTRUCTOR'), upload.
   if (!lesson) return response.status(404).json({ error: 'Không tìm thấy bài học' })
   if (lesson.course.instructorId !== request.user.id) return response.status(403).json({ error: 'Bạn không có quyền sửa bài học này' })
 
+  let parsed
+  try { parsed = await processUploadForStorage(request.file) }
+  catch (error) { return response.status(error.code === 'SIZE_LIMIT' ? 413 : 400).json({ code: error.code || 'INVALID_DOCUMENT', error: error.message }) }
   const originalExtension = extname(request.file.originalname).toLowerCase()
-  const allowedExtension = request.file.mimetype === 'application/pdf'
-    ? '.pdf'
-    : ['.txt', '.md', '.csv'].includes(originalExtension) ? originalExtension : '.txt'
+  const allowedExtension = originalExtension === '.markdown' ? '.md' : originalExtension
   const storedName = `${randomUUID()}${allowedExtension}`
 
   try {
     await mkdir(uploadDirectory, { recursive: true })
     await writeFile(resolve(uploadDirectory, storedName), request.file.buffer)
-    const extractedText = uploadedLessonText({
-      mimetype: request.file.mimetype,
-      buffer: request.file.buffer,
-      content: lesson.content,
+    const committed = await prisma.lesson.updateMany({
+      where: { id: lessonId, documentUrl: lesson.documentUrl },
+      data: { documentUrl: storedName, documentName: request.file.originalname.slice(0, 255), extractedText: null,
+        documentText: parsed.text, documentHash: parsed.hash, extractionStatus: parsed.status,
+        extractionErrorCode: parsed.errorCode || (parsed.status === 'NO_TEXT' ? 'NO_TEXT' : null), extractionTruncated: parsed.truncated,
+        sourceRevision: { increment: 1 } },
     })
-    const updatedLesson = await prisma.lesson.update({
-      where: { id: lessonId },
-      data: { documentUrl: storedName, documentName: request.file.originalname.slice(0, 255), extractedText },
-      select: lessonSelect,
-    })
+    if (committed.count !== 1) { await removeStoredFile(storedName); return response.status(409).json({ error: 'Bài học vừa được cập nhật. Hãy tải lại trước khi thay tài liệu.' }) }
+    const updatedLesson = await prisma.lesson.findUnique({ where: { id: lessonId }, select: lessonSelect })
     await removeStoredFile(lesson.documentUrl)
     return response.json({ lesson: updatedLesson })
   } catch (error) {
@@ -610,11 +622,13 @@ router.delete('/lessons/:lessonId/document', authorizeRole('INSTRUCTOR'), async 
   if (lesson.course.instructorId !== request.user.id) return response.status(403).json({ error: 'Bạn không có quyền sửa bài học này' })
   if (!lesson.documentUrl) return response.status(404).json({ error: 'Bài học chưa có tài liệu' })
 
-  const updatedLesson = await prisma.lesson.update({
-    where: { id: lessonId },
-    data: { documentUrl: null, documentName: null, extractedText: lessonTextAfterDocumentRemoval(lesson.content) },
-    select: lessonSelect,
+  const removed = await prisma.lesson.updateMany({
+    where: { id: lessonId, documentUrl: lesson.documentUrl },
+    data: { documentUrl: null, documentName: null, extractedText: null, documentText: null, documentHash: null,
+      extractionStatus: null, extractionErrorCode: null, extractionTruncated: false, sourceRevision: { increment: 1 } },
   })
+  if (removed.count !== 1) return response.status(409).json({ error: 'Tài liệu vừa được thay đổi. Hãy tải lại trước khi gỡ.' })
+  const updatedLesson = await prisma.lesson.findUnique({ where: { id: lessonId }, select: lessonSelect })
   await removeStoredFile(lesson.documentUrl)
   return response.json({ lesson: updatedLesson })
 })
@@ -630,6 +644,45 @@ router.delete('/lessons/:lessonId', authorizeRole('INSTRUCTOR'), async (request,
   await prisma.lesson.delete({ where: { id: lessonId } })
   await removeStoredFile(lesson.documentUrl)
   return response.status(204).end()
+})
+
+router.post('/lessons/:lessonId/document/process', authorizeRole('INSTRUCTOR'), async (request, response) => {
+  const lessonId = parseId(request.params.lessonId)
+  if (!lessonId) return response.status(400).json({ error: 'ID bài học không hợp lệ' })
+  const lesson = await prisma.lesson.findUnique({ where: { id: lessonId }, include: { course: { select: { instructorId: true } } } })
+  if (!lesson) return response.status(404).json({ error: 'Không tìm thấy bài học' })
+  if (lesson.course.instructorId !== request.user.id) return response.status(403).json({ error: 'Chỉ giảng viên sở hữu khóa học được xử lý tài liệu' })
+  if (!lesson.documentUrl) return response.status(404).json({ error: 'Bài học chưa có tài liệu' })
+  const filePath = resolve(uploadDirectory, lesson.documentUrl)
+  const { readFile } = await import('node:fs/promises')
+  let processed
+  try { processed = await processDocument({ name: lesson.documentName, buffer: await readFile(filePath) }) }
+  catch (error) {
+    await prisma.lesson.updateMany({ where: { id: lessonId, documentUrl: lesson.documentUrl }, data: {
+      documentText: null, documentHash: null, extractionStatus: 'FAILED', extractionErrorCode: error.code || 'PROCESSING_FAILED',
+      extractionTruncated: false, sourceRevision: { increment: 1 },
+    } })
+    return response.status(422).json({ code: error.code || 'PROCESSING_FAILED', error: error.message })
+  }
+  const saved = await prisma.lesson.updateMany({ where: { id: lessonId, documentUrl: lesson.documentUrl }, data: {
+    documentText: processed.text, documentHash: processed.hash, extractionStatus: processed.status,
+    extractionErrorCode: processed.status === 'NO_TEXT' ? 'NO_TEXT' : null,
+    extractionTruncated: processed.truncated, sourceRevision: { increment: 1 },
+  } })
+  if (saved.count !== 1) return response.status(409).json({ error: 'Tài liệu đã thay đổi trong lúc xử lý. Hãy thử lại.' })
+  return response.json({ lesson: await prisma.lesson.findUnique({ where: { id: lessonId }, select: lessonSelect }) })
+})
+
+router.get('/lessons/:lessonId/summary', async (request, response) => {
+  const lessonId = parseId(request.params.lessonId)
+  if (!lessonId) return response.status(400).json({ error: 'ID bài học không hợp lệ' })
+  const lesson = await prisma.lesson.findUnique({ where: { id: lessonId }, include: { course: { include: { enrollments: { where: { userId: request.user.id }, select: { userId: true } } } } } })
+  if (!lesson) return response.status(404).json({ error: 'Không tìm thấy bài học' })
+  if (!canAccessCourse(lesson.course, request.user)) return response.status(403).json({ error: 'Bạn chưa tham gia khóa học này' })
+  const source = resolveLessonSource(lesson)
+  if (!source.text) return response.status(422).json({ code: 'SOURCE_UNAVAILABLE', error: 'Chưa có nội dung văn bản để tóm tắt.', extractionStatus: lesson.extractionStatus || 'NOT_PROCESSED' })
+  return response.json({ title: 'Tóm tắt trích xuất', points: createExtractiveSummary(source), sourceType: source.sourceType,
+    sourceRevision: source.revision, truncated: source.truncated })
 })
 
 router.get('/lessons/:lessonId/document', async (request, response) => {
@@ -686,9 +739,10 @@ router.post('/lessons/:lessonId/chat', async (request, response) => {
   })
   if (!lesson) return response.status(404).json({ error: 'Không tìm thấy bài học' })
   if (!canAccessCourse(lesson.course, request.user)) return response.status(403).json({ error: 'Bạn không có quyền hỏi về bài học này' })
-  if (!lesson.extractedText) return response.status(422).json({ error: 'Bài học chưa có nội dung text để tra cứu' })
+  const source = resolveLessonSource(lesson)
+  if (!source.text) return response.status(422).json({ error: 'Bài học chưa có nội dung text để tra cứu' })
 
-  const answer = answerFromDocument(question, lesson.extractedText)
+  const answer = answerFromDocument(question, source.text)
   const message = await prisma.chatMessage.create({ data: { question, answer, userId: request.user.id, lessonId } })
   return response.status(201).json({ message })
 })

@@ -114,13 +114,43 @@ function DashboardPage() {
     {!loading && !loadError && <section className="dashboard-totals" aria-label="Tổng quan khóa học"><article><strong>{courses.length}</strong><span>Khóa học</span></article><article><strong>{totals.lessons}</strong><span>Bài học</span></article><article><strong>{isInstructor ? totals.enrollments : totals.completed}</strong><span>{isInstructor ? 'Lượt ghi danh trên các khóa' : 'Bài học đã hoàn thành'}</span></article></section>}
 
     <section className="course-library"><div className="section-title"><div><span className="eyebrow">THƯ VIỆN</span><h2>{isInstructor ? 'Khóa học đang giảng dạy' : 'Khóa học của tôi'}</h2></div><span>{loading || loadError ? '' : `${visibleCourses.length}/${courses.length} khóa học`}</span></div>
-      <div className="course-controls"><label className="course-filter"><span className="sr-only">Tìm khóa học</span><input type="search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Tìm theo tên, mô tả hoặc giảng viên…" /></label>{isInstructor ? <label>Sắp xếp<select value={sort} onChange={(event) => setSort(event.target.value)}><option value="recent">Cập nhật gần đây</option><option value="name">Tên A–Z</option></select></label> : <label>Tiến độ<select value={progressFilter} onChange={(event) => setProgressFilter(event.target.value)}><option value="all">Tất cả</option><option value="not-started">Chưa bắt đầu</option><option value="progress">Đang học</option><option value="complete">Hoàn thành</option></select></label>}</div>
+      <div className="course-controls"><label className="course-filter"><span>Tìm kiếm</span><input type="search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Tìm khóa học…" /></label>{isInstructor ? <label>Sắp xếp<select value={sort} onChange={(event) => setSort(event.target.value)}><option value="recent">Cập nhật gần đây</option><option value="name">Tên A–Z</option></select></label> : <label>Tiến độ<select value={progressFilter} onChange={(event) => setProgressFilter(event.target.value)}><option value="all">Tất cả</option><option value="not-started">Chưa bắt đầu</option><option value="progress">Đang học</option><option value="complete">Hoàn thành</option></select></label>}</div>
       {loading ? <LoadingState>Đang tải khóa học…</LoadingState> : loadError ? <ErrorState>{loadError}<button type="button" className="ui-button ui-button-secondary" onClick={loadCourses}>Thử lại</button></ErrorState> : courses.length === 0 ? <EmptyState title="Chưa có khóa học nào">{isInstructor ? 'Tạo khóa học đầu tiên ở biểu mẫu phía trên.' : 'Nhập mã tham gia để khóa học xuất hiện tại đây.'}</EmptyState> : visibleCourses.length === 0 ? <EmptyState title="Không tìm thấy khóa học">Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc.</EmptyState> : <div className="course-card-grid">{visibleCourses.map((course) => {
         const lessons = numericOrNull(course._count?.lessons)
         const enrollments = numericOrNull(course._count?.enrollments)
         const completed = numericOrNull(course.completedLessons)
-        const progress = Number.isFinite(course.progressPercent) ? course.progressPercent : null
-        return <article className="course-card" key={course.id}><Link className="course-card-main" to={`/courses/${course.id}`}><div className="course-card-cover"><span>{initials(course.title)}</span></div><div className="course-card-body"><small>{isInstructor ? 'KHÓA HỌC CỦA BẠN' : course.instructor?.name || 'Giảng viên'}</small><h3>{course.title}</h3><p>{course.description || 'Khóa học chưa có mô tả.'}</p><div className="course-card-meta"><span>{count(lessons)} bài học</span>{isInstructor && <span>{count(enrollments)} lượt tham gia</span>}</div>{!isInstructor && <div className="course-card-progress"><span>{completed}/{lessons} bài hoàn thành</span><span>{count(progress)}%</span><span className="course-card-progress-track"><span style={{ width: `${progress ?? 0}%` }} /></span></div>}</div></Link><div className="course-card-actions">{isInstructor ? <button type="button" onClick={() => copyJoinCode(course.joinCode)} disabled={!course.joinCode}>Sao chép mã tham gia</button> : <button type="button" onClick={() => continueLearning(course.id)}>Tiếp tục học</button>}</div></article>
+        const progress = numericOrNull(course.progressPercent)
+        const safeProgress = progress === null ? null : Math.min(100, Math.max(0, progress))
+        const description = typeof course.description === 'string' ? course.description.trim() : ''
+        const displayDescription = description && description !== '...' && description !== '…' ? description : 'Chưa có mô tả.'
+        const hasProgress = lessons !== null && lessons > 0 && completed !== null && safeProgress !== null
+        const hasNoLessons = lessons === 0
+        const isComplete = lessons !== null && lessons > 0 && completed !== null && completed >= lessons
+        const isInProgress = hasProgress && completed > 0 && !isComplete
+        const progressLabel = isComplete ? 'Đã hoàn thành' : isInProgress ? 'Đang học' : 'Chưa bắt đầu'
+        const actionPath = `/courses/${course.id}`
+        return <article className="course-card" key={course.id}>
+          <div className="course-card-body">
+            <div className="course-card-identity"><span className="course-card-mark" aria-hidden="true">{initials(course.title)}</span><span className="course-card-instructor">{isInstructor ? 'Khóa học của bạn' : course.instructor?.name || 'Giảng viên'}</span></div>
+            <h3><Link className="course-card-title" title={course.title} to={actionPath}>{course.title}</Link></h3>
+            <p>{displayDescription}</p>
+            <div className="course-card-meta"><span>{count(lessons)} bài học</span>{isInstructor && <span>{count(enrollments)} học viên đang tham gia</span>}</div>
+            {!isInstructor && (hasNoLessons
+              ? <div className="course-card-empty-progress"><strong>Chưa có bài học</strong><span>Giảng viên chưa đăng nội dung</span></div>
+              : hasProgress
+                ? <div className="course-card-progress"><div className="course-card-progress-label"><span>{progressLabel}</span><strong>{safeProgress}%</strong></div><div className="course-card-progress-track" role="progressbar" aria-label={`Tiến độ ${course.title}`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={safeProgress}><span style={{ width: `${safeProgress}%` }} /></div></div>
+                : <div className="course-card-progress-unavailable">Tiến độ chưa có dữ liệu</div>)}
+          </div>
+          <div className="course-card-actions">
+            {isInstructor
+              ? <><Link className="ui-button ui-button-primary course-card-action" to={`${actionPath}?section=overview`}>Quản lý khóa học</Link><button className="ui-button ui-button-secondary course-card-action-secondary" type="button" onClick={() => copyJoinCode(course.joinCode)} disabled={!course.joinCode}>Sao chép mã tham gia</button></>
+              : hasNoLessons || !hasProgress
+                ? <Link className="ui-button ui-button-primary course-card-action" to={actionPath}>Xem khóa học</Link>
+                : isComplete
+                  ? <Link className="ui-button ui-button-primary course-card-action" to={`${actionPath}?section=lessons`}>Ôn tập lại</Link>
+                  : <button className="ui-button ui-button-primary course-card-action" type="button" onClick={() => continueLearning(course.id)}>{isInProgress ? 'Tiếp tục học' : 'Bắt đầu học'}</button>}
+          </div>
+        </article>
       })}</div>}
     </section>
   </main>

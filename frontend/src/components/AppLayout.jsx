@@ -3,6 +3,11 @@ import { useSession } from '../app/SessionContext.jsx'
 
 const roleLabels = { STUDENT: 'Học viên', INSTRUCTOR: 'Giảng viên', ADMIN: 'Quản trị viên' }
 const labels = { dashboard: 'Tổng quan', admin: 'Quản trị', account: 'Tài khoản', courses: 'Khóa học' }
+const profileInitials = (name = '') => {
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (!parts.length) return 'L'
+  return (parts.length > 1 ? `${parts[0][0]}${parts.at(-1)[0]}` : parts[0].slice(0, 2)).toLocaleUpperCase('vi')
+}
 
 export default function AppLayout({ children, breadcrumbs = [] }) {
   const { user, logout } = useSession()
@@ -10,11 +15,16 @@ export default function AppLayout({ children, breadcrumbs = [] }) {
   const navigate = useNavigate()
   const isAdmin = user?.role === 'ADMIN'
   const home = isAdmin ? '/admin' : '/dashboard'
+  const currentPath = location.pathname.replace(/\/+$/, '') || '/'
+  const dashboardRoute = currentPath === '/dashboard'
+  const accountRoute = currentPath === '/account'
   const courseMatch = location.pathname.match(/^\/courses\/([^/]+)/)
-  const crumbs = breadcrumbs.length ? breadcrumbs : [
+  const crumbs = breadcrumbs.length ? breadcrumbs : dashboardRoute || accountRoute ? [] : [
     { label: labels[isAdmin ? 'admin' : 'dashboard'], to: home },
     ...(courseMatch ? [{ label: labels.courses }] : []),
   ]
+  const displayName = user?.name?.trim() || user?.email || 'Tài khoản'
+  const roleLabel = roleLabels[user?.role] || 'Tài khoản'
 
   const signOut = () => {
     logout()
@@ -25,9 +35,15 @@ export default function AppLayout({ children, breadcrumbs = [] }) {
     <header className="learning-header">
       <Link className="learning-brand" to={home}><span>L</span><strong>Lumina LMS</strong></Link>
       <nav aria-label="Điều hướng chính">
-        {isAdmin ? <Link to="/admin" aria-current={location.pathname === '/admin' ? 'page' : undefined}>Quản trị</Link> : <Link to="/dashboard" aria-current={location.pathname === '/dashboard' ? 'page' : undefined}>Tổng quan</Link>}
-        <Link to="/account" aria-current={location.pathname === '/account' ? 'page' : undefined}>Tài khoản</Link>
-        <span className="nav-user">{user?.name || user?.email} · {roleLabels[user?.role]}</span>
+        {isAdmin ? <Link to="/admin" aria-current={currentPath === '/admin' ? 'page' : undefined}>Quản trị</Link> : <Link to="/dashboard" aria-current={dashboardRoute ? 'page' : undefined}>Tổng quan</Link>}
+        <Link to="/account" aria-current={accountRoute ? 'page' : undefined}>Tài khoản</Link>
+        <div className="nav-profile" role="group" aria-label={`${displayName}, ${roleLabel}`}>
+          <span className="nav-profile-avatar" aria-hidden="true">{profileInitials(user?.name || '')}</span>
+          <span className="nav-profile-copy">
+            <span className="nav-profile-name" title={displayName}>{displayName}</span>
+            <span className="nav-profile-role">{roleLabel}</span>
+          </span>
+        </div>
         <button type="button" onClick={signOut}>Đăng xuất</button>
       </nav>
     </header>

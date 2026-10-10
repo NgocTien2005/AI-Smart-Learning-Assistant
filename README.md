@@ -1,5 +1,5 @@
 # AI-Smart-Learning-Assistant
-AI-Powered LMS là nền tảng quản lý học tập trực tuyến giúp giảng viên quản lý khóa học, bài giảng, bài tập và kết quả học tập. Sinh viên có thể học, làm bài và theo dõi tiến độ. Hệ thống tích hợp AI trợ giảng để hỗ trợ hỏi đáp, tóm tắt tài liệu, tạo câu hỏi ôn tập và đề xuất nội dung học tập phù hợp.
+AI-Powered LMS là nền tảng quản lý học tập trực tuyến giúp giảng viên quản lý khóa học, bài giảng, bài tập và kết quả học tập. Sinh viên có thể học, làm bài và theo dõi tiến độ. Hệ thống có trợ lý tra cứu tài liệu cục bộ, tóm tắt trích xuất và bài ôn dựa trên mẫu câu hỗ trợ; không dùng dịch vụ AI bên ngoài cho nội dung tài liệu.
 
 ## Cấu trúc repository
 
@@ -48,7 +48,15 @@ docker compose down
 
 Khi chạy frontend bằng Vite trên host, backend mặc định chỉ cho phép origin `http://localhost:5173`. Có thể đặt `CORS_ORIGIN` thành một hoặc nhiều origin phân tách bằng dấu phẩy cho môi trường khác.
 
-Tài liệu upload được lưu trong Docker volume `uploads_data` và chỉ tải xuống qua endpoint có authentication. Định dạng hỗ trợ là PDF, TXT, Markdown và CSV, tối đa 10 MB. Nội dung text được dùng cho trợ lý tài liệu cục bộ; dữ liệu không được gửi sang dịch vụ AI bên ngoài.
+Tài liệu upload được lưu trong Docker volume `uploads_data` và chỉ tải xuống qua endpoint có authentication. Định dạng hỗ trợ là PDF, TXT, Markdown và CSV, tối đa 10 MiB. Nội dung text được dùng cho trợ lý tài liệu cục bộ; dữ liệu không được gửi sang dịch vụ AI bên ngoài.
+
+### Trích xuất tài liệu và tóm tắt
+
+PDF có lớp văn bản được xử lý cục bộ bằng Mozilla PDF.js; giới hạn hiện tại là 250 trang và 100.000 ký tự đầu ra. PDF scan, được mã hóa hoặc không có chữ vẫn có thể xem/tải nếu tệp hợp lệ, nhưng không cung cấp nguồn văn bản. Không có OCR. MIME có thể thiếu hoặc là `application/octet-stream`; phần mở rộng và nội dung được kiểm tra.
+
+Văn bản đã trích được lưu riêng khỏi nội dung nhập tay, cùng hash, trạng thái, revision và cờ cắt ngắn. Assistant, tóm tắt và quiz mới cùng ưu tiên văn bản tài liệu đã trích; nếu chưa có, dùng nội dung bài học do giảng viên nhập. Migration không tự xử lý tài liệu lịch sử. Giảng viên sở hữu khóa học có thể yêu cầu xử lý lại bằng `POST /api/courses/lessons/:lessonId/document/process`. Thay/gỡ tài liệu làm mới nguồn; snapshot quiz và kết quả đã nộp không đổi.
+
+`GET /api/courses/lessons/:lessonId/summary` trả các câu được chọn từ nguồn dưới nhãn “Tóm tắt trích xuất”, kèm trang khi parser cung cấp được. Đây không phải giải thích AI; nội dung ngắn có thể không có điểm tóm tắt. Không gửi văn bản đến dịch vụ ngoài. PDF.js Node API được dùng theo ví dụ chính thức của Mozilla: https://github.com/mozilla/pdf.js/blob/master/examples/node/getinfo.mjs.
 
 ## Chức năng LMS hiện có
 
