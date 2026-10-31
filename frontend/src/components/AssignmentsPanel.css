@@ -1,0 +1,46 @@
+.assignment-workspace { min-width: 0; color: var(--lumina-ink, #17243b); font: 400 14px/1.5 Inter, 'Segoe UI', sans-serif; }
+.assignment-workspace .aw-heading { display: flex; justify-content: space-between; gap: 20px; align-items: center; margin-bottom: 16px; }
+.assignment-workspace .aw-heading h2 { margin: 2px 0; font: 600 22px/30px Lexend, sans-serif; }
+.assignment-workspace .aw-heading p, .assignment-workspace .aw-muted { margin: 4px 0 12px; color: var(--lumina-muted, #65748b); font-size: 13px; }
+.assignment-workspace .aw-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 20px; align-items: start; }
+.assignment-workspace :is(.aw-list, .aw-detail) { min-width: 0; padding: 18px; border: 1px solid var(--lumina-border, #dfe6ef); border-radius: 12px; background: #fff; }
+.assignment-workspace :is(.aw-detail-column, .aw-detail-heading > div, .aw-submission-detail) { min-width: 0; }
+.assignment-workspace .aw-list { max-height: calc(100vh - 140px); overflow-y: auto; }
+.assignment-workspace label { display: grid; gap: 6px; margin-bottom: 12px; font-size: 13px; font-weight: 600; }
+.assignment-workspace :is(input, select, textarea) { width: 100%; min-width: 0; box-sizing: border-box; padding: 10px 12px; border: 1px solid #ccd6e4; border-radius: 8px; background: #fbfcfe; color: inherit; font: 400 14px/21px Inter, 'Segoe UI', sans-serif; }
+.assignment-workspace :is(input, select) { min-height: 42px; }
+.assignment-workspace textarea { resize: vertical; }
+.assignment-workspace .aw-list-count { color: #65748b; font-size: 12px; margin: 8px 0; }
+.assignment-workspace :is(.aw-list-items, .aw-submission-list) { display: grid; gap: 8px; }
+.assignment-workspace :is(.aw-list-item, .aw-submission-choice) { display: grid; gap: 5px; width: 100%; min-width: 0; padding: 12px; border: 1px solid #e2e8f0; border-radius: 9px; text-align: left; color: #24364e; background: #fff; cursor: pointer; font: inherit; }
+.assignment-workspace :is(.aw-list-item, .aw-submission-choice):hover { background: #f5f8fe; border-color: #a9c7ee; }
+.assignment-workspace .is-selected { border-color: #1769e0; background: #edf5ff; box-shadow: inset 3px 0 #1769e0; }
+.assignment-workspace .aw-list-item strong { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font-size: 15px; line-height: 22px; overflow-wrap: anywhere; }
+.assignment-workspace .aw-list-item:focus-visible strong { display: block; -webkit-line-clamp: unset; }
+.assignment-workspace :is(small, .aw-status) { font-size: 12px; line-height: 18px; overflow-wrap: anywhere; }
+.assignment-workspace .aw-status { color: #1559a8; font-weight: 600; }
+.assignment-workspace .aw-detail-heading { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+.assignment-workspace .aw-detail h3 { margin: 6px 0; font: 600 22px/30px Lexend, sans-serif; overflow-wrap: anywhere; }
+.assignment-workspace .aw-detail h4 { margin: 16px 0 8px; font: 600 16px/24px Lexend, sans-serif; }
+.assignment-workspace .aw-detail h5 { margin: 10px 0 4px; font: 600 15px/22px Lexend, sans-serif; overflow-wrap: anywhere; }
+.assignment-workspace .aw-detail p { overflow-wrap: anywhere; }
+.assignment-workspace .aw-long-text { white-space: pre-wrap; overflow-wrap: anywhere; max-width: 76ch; max-height: 260px; overflow-y: auto; padding: 8px 0; font-size: 15px; line-height: 25px; }
+.assignment-workspace .aw-requirements .aw-long-text { max-height: 140px; }
+.assignment-workspace .aw-review, .assignment-workspace .aw-student-result { margin-top: 18px; padding-top: 6px; border-top: 1px solid #e1e8f2; }
+.assignment-workspace .aw-submission-layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 16px; align-items: start; }
+.assignment-workspace .aw-submission-list { max-height: 500px; overflow-y: auto; }
+.assignment-workspace .aw-submission-choice strong { overflow-wrap: anywhere; }
+.assignment-workspace .aw-grade-fields { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 12px; margin-top: 16px; }
+.assignment-workspace .aw-feedback { padding: 12px; margin-block: 12px; border-left: 3px solid #1769e0; background: #f4f8ff; white-space: pre-wrap; overflow-wrap: anywhere; }
+.assignment-workspace .aw-editor { margin-bottom: 12px; }
+.assignment-workspace .aw-editor-panel { min-width: 0; padding: 18px; margin-top: 12px; border: 1px solid #dfe6ef; border-radius: 12px; background: #f8faff; }
+.assignment-workspace .aw-editor-heading { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 12px; }
+.assignment-workspace .aw-editor-heading h4 { margin: 0; overflow-wrap: anywhere; }
+.assignment-workspace .aw-form-row { display: grid; grid-template-columns: minmax(0, 1fr) 140px; gap: 12px; }
+.assignment-workspace .aw-student-editor form { margin-top: 16px; padding: 16px; border-radius: 10px; background: #f6f9fe; }
+.assignment-workspace .aw-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.assignment-workspace .ui-button { min-height: 40px; flex-shrink: 0; }
+.assignment-workspace :is(button, input, select, textarea):disabled { cursor: not-allowed; opacity: .6; }
+.assignment-workspace :is(button, input, select, textarea, [tabindex]):focus-visible { outline: 3px solid #77a8ef; outline-offset: 3px; }
+.assignment-workspace .state-card, .assignment-workspace .status-message { overflow-wrap: anywhere; }
+.assignment-workspace .status-message .ui-button { margin-top: 8px; }
