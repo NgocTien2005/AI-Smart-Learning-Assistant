@@ -1,7 +1,7 @@
 ﻿import { afterEach, test, vi } from 'vitest'
 import assert from 'node:assert/strict'
 import React from 'react'
-import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SessionProvider, useSession } from '../app/SessionContext.jsx'
 import { MemoryRouter, Route, Routes, Link, useParams } from 'react-router-dom'
@@ -16,10 +16,25 @@ import PracticeQuizPanel from '../components/PracticeQuizPanel.jsx'
 import AssignmentsPanel from '../components/AssignmentsPanel.jsx'
 import LessonSummaryPanel from '../components/LessonSummaryPanel.jsx'
 import { resolvePostLoginDestination } from '../services/navigation.js'
+import App from '../app/App.jsx'
 
 const nativeFetch = globalThis.fetch
 afterEach(() => { cleanup(); localStorage.clear(); sessionStorage.clear(); globalThis.fetch = nativeFetch; vi.useRealTimers() })
 const h = React.createElement
+const jsonResponse = (data, status = 200) => new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } })
+const learnerCourse = (id = 1) => ({ id, title: `Khóa ${id}`, description: 'Nội dung khóa học', instructor: { name: 'Giảng viên' }, _count: { lessons: 3, enrollments: 1 }, completedLessons: 1, progressPercent: 33 })
+function renderDashboard() {
+  localStorage.setItem('luminaToken', 'test-session')
+  return render(h(MemoryRouter, { initialEntries: ['/dashboard'] }, h(SessionProvider, null,
+    h(AppLayout, null, h(DashboardPage), h(CurrentPath)))))
+}
+function adminRecord(id = 1) { return { id, name: `Học viên ${id}`, email: `learner${id}@example.test`, role: 'STUDENT', isActive: true, createdAt: '2026-01-01', _count: { enrollments: 1, submissions: 0 } } }
+function dialogTestSupport() {
+  // jsdom support for component semantics only; native modal behavior requires browser verification.
+  const prototype = window.HTMLDialogElement.prototype
+  prototype.showModal = function () { this.setAttribute('open', '') }
+  prototype.close = function () { this.removeAttribute('open') }
+}
 function SessionStatus() { const session = useSession(); return h('div', null, h('span', null, session.status), h('button', { onClick: session.logout }, 'logout')) }
 
 test('lesson summary exposes retry and renders source points and page references', async () => {
@@ -165,7 +180,7 @@ test('instructor course overview uses role-specific actions and URL-backed style
   assert.equal(lessonPosts.length, 1)
 })
 
-function CurrentPath() { return h('span', { 'data-testid': 'current-path' }, useLocation().pathname) }
+function CurrentPath() { const location = useLocation(); return h('span', { 'data-testid': 'current-path' }, location.pathname + location.search) }
 
 test.each([
   [{ id: 1, name: 'Đặng Ngọc Tiên', email: 'student@example.test', role: 'STUDENT' }, 'Học viên', 'ĐT'],
@@ -386,4 +401,469 @@ test('rendered login returns to the intended course section and query', async ()
   await user.type(document.getElementById('password'), 'password123')
   await user.click(document.querySelector('.submit-button'))
   await waitFor(() => assert.equal(document.querySelector('output')?.textContent, '/courses/7?section=lessons&lessonId=2'))
+})
+
+test('role disclosure retains draft and focus without sending on open, close or Escape', async () => {
+  const posts = []
+  globalThis.fetch = async (url, options = {}) => {
+    if (options.method === 'POST') posts.push(url)
+    return jsonResponse(String(url).endsWith('/me') ? { user: { id: 1, name: 'Học viên', role: 'STUDENT' } } : { courses: [learnerCourse()] })
+  }
+  renderDashboard()
+  const trigger = await screen.findByRole('button', { name: 'Tham gia khóa học' })
+  assert.equal(trigger.getAttribute('aria-expanded'), 'false')
+  assert.equal(screen.queryByRole('textbox', { name: 'Mã tham gia' }), null)
+  await userEvent.click(trigger)
+  const input = screen.getByRole('textbox', { name: 'Mã tham gia' })
+  assert.equal(document.activeElement, input)
+  await userEvent.type(input, 'ab12')
+  await userEvent.keyboard('{Escape}')
+  assert.equal(trigger.getAttribute('aria-expanded'), 'false')
+  assert.equal(document.activeElement, trigger)
+  await userEvent.click(trigger)
+  assert.equal(input.value.toUpperCase(), 'AB12')
+  assert.equal(posts.length, 0)
+})
+
+test('join normalizes whitespace and lowercase, locks duplicates and keeps success outside closed panel', async () => {
+  let resolveJoin
+  const bodies = []
+  globalThis.fetch = async (url, options = {}) => {
+    if (String(url).endsWith('/me')) return jsonResponse({ user: { id: 1, name: 'Học viên', role: 'STUDENT' } })
+    if (options.method === 'POST') { bodies.push(JSON.parse(options.body)); return new Promise((resolve) => { resolveJoin = resolve }) }
+    return jsonResponse({ courses: [learnerCourse()] })
+  }
+  renderDashboard()
+  const trigger = await screen.findByRole('button', { name: 'Tham gia khóa học' })
+  await userEvent.click(trigger)
+  await userEvent.type(screen.getByLabelText('Mã tham gia'), ' abcd1234 ')
+  const submit = screen.getByRole('button', { name: 'Tham gia', exact: true })
+  await userEvent.dblClick(submit)
+  assert.deepEqual(bodies, [{ joinCode: 'ABCD1234' }])
+  resolveJoin(jsonResponse({ course: learnerCourse() }))
+  await screen.findByText(/Đã tham gia/)
+  assert.equal(trigger.getAttribute('aria-expanded'), 'false')
+  assert.equal(screen.getAllByRole('link', { name: 'Khóa 1' }).length, 1)
+  await userEvent.click(trigger)
+  assert.equal(screen.getByLabelText('Mã tham gia').value, '')
+})
+
+test('failed normalized form validation never sends and server failure preserves the draft', async () => {
+  let posts = 0
+  globalThis.fetch = async (url, options = {}) => {
+    if (String(url).endsWith('/me')) return jsonResponse({ user: { id: 1, name: 'Học viên', role: 'STUDENT' } })
+    if (options.method === 'POST') { posts += 1; return jsonResponse({ error: 'Mã không tồn tại' }, 404) }
+    return jsonResponse({ courses: [] })
+  }
+  renderDashboard()
+  await userEvent.click(await screen.findByRole('button', { name: 'Tham gia khóa học' }))
+  const input = screen.getByLabelText('Mã tham gia')
+  await userEvent.type(input, 'XXXXXXXX')
+  await userEvent.click(screen.getByRole('button', { name: 'Tham gia', exact: true }))
+  assert.equal(posts, 0)
+  await userEvent.clear(input); await userEvent.type(input, 'ABCD1234')
+  await userEvent.click(screen.getByRole('button', { name: 'Tham gia', exact: true }))
+  await screen.findByText('Mã không tồn tại')
+  assert.equal(input.value, 'ABCD1234')
+  assert.equal(posts, 1)
+})
+
+test('latest continue-learning intent wins and selects first incomplete lesson', async () => {
+  const details = {}
+  globalThis.fetch = async (url) => {
+    const path = new URL(String(url)).pathname
+    if (path.endsWith('/me')) return jsonResponse({ user: { id: 1, name: 'Học viên', role: 'STUDENT' } })
+    if (/courses\/[12]$/.test(path)) return new Promise((resolve) => { details[path.at(-1)] = resolve })
+    return jsonResponse({ courses: [learnerCourse(1), learnerCourse(2)] })
+  }
+  renderDashboard()
+  const buttons = await screen.findAllByRole('button', { name: 'Tiếp tục học', exact: true })
+  await userEvent.click(buttons[0]); await userEvent.click(buttons[1])
+  details['2'](jsonResponse({ course: { lessons: [{ id: 20, isCompleted: true }, { id: 21, isCompleted: false }] } }))
+  await waitFor(() => assert.match(screen.getByTestId('current-path').textContent, /courses\/2.*lessonId=21/))
+  details['1'](jsonResponse({ course: { lessons: [{ id: 11, isCompleted: false }] } }))
+  await act(async () => { await new Promise((resolve) => setTimeout(resolve, 0)) })
+  assert.match(screen.getByTestId('current-path').textContent, /courses\/2.*lessonId=21/)
+})
+
+test('initial course read superseded by a failed write can recover and ignores its late response', async () => {
+  let resolveFirst
+  let reads = 0
+  globalThis.fetch = async (url, options = {}) => {
+    if (String(url).endsWith('/me')) return jsonResponse({ user: { id: 1, name: 'Học viên', role: 'STUDENT' } })
+    if (options.method === 'POST') return jsonResponse({ error: 'Không tham gia được' }, 503)
+    reads += 1
+    if (reads === 1) return new Promise((resolve) => { resolveFirst = resolve })
+    return jsonResponse({ courses: [learnerCourse(2)] })
+  }
+  renderDashboard()
+  await userEvent.click(await screen.findByRole('button', { name: 'Tham gia khóa học' }))
+  await userEvent.type(screen.getByLabelText('Mã tham gia'), 'ABCD1234')
+  await userEvent.click(screen.getByRole('button', { name: 'Tham gia', exact: true }))
+  await screen.findByText('Không tham gia được')
+  await screen.findByRole('link', { name: 'Khóa 2' })
+  resolveFirst(jsonResponse({ courses: [learnerCourse(1)] }))
+  await act(async () => { await new Promise((resolve) => setTimeout(resolve, 0)) })
+  assert.equal(screen.queryByRole('link', { name: 'Khóa 1' }), null)
+})
+
+test('admin initial error has no confirmed zero total and exposes read retry', async () => {
+  globalThis.fetch = async () => jsonResponse({ error: 'Mất kết nối dữ liệu' }, 503)
+  render(h(AdminPage))
+  await screen.findByText('Mất kết nối dữ liệu')
+  assert.equal(screen.queryByText('0 tài khoản'), null)
+  assert.ok(screen.getByRole('button', { name: 'Thử lại' }))
+})
+
+test('admin toggle preserves unsaved profile and locks the whole row during write', async () => {
+  dialogTestSupport()
+  let resolveWrite
+  const requests = []
+  globalThis.fetch = async (url, options = {}) => {
+    if (options.method === 'PATCH') { requests.push(JSON.parse(options.body)); return new Promise((resolve) => { resolveWrite = resolve }) }
+    return jsonResponse({ users: [adminRecord()], total: 1, totalPages: 1 })
+  }
+  render(h(AdminPage))
+  await screen.findByText('learner1@example.test')
+  const name = screen.getByLabelText('Họ tên')
+  await userEvent.clear(name); await userEvent.type(name, 'Bản chỉnh chưa lưu')
+  await userEvent.click(screen.getByRole('button', { name: 'Khóa tài khoản' }))
+  await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Khóa tài khoản' }))
+  assert.equal(name.disabled, true)
+  assert.equal(screen.getByRole('button', { name: 'Lưu thay đổi' }).disabled, true)
+  assert.deepEqual(requests, [{ isActive: false }])
+  resolveWrite(jsonResponse({ user: { ...adminRecord(), isActive: false } }))
+  await screen.findByText('Đã khóa tài khoản và thu hồi các phiên đăng nhập.')
+  assert.equal(name.value, 'Bản chỉnh chưa lưu')
+})
+
+test('admin role conflict preserves draft and cancel never patches', async () => {
+  dialogTestSupport()
+  let writes = 0
+  globalThis.fetch = async (url, options = {}) => {
+    if (options.method === 'PATCH') { writes += 1; return jsonResponse({ error: 'Còn tham gia khóa học' }, 409) }
+    return jsonResponse({ users: [adminRecord()], total: 1, totalPages: 1 })
+  }
+  render(h(AdminPage))
+  await screen.findByText('learner1@example.test')
+  await userEvent.selectOptions(screen.getByLabelText('Vai trò'), 'INSTRUCTOR')
+  await userEvent.click(screen.getByRole('button', { name: 'Lưu thay đổi' }))
+  await userEvent.click(screen.getByRole('button', { name: 'Hủy' }))
+  assert.equal(writes, 0)
+  await userEvent.click(screen.getByRole('button', { name: 'Lưu thay đổi' }))
+  await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Đổi vai trò' }))
+  await screen.findByText(/Còn tham gia khóa học/)
+  assert.equal(screen.getByLabelText('Vai trò').value, 'INSTRUCTOR')
+  assert.ok(screen.getByText(/khóa học đã tham gia/))
+})
+
+test('actual route guards deny admin course UI and students admin UI', async () => {
+  localStorage.setItem('luminaToken', 'test-session')
+  window.history.replaceState({}, '', '/courses/1')
+  globalThis.fetch = async () => jsonResponse({ user: { id: 1, name: 'Quản trị', role: 'ADMIN' } })
+  const view = render(h(App))
+  await screen.findByRole('heading', { name: 'Không có quyền truy cập' })
+  assert.equal(screen.getByRole('link', { name: 'Về trang phù hợp' }).getAttribute('href'), '/admin')
+  view.unmount()
+  window.history.replaceState({}, '', '/admin')
+  globalThis.fetch = async () => jsonResponse({ user: { id: 2, name: 'Học viên', role: 'STUDENT' } })
+  render(h(App))
+  await screen.findByRole('heading', { name: 'Không có quyền truy cập' })
+  assert.equal(screen.getByRole('link', { name: 'Về trang phù hợp' }).getAttribute('href'), '/dashboard')
+  window.history.replaceState({}, '', '/')
+})
+
+test('instructor search and sort preserve owned course actions and clipboard denial exposes real code', async () => {
+  const courses = [
+    { ...learnerCourse(1), title: 'Zeta', joinCode: 'ABCDEF12', updatedAt: '2026-10-01' },
+    { ...learnerCourse(2), title: 'Alpha', joinCode: '1234ABCD', updatedAt: '2026-09-01' },
+  ]
+  Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: vi.fn().mockRejectedValue(new Error('denied')) } })
+  globalThis.fetch = async (url) => jsonResponse(String(url).endsWith('/me') ? { user: { id: 4, role: 'INSTRUCTOR', name: 'Giảng viên' } } : { courses })
+  renderDashboard()
+  await screen.findByRole('link', { name: 'Zeta' })
+  await userEvent.selectOptions(screen.getByLabelText('Sắp xếp'), 'name')
+  assert.equal(document.querySelector('.course-card h3').textContent, 'Alpha')
+  await userEvent.type(screen.getByRole('searchbox'), 'zEtA')
+  assert.equal(screen.queryByRole('link', { name: 'Alpha' }), null)
+  await userEvent.click(screen.getByRole('button', { name: 'Sao chép mã tham gia' }))
+  await screen.findByText('Không thể sao chép tự động. Mã tham gia: ABCDEF12')
+  assert.equal(screen.queryByText(/Đã sao chép/), null)
+  assert.equal(screen.getByRole('link', { name: 'Quản lý khóa học' }).getAttribute('href'), '/courses/1?section=overview')
+})
+
+test('create validates normalized title and description boundaries without native raw length clipping', async () => {
+  const writes = []
+  globalThis.fetch = async (url, options = {}) => {
+    if (String(url).endsWith('/me')) return jsonResponse({ user: { id: 4, role: 'INSTRUCTOR', name: 'Giảng viên' } })
+    if (options.method === 'POST') { writes.push(JSON.parse(options.body)); return jsonResponse({ error: 'Chưa thể tạo khóa' }, 503) }
+    return jsonResponse({ courses: [] })
+  }
+  renderDashboard()
+  const trigger = await screen.findByRole('button', { name: 'Tạo khóa học' })
+  await userEvent.click(trigger)
+  const panel = screen.getByRole('region', { name: 'Tạo khóa học' })
+  const title = screen.getByLabelText('Tên khóa học')
+  const description = screen.getByLabelText('Mô tả')
+  const send = within(panel).getByRole('button', { name: 'Tạo khóa học' })
+  for (const value of [' ab ', 'x'.repeat(121)]) {
+    fireEvent.change(title, { target: { value } }); await userEvent.click(send)
+    assert.equal(writes.length, 0)
+    assert.ok(screen.getByText('Tên khóa học cần từ 3 đến 120 ký tự.'))
+  }
+  fireEvent.change(title, { target: { value: ' abc ' } })
+  fireEvent.change(description, { target: { value: 'x'.repeat(4001) } })
+  await userEvent.click(send)
+  assert.equal(writes.length, 0)
+  fireEvent.change(description, { target: { value: ' ' + 'x'.repeat(4000) + ' ' } })
+  await userEvent.click(send)
+  await screen.findByText('Chưa thể tạo khóa')
+  assert.deepEqual(writes[0], { title: 'abc', description: 'x'.repeat(4000) })
+  fireEvent.change(title, { target: { value: ' ' + 'x'.repeat(120) + ' ' } })
+  await userEvent.click(send)
+  await waitFor(() => assert.equal(writes.length, 2))
+  assert.equal(writes[1].title.length, 120)
+  assert.equal(title.value.length, 122)
+})
+
+test('closed pending disclosure keeps focus outside and failure offers reopening with draft', async () => {
+  let resolveWrite
+  globalThis.fetch = async (url, options = {}) => {
+    if (String(url).endsWith('/me')) return jsonResponse({ user: { id: 1, role: 'STUDENT', name: 'Học viên' } })
+    if (options.method === 'POST') return new Promise((resolve) => { resolveWrite = resolve })
+    return jsonResponse({ courses: [learnerCourse()] })
+  }
+  renderDashboard()
+  const trigger = await screen.findByRole('button', { name: 'Tham gia khóa học' })
+  await userEvent.click(trigger)
+  await userEvent.type(screen.getByLabelText('Mã tham gia'), 'abcdef12')
+  await userEvent.click(screen.getByRole('button', { name: 'Tham gia', exact: true }))
+  await userEvent.click(screen.getByRole('button', { name: 'Thu gọn biểu mẫu' }))
+  const search = screen.getByRole('searchbox')
+  search.focus()
+  await act(async () => resolveWrite(jsonResponse({ error: 'Mạng gián đoạn' }, 503)))
+  await screen.findByText('Mạng gián đoạn')
+  assert.equal(document.activeElement, search)
+  await userEvent.click(screen.getByRole('button', { name: 'Mở lại biểu mẫu' }))
+  assert.equal(screen.getByLabelText('Mã tham gia').value, 'abcdef12')
+  assert.equal(document.activeElement, screen.getByLabelText('Mã tham gia'))
+})
+
+test('continue error retries same course and all-complete detail falls back to lessons', async () => {
+  let detailReads = 0
+  globalThis.fetch = async (url) => {
+    const path = String(url)
+    if (path.endsWith('/me')) return jsonResponse({ user: { id: 1, role: 'STUDENT', name: 'Học viên' } })
+    if (path.endsWith('/courses/1')) {
+      detailReads += 1
+      return detailReads === 1 ? jsonResponse({ error: 'Không đọc được khóa' }, 403) : jsonResponse({ course: { lessons: [{ id: 4, isCompleted: true }] } })
+    }
+    return jsonResponse({ courses: [learnerCourse()] })
+  }
+  renderDashboard()
+  await userEvent.click(await screen.findByRole('button', { name: 'Tiếp tục học' }))
+  await screen.findByText('Không đọc được khóa')
+  assert.equal(screen.getByTestId('current-path').textContent, '/dashboard')
+  await userEvent.click(screen.getByRole('button', { name: 'Thử lại' }))
+  await waitFor(() => assert.equal(screen.getByTestId('current-path').textContent, '/courses/1?section=lessons'))
+  assert.equal(detailReads, 2)
+})
+
+test('unmounted dashboard ignores late detail and pending same-course activation is serialized', async () => {
+  let resolveDetail
+  let reads = 0
+  globalThis.fetch = async (url) => {
+    if (String(url).endsWith('/me')) return jsonResponse({ user: { id: 1, role: 'STUDENT', name: 'Học viên' } })
+    if (String(url).endsWith('/courses/1')) { reads += 1; return new Promise((resolve) => { resolveDetail = resolve }) }
+    return jsonResponse({ courses: [learnerCourse()] })
+  }
+  const view = renderDashboard()
+  const button = await screen.findByRole('button', { name: 'Tiếp tục học' })
+  await userEvent.dblClick(button)
+  assert.equal(reads, 1)
+  assert.equal(button.disabled, true)
+  view.unmount()
+  await act(async () => resolveDetail(jsonResponse({ course: { lessons: [{ id: 8, isCompleted: false }] } })))
+  assert.equal(document.querySelector('[data-testid="current-path"]'), null)
+})
+
+test('admin successful write plus refresh error retains confirmed record and retry never repeats PATCH', async () => {
+  let reads = 0, writes = 0
+  let saved = adminRecord()
+  globalThis.fetch = async (url, options = {}) => {
+    if (options.method === 'PATCH') { writes += 1; saved = { ...saved, ...JSON.parse(options.body) }; return jsonResponse({ user: { id: saved.id, name: saved.name, role: saved.role, email: saved.email, isActive: saved.isActive } }) }
+    reads += 1
+    return reads === 2 ? jsonResponse({ error: 'Refresh unavailable' }, 503) : jsonResponse({ users: [saved], total: 1, totalPages: 1 })
+  }
+  render(h(AdminPage))
+  await screen.findByText('learner1@example.test')
+  fireEvent.change(screen.getByLabelText('Họ tên'), { target: { value: '  Tên mới  ' } })
+  await userEvent.click(screen.getByRole('button', { name: 'Lưu thay đổi' }))
+  await screen.findByText(/Refresh unavailable/)
+  assert.ok(screen.getByText('Đã cập nhật tài khoản learner1@example.test.'))
+  assert.equal(screen.getByLabelText('Họ tên').value, 'Tên mới')
+  assert.ok(screen.getByText(/Tham gia/))
+  assert.ok(screen.getByText(/khóa học đã tham gia/))
+  await userEvent.click(screen.getByRole('button', { name: 'Thử lại' }))
+  await waitFor(() => assert.equal(reads, 3))
+  assert.equal(writes, 1)
+  assert.ok(screen.getByText('Đã cập nhật tài khoản learner1@example.test.'))
+})
+
+test('admin rename on last page clamps and fetches authoritative remaining page', async () => {
+  let renamed = false
+  const paths = []
+  globalThis.fetch = async (url, options = {}) => {
+    if (options.method === 'PATCH') { renamed = true; return jsonResponse({ user: { ...adminRecord(2), name: 'Tên ngoài query' } }) }
+    const query = new URL(String(url)).searchParams
+    paths.push(query.get('q') + ':' + query.get('page'))
+    const secondPage = query.get('page') === '2'
+    return jsonResponse({ users: renamed && secondPage ? [] : [adminRecord(secondPage ? 2 : 1)], total: renamed ? 25 : 26, totalPages: renamed ? 1 : 2 })
+  }
+  render(h(AdminPage))
+  await screen.findByText('learner1@example.test')
+  await userEvent.click(screen.getByRole('button', { name: 'Trang sau' }))
+  await screen.findByText('learner2@example.test')
+  fireEvent.change(screen.getByLabelText('Họ tên'), { target: { value: 'Tên ngoài query' } })
+  await userEvent.click(screen.getByRole('button', { name: 'Lưu thay đổi' }))
+  await screen.findByText('learner1@example.test')
+  assert.ok(screen.getByText('25 tài khoản'))
+  assert.deepEqual(paths.slice(-2), [':2', ':1'])
+  assert.equal(screen.queryByText('Chưa có tài khoản'), null)
+})
+
+test('admin delayed write reconciles current normalized query and preserves another dirty row', async () => {
+  let resolveWrite
+  const queries = []
+  globalThis.fetch = async (url, options = {}) => {
+    if (options.method === 'PATCH') return new Promise((resolve) => { resolveWrite = resolve })
+    const query = new URL(String(url)).searchParams.get('q'); queries.push(query)
+    return jsonResponse({ users: query ? [adminRecord(2)] : [adminRecord(), adminRecord(2)], total: query ? 1 : 2, totalPages: 1 })
+  }
+  render(h(AdminPage))
+  await screen.findByText('learner1@example.test')
+  const names = screen.getAllByLabelText('Họ tên')
+  fireEvent.change(names[1], { target: { value: 'Draft thứ hai' } })
+  fireEvent.change(names[0], { target: { value: 'Đổi tên thứ nhất' } })
+  await userEvent.click(screen.getAllByRole('button', { name: 'Lưu thay đổi' })[0])
+  const query = 'x'.repeat(120)
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: ' ' + query + ' ignored ' } })
+  await waitFor(() => assert.equal(queries.at(-1), query))
+  await act(async () => resolveWrite(jsonResponse({ user: { ...adminRecord(), name: 'Đổi tên thứ nhất' } })))
+  await waitFor(() => assert.equal(queries.filter((item) => item === query).length, 2))
+  assert.equal(screen.getByLabelText('Họ tên').value, 'Draft thứ hai')
+  assert.equal(screen.queryByText('learner1@example.test'), null)
+})
+
+test('admin stale pre-write GET cannot undo confirmed active state; name invalid disables save', async () => {
+  dialogTestSupport()
+  let resolveOld, reads = 0, active = true
+  globalThis.fetch = async (url, options = {}) => {
+    if (options.method === 'PATCH') { active = false; return jsonResponse({ user: { ...adminRecord(), isActive: false } }) }
+    reads += 1
+    if (reads === 2) return new Promise((resolve) => { resolveOld = resolve })
+    return jsonResponse({ users: [{ ...adminRecord(), isActive: active }], total: 1, totalPages: 1 })
+  }
+  render(h(AdminPage))
+  await screen.findByText('learner1@example.test')
+  fireEvent.change(screen.getByLabelText('Họ tên'), { target: { value: ' a ' } })
+  assert.equal(screen.getByRole('button', { name: 'Lưu thay đổi' }).disabled, true)
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'learner' } })
+  await waitFor(() => assert.ok(resolveOld))
+  await userEvent.click(screen.getByRole('button', { name: 'Khóa tài khoản' }))
+  await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Khóa tài khoản' }))
+  await screen.findByText('Đã khóa')
+  await act(async () => resolveOld(jsonResponse({ users: [adminRecord()], total: 1, totalPages: 1 })))
+  assert.ok(screen.getByText('Đã khóa'))
+  assert.equal(screen.getByLabelText('Họ tên').value, ' a ')
+})
+
+test('route marker is removed when leaving dashboard for account or course and admin has no self breadcrumb', async () => {
+  localStorage.setItem('luminaToken', 'test-session')
+  globalThis.fetch = async () => jsonResponse({ user: { id: 1, role: 'ADMIN', name: 'Admin', email: 'admin@example.test' } })
+  render(h(MemoryRouter, { initialEntries: ['/admin'] }, h(SessionProvider, null, h(AppLayout, null,
+    h(Link, { to: '/account' }, 'Go account'), h(Link, { to: '/courses/1' }, 'Go course')))))
+  await screen.findByText('Quản trị viên')
+  assert.ok(document.querySelector('.role-dashboard-shell'))
+  assert.equal(screen.queryByRole('navigation', { name: 'Đường dẫn' }), null)
+  await userEvent.click(screen.getByRole('link', { name: 'Go account' }))
+  assert.equal(document.querySelector('.role-dashboard-shell'), null)
+  await userEvent.click(screen.getByRole('link', { name: 'Go course' }))
+  assert.equal(document.querySelector('.role-dashboard-shell'), null)
+  assert.ok(screen.getByRole('navigation', { name: 'Đường dẫn' }))
+})
+
+test('successful join before first list snapshot never presents partial totals and ignores older GET', async () => {
+  const reads = []
+  globalThis.fetch = async (url, options = {}) => {
+    if (String(url).endsWith('/me')) return jsonResponse({ user: { id: 1, role: 'STUDENT', name: 'Học viên' } })
+    if (options.method === 'POST') return jsonResponse({ course: learnerCourse(2) })
+    return new Promise((resolve) => reads.push(resolve))
+  }
+  renderDashboard()
+  await waitFor(() => assert.equal(reads.length, 1))
+  await userEvent.click(screen.getByRole('button', { name: 'Tham gia khóa học' }))
+  fireEvent.change(screen.getByLabelText('Mã tham gia'), { target: { value: 'ABCD1234' } })
+  await userEvent.click(screen.getByRole('button', { name: 'Tham gia', exact: true }))
+  await screen.findByText(/Đã tham gia “Khóa 2”/)
+  assert.equal(screen.queryByRole('region', { name: 'Tổng quan khóa học' }), null)
+  assert.equal(screen.queryByRole('link', { name: 'Khóa 2' }), null)
+  assert.equal(reads.length, 2)
+  await act(async () => reads[1](jsonResponse({ courses: [learnerCourse(1), learnerCourse(2)] })))
+  await screen.findByRole('link', { name: 'Khóa 2' })
+  await act(async () => reads[0](jsonResponse({ courses: [learnerCourse(1)] })))
+  assert.equal(screen.getAllByRole('link', { name: 'Khóa 2' }).length, 1)
+  assert.ok(screen.getByRole('region', { name: 'Tổng quan khóa học' }))
+})
+
+test('successful pending submit returns lost panel focus but never steals explicitly moved focus', async () => {
+  let resolveWrite
+  globalThis.fetch = async (url, options = {}) => {
+    if (String(url).endsWith('/me')) return jsonResponse({ user: { id: 1, role: 'STUDENT', name: 'Học viên' } })
+    if (options.method === 'POST') return new Promise((resolve) => { resolveWrite = resolve })
+    return jsonResponse({ courses: [learnerCourse()] })
+  }
+  renderDashboard()
+  const trigger = await screen.findByRole('button', { name: 'Tham gia khóa học' })
+  for (const moveOutside of [false, true]) {
+    await userEvent.click(trigger)
+    fireEvent.change(screen.getByLabelText('Mã tham gia'), { target: { value: 'ABCD1234' } })
+    await userEvent.click(screen.getByRole('button', { name: 'Tham gia', exact: true }))
+    if (moveOutside) screen.getByRole('searchbox').focus()
+    else document.activeElement.blur() // Native browser blurs disabled submit to body.
+    await act(async () => resolveWrite(jsonResponse({ course: learnerCourse() })))
+    await waitFor(() => assert.equal(trigger.getAttribute('aria-expanded'), 'false'))
+    assert.equal(document.activeElement, moveOutside ? screen.getByRole('searchbox') : trigger)
+  }
+})
+
+test('two independent admin writes cannot be undone by an intermediate refresh', async () => {
+  dialogTestSupport()
+  const patches = [], intermediate = []
+  let records = [adminRecord(1), adminRecord(2)]
+  let readCount = 0
+  globalThis.fetch = async (url, options = {}) => {
+    if (options.method === 'PATCH') return new Promise((resolve) => patches.push({ resolve, id: Number(String(url).split('/').at(-1)) }))
+    readCount += 1
+    if (readCount === 2) return new Promise((resolve) => intermediate.push(resolve))
+    return jsonResponse({ users: records, total: 2, totalPages: 1 })
+  }
+  render(h(AdminPage))
+  await screen.findByText('learner1@example.test')
+  for (const id of [1, 2]) {
+    const row = screen.getByText('learner' + id + '@example.test').closest('article')
+    assert.equal(within(row).getByRole('button', { name: 'Khóa tài khoản' }).disabled, false)
+    await userEvent.click(within(row).getByRole('button', { name: 'Khóa tài khoản' }))
+    await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Khóa tài khoản' }))
+  }
+  assert.equal(patches.length, 2)
+  records = [{ ...records[0], isActive: false }, records[1]]
+  await act(async () => patches[0].resolve(jsonResponse({ user: records[0] })))
+  await waitFor(() => assert.equal(intermediate.length, 1))
+  const old = [...records]
+  records = [records[0], { ...records[1], isActive: false }]
+  await act(async () => patches[1].resolve(jsonResponse({ user: records[1] })))
+  await waitFor(() => assert.equal(screen.getAllByText('Đã khóa').length, 2))
+  await act(async () => intermediate[0](jsonResponse({ users: old, total: 2, totalPages: 1 })))
+  assert.equal(screen.getAllByText('Đã khóa').length, 2)
 })

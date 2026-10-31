@@ -17,9 +17,10 @@ export default function AppLayout({ children, breadcrumbs = [] }) {
   const home = isAdmin ? '/admin' : '/dashboard'
   const currentPath = location.pathname.replace(/\/+$/, '') || '/'
   const dashboardRoute = currentPath === '/dashboard'
+  const adminRoute = currentPath === '/admin'
   const accountRoute = currentPath === '/account'
   const courseMatch = location.pathname.match(/^\/courses\/([^/]+)/)
-  const crumbs = breadcrumbs.length ? breadcrumbs : dashboardRoute || accountRoute ? [] : [
+  const crumbs = breadcrumbs.length ? breadcrumbs : dashboardRoute || adminRoute || accountRoute ? [] : [
     { label: labels[isAdmin ? 'admin' : 'dashboard'], to: home },
     ...(courseMatch ? [{ label: labels.courses }] : []),
   ]
@@ -31,7 +32,7 @@ export default function AppLayout({ children, breadcrumbs = [] }) {
     navigate('/auth', { replace: true })
   }
 
-  return <div className="learning-page">
+  return <div className={`learning-page${dashboardRoute || adminRoute ? ' role-dashboard-shell' : ''}`}>
     <header className="learning-header">
       <Link className="learning-brand" to={home}><span>L</span><strong>Lumina LMS</strong></Link>
       <nav aria-label="Điều hướng chính">

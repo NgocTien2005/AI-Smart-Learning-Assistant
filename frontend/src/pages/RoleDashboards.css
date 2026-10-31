@@ -1,0 +1,55 @@
+/* Only the two dashboard routes receive this ancestor. */
+.role-dashboard-shell .course-entry-panel[hidden] { display: none; }
+.role-dashboard-shell .role-dashboard :focus-visible { outline: 3px solid #77a8ef; outline-offset: 3px; }
+.role-dashboard-shell .course-card-title:focus-visible { display: block; -webkit-line-clamp: unset; }
+
+@media (min-width: 1024px) {
+  .role-dashboard-shell .role-dashboard { width: min(1240px, calc(100% - 64px)); margin: 0 auto; padding: 24px 0 64px; color: var(--lumina-ink, #17243b); font: 400 14px/1.5 Inter, 'Segoe UI', sans-serif; }
+  .role-dashboard-shell .role-dashboard-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 16px 24px; }
+  .role-dashboard-shell .role-dashboard h1 { margin: 4px 0 8px; font: 700 30px/36px Lexend, sans-serif; overflow-wrap: anywhere; }
+  .role-dashboard-shell .role-dashboard-heading p, .role-dashboard-shell .account-heading p { margin: 0; color: var(--lumina-muted, #5f6e83); font-size: 14px; line-height: 21px; }
+  .role-dashboard-shell .role-dashboard h2 { font: 600 22px/30px Lexend, sans-serif; }
+  .role-dashboard-shell .course-entry-panel { grid-column: 1 / -1; grid-template-columns: minmax(0, .8fr) minmax(0, 1.4fr); gap: 24px; padding: 24px; }
+  .role-dashboard-shell .course-entry-intro { display: grid; gap: 12px; justify-items: start; }
+  .role-dashboard-shell .role-dashboard label { font-size: 13px; line-height: 18px; }
+  .role-dashboard-shell .role-dashboard input, .role-dashboard-shell .role-dashboard select { min-width: 0; min-height: 44px; font: 400 14px/21px Inter, 'Segoe UI', sans-serif; }
+  .role-dashboard-shell .role-dashboard textarea { resize: vertical; font: 400 14px/21px Inter, 'Segoe UI', sans-serif; }
+  .role-dashboard-shell .ui-button, .role-dashboard-shell .admin-pagination button { min-height: 40px; padding: 9px 14px; font-size: 14px; line-height: 20px; }
+  .role-dashboard-shell .ui-button:disabled { opacity: .55; cursor: not-allowed; }
+  .role-dashboard-shell .status-message { margin: 16px 0; overflow-wrap: anywhere; }
+  .role-dashboard-shell .status-message .ui-button { margin-left: 12px; }
+  .role-dashboard-shell .state-card { margin-block: 16px; }
+  .role-dashboard-shell .dashboard-main .course-library { margin-top: 24px; }
+  .role-dashboard-shell .course-library .section-title { margin: 0; }
+  .role-dashboard-shell .dashboard-main .course-controls { gap: 16px; margin: 8px 0 16px; }
+  .role-dashboard-shell .dashboard-main .course-card-grid { max-width: none; gap: 20px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .role-dashboard-shell .dashboard-main .course-card { border-radius: 12px; }
+  .role-dashboard-shell .dashboard-main .course-card-body { padding: 16px; }
+  .role-dashboard-shell .dashboard-main .course-card-identity { margin-bottom: 12px; }
+  .role-dashboard-shell .dashboard-main .course-card-mark { width: 36px; height: 36px; flex-basis: 36px; border-radius: 8px; }
+  .role-dashboard-shell .dashboard-main .course-card-instructor { overflow: visible; white-space: normal; overflow-wrap: anywhere; }
+  .role-dashboard-shell .dashboard-main .course-card-body h3 { font: 600 18px/25px Lexend, sans-serif; }
+  .role-dashboard-shell .dashboard-main .course-card-body p { margin-bottom: 12px; line-height: 21px; }
+  .role-dashboard-shell .dashboard-main .course-card-meta { padding-top: 8px; font-size: 12px; line-height: 18px; }
+  .role-dashboard-shell .dashboard-main .course-card-progress { margin-top: 12px; }
+  .role-dashboard-shell .dashboard-main .course-card-actions { padding: 0 16px 16px; }
+  .role-dashboard-shell .dashboard-main .course-card-action { min-height: 42px; }
+  .role-dashboard-shell .dashboard-totals { margin-top: 24px; gap: 16px; }
+  .role-dashboard-shell .dashboard-totals article { min-height: 64px; padding: 12px 16px; }
+  .role-dashboard-shell .dashboard-totals strong { font-size: 20px; line-height: 28px; }
+  .role-dashboard-shell .admin-toolbar { margin: 24px 0 16px; padding: 16px; gap: 24px; }
+  .role-dashboard-shell .admin-toolbar > label { min-width: 0; width: min(600px, 70%); }
+  .role-dashboard-shell .admin-user-list { gap: 16px; }
+  .role-dashboard-shell .admin-user-card { min-width: 0; padding: 16px; gap: 12px; }
+  .role-dashboard-shell .admin-user-heading, .role-dashboard-shell .admin-user-heading > div { min-width: 0; gap: 8px 12px; }
+  .role-dashboard-shell .admin-email { overflow-wrap: anywhere; }
+  .role-dashboard-shell .admin-effective-role { color: var(--lumina-muted, #5f6e83); font-size: 12px; }
+  .role-dashboard-shell .admin-user-heading > small { flex-shrink: 0; font-size: 12px; line-height: 18px; }
+  .role-dashboard-shell .admin-user-fields { grid-template-columns: minmax(0, 1.4fr) minmax(150px, .75fr) minmax(150px, 1fr) auto; gap: 16px; }
+  .role-dashboard-shell .admin-user-fields label { min-width: 0; }
+  .role-dashboard-shell .admin-user-fields input, .role-dashboard-shell .admin-user-fields select { width: 100%; min-width: 0; }
+  .role-dashboard-shell .admin-user-fields .form-actions { margin: 0; gap: 8px; }
+  .role-dashboard-shell .admin-user-stats { color: var(--lumina-muted, #5f6e83); font-size: 12px; line-height: 18px; }
+  .role-dashboard-shell .confirm-dialog { max-width: min(520px, calc(100vw - 64px)); padding: 24px; color: var(--lumina-ink, #17243b); }
+  .role-dashboard-shell .confirm-dialog h2 { font: 600 22px/30px Lexend, sans-serif; }
+}
