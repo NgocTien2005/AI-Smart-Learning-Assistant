@@ -3,16 +3,19 @@ import { Link, useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import AssignmentsPanel from '../components/AssignmentsPanel.jsx'
 import ConfirmDialog from '../components/ui/ConfirmDialog.jsx'
 import DocumentAssistantPanel from '../components/DocumentAssistantPanel.jsx'
-import DocumentPreview, { DocumentSelection, validateDocumentFile } from '../components/DocumentPreview.jsx'
+import DocumentPreview, { validateDocumentFile } from '../components/DocumentPreview.jsx'
 import PracticeQuizPanel from '../components/PracticeQuizPanel.jsx'
 import LessonSummaryPanel from '../components/LessonSummaryPanel.jsx'
+import LessonCreateDisclosure from '../components/LessonCreateDisclosure.jsx'
 import { EmptyState, ErrorState, LoadingState, StatusMessage } from '../components/ui/Feedback.jsx'
 import { useSession } from '../app/SessionContext.jsx'
 import { apiRequest, downloadDocument } from '../services/api.js'
 import './LearningApp.css'
+import './CourseWorkspace.css'
 
 const sectionNames = { overview: 'Tổng quan', lessons: 'Bài học', assignments: 'Bài tập', students: 'Học viên', settings: 'Cài đặt' }
 const sortLessons = (lessons) => [...lessons].sort((a, b) => a.order - b.order || new Date(a.createdAt) - new Date(b.createdAt))
+const lessonStatus = (lesson, isInstructor) => !isInstructor && lesson.isCompleted ? 'Đã hoàn thành' : lesson.documentName ? 'Có tài liệu' : 'Bài học'
 
 function CourseWorkspacePage() {
   const { courseId } = useParams()
@@ -33,6 +36,10 @@ function CourseWorkspacePage() {
   const [lessonFilter, setLessonFilter] = useState('all')
   const [courseDraft, setCourseDraft] = useState({ title: '', description: '' })
   const [lessonDraft, setLessonDraft] = useState({ title: '', content: '', order: '0', file: null, fileError: '' })
+  const [createOpen, setCreateOpen] = useState(false)
+  const [createErrors, setCreateErrors] = useState({})
+  const [createReset, setCreateReset] = useState(0)
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false)
   const [editingLesson, setEditingLesson] = useState(null)
   const [students, setStudents] = useState([])
   const [studentsLoading, setStudentsLoading] = useState(false)
@@ -40,30 +47,47 @@ function CourseWorkspacePage() {
   const [previewLesson, setPreviewLesson] = useState(null)
   const [uploadStates, setUploadStates] = useState({})
   const guard = useRef(0)
+  const mounted = useRef(false)
+  const readController = useRef(null)
+  const operationLocks = useRef(new Set())
+  const selectedIdRef = useRef(selectedLessonId)
   const quizFlushRef = useRef(null)
   const [studentReload, setStudentReload] = useState(0)
+  const workspaceClass = 'workspace-main course-workspace' + (section === 'lessons' ? ' course-workspace--lessons' : '')
+
+  useEffect(() => { selectedIdRef.current = selectedLessonId }, [selectedLessonId])
+
+  const invalidateRead = useCallback(() => {
+    guard.current += 1
+    readController.current?.abort()
+  }, [])
 
   const loadCourse = useCallback(async () => {
-    const request = ++guard.current
+    invalidateRead()
+    const request = guard.current
+    const controller = new AbortController()
+    readController.current = controller
     setLoading(true)
     setLoadError('')
     try {
-      const data = await apiRequest(`/api/courses/${courseId}`)
-      if (guard.current !== request) return
+      const data = await apiRequest(`/api/courses/${courseId}`, { signal: controller.signal })
+      if (!mounted.current || guard.current !== request) return
       const nextCourse = { ...data.course, lessons: sortLessons(data.course.lessons) }
       setCourse(nextCourse)
       setCourseDraft({ title: nextCourse.title, description: nextCourse.description || '' })
     } catch (error) {
-      if (guard.current === request) setLoadError(error.message)
+      if (mounted.current && guard.current === request && error.name !== 'AbortError') setLoadError(error.message)
     } finally {
-      if (guard.current === request) setLoading(false)
+      if (mounted.current && guard.current === request) setLoading(false)
     }
-  }, [courseId])
+  }, [courseId, invalidateRead])
 
   useEffect(() => {
-    queueMicrotask(loadCourse)
-    return () => { guard.current += 1 }
-  }, [loadCourse])
+    mounted.current = true
+    let active = true
+    queueMicrotask(() => { if (active) loadCourse() })
+    return () => { active = false; mounted.current = false; invalidateRead() }
+  }, [loadCourse, invalidateRead])
 
   const safelyNavigateFromQuiz = async (action) => {
     if (params.get('panel') !== 'quiz' || !quizFlushRef.current) { action(); return }
@@ -134,6 +158,8 @@ function CourseWorkspacePage() {
       return matchesSearch && matchesFilter
     })
   }, [course, lessonSearch, lessonFilter, isInstructor])
+  const lessonNumbers = useMemo(() => new Map((course?.lessons || []).map((lesson, index) => [lesson.id, index + 1])), [course])
+  const hasProgress = Boolean(course?.lessons.every((lesson) => typeof lesson.isCompleted === 'boolean'))
   const completedLessons = course?.lessons.filter((lesson) => lesson.isCompleted).length || 0
   const progressPercent = course?.lessons.length ? Math.round(completedLessons / course.lessons.length * 100) : 0
   const currentLessonIndex = selectedLesson ? course.lessons.findIndex(({ id }) => id === selectedLesson.id) : -1
@@ -162,24 +188,47 @@ function CourseWorkspacePage() {
 
   const createLesson = async (event) => {
     event.preventDefault()
-    if (!lessonDraft.content.trim() && !lessonDraft.file) {
-      setLessonDraft((current) => ({ ...current, fileError: 'Nhập nội dung hoặc chọn tài liệu.' }))
+    if (operationLocks.current.has('lesson:create')) return
+    const title = lessonDraft.title.trim()
+    const content = lessonDraft.content.trim()
+    const order = Number(lessonDraft.order)
+    const errors = {}
+    if (title.length < 2 || title.length > 160) errors.title = 'Tiêu đề cần từ 2 đến 160 ký tự.'
+    if (content.length > 100000) errors.content = 'Nội dung tối đa 100.000 ký tự.'
+    if (!Number.isInteger(order) || order < 0 || order > 10000) errors.order = 'Thứ tự phải là số nguyên từ 0 đến 10.000.'
+    const fileError = lessonDraft.file ? validateDocumentFile(lessonDraft.file) : !content ? 'Nhập nội dung hoặc chọn tài liệu.' : ''
+    setCreateErrors(errors)
+    setLessonDraft((current) => ({ ...current, fileError }))
+    if (Object.keys(errors).length || fileError) {
+      document.getElementById('lesson-create-' + (errors.title ? 'title' : errors.order ? 'order' : 'content'))?.focus()
       return
     }
     const body = new FormData()
-    body.set('title', lessonDraft.title.trim())
-    body.set('content', lessonDraft.content)
-    body.set('order', String(lessonDraft.order))
+    body.set('title', title)
+    body.set('content', content)
+    body.set('order', String(order))
     if (lessonDraft.file) body.set('document', lessonDraft.file)
+    operationLocks.current.add('lesson:create')
+    invalidateRead()
+    setLoading(false)
     setPending('lesson:create', true)
     setNotice(null)
     try {
       const data = await apiRequest(`/api/courses/${courseId}/lessons`, { method: 'POST', body })
-      updateCourseState((current) => ({ ...current, lessons: sortLessons([...current.lessons, data.lesson]) }))
+      if (!mounted.current) return
+      invalidateRead()
+      setLoading(false)
+      updateCourseState((current) => ({ ...current, lessons: sortLessons([...current.lessons.filter((lesson) => lesson.id !== data.lesson.id), data.lesson]) }))
       setLessonDraft({ title: '', content: '', order: String(course.lessons.length + 1), file: null, fileError: '' })
       setNotice({ type: 'success', text: 'Đã thêm bài học.' })
-    } catch (error) { setNotice({ type: 'error', text: error.message }) }
-    finally { setPending('lesson:create', false) }
+      setCreateOpen(false)
+      setCreateReset((current) => current + 1)
+      setCreateErrors({})
+    } catch (error) { if (mounted.current) setNotice({ type: 'error', text: error.message }) }
+    finally {
+      operationLocks.current.delete('lesson:create')
+      if (mounted.current) setPending('lesson:create', false)
+    }
   }
 
   const saveLesson = async (event) => {
@@ -261,14 +310,21 @@ function CourseWorkspacePage() {
 
   const toggleProgress = async (lesson) => {
     const key = `progress:${lesson.id}`
+    if (operationLocks.current.has(key)) return
+    operationLocks.current.add(key)
+    invalidateRead()
+    setLoading(false)
     setPending(key, true)
     try {
       const completed = !lesson.isCompleted
       const data = await apiRequest(`/api/courses/lessons/${lesson.id}/progress`, { method: completed ? 'PUT' : 'DELETE' })
+      if (!mounted.current) return
+      invalidateRead()
+      setLoading(false)
       updateCourseState((current) => ({ ...current, lessons: current.lessons.map((item) => item.id === lesson.id ? { ...item, isCompleted: data.isCompleted, completedAt: data.completedAt } : item) }))
-      setNotice({ type: 'success', text: completed ? 'Đã đánh dấu hoàn thành.' : 'Đã bỏ trạng thái hoàn thành.' })
-    } catch (error) { setNotice({ type: 'error', text: error.message }) }
-    finally { setPending(key, false) }
+      if (selectedIdRef.current === lesson.id) setNotice({ type: 'success', text: completed ? 'Đã đánh dấu hoàn thành.' : 'Đã bỏ trạng thái hoàn thành.' })
+    } catch (error) { if (mounted.current) setNotice({ type: 'error', text: 'Bài “' + lesson.title + '”: ' + error.message }) }
+    finally { operationLocks.current.delete(key); if (mounted.current) setPending(key, false) }
   }
 
   const deleteLesson = async (lesson) => {
@@ -318,40 +374,48 @@ function CourseWorkspacePage() {
     }
   }
 
-  if (loading) return <main className="workspace-main"><LoadingState>Đang tải khóa học…</LoadingState></main>
-  if (loadError || !course) return <main className="workspace-main"><ErrorState title="Không thể mở khóa học" onRetry={loadCourse}>{loadError}</ErrorState><Link to="/dashboard">Quay lại trang tổng quan</Link></main>
+  if (loading) return <main className={workspaceClass}><LoadingState>Đang tải khóa học…</LoadingState></main>
+  if (loadError || !course) return <main className={workspaceClass}><ErrorState title="Không thể mở khóa học" onRetry={loadCourse}>{loadError}</ErrorState><Link to="/dashboard">Quay lại trang tổng quan</Link></main>
 
   const availableSections = isInstructor ? ['overview', 'lessons', 'assignments', 'students', 'settings'] : ['overview', 'lessons', 'assignments']
   const lessonList = course.lessons.length > 0 ? <div className="lesson-browser"><aside className="lesson-browser-list" aria-label="Danh sách bài học">
     <label htmlFor="lesson-search">Tìm bài học<input id="lesson-search" type="search" value={lessonSearch} onChange={(event) => setLessonSearch(event.target.value)} placeholder="Tìm theo tiêu đề hoặc nội dung…" /></label>
     {!isInstructor && <label htmlFor="lesson-filter">Trạng thái<select id="lesson-filter" value={lessonFilter} onChange={(event) => setLessonFilter(event.target.value)}><option value="all">Tất cả bài</option><option value="incomplete">Chưa hoàn thành</option><option value="complete">Đã hoàn thành</option></select></label>}
-    {visibleLessons.length === 0 ? <EmptyState title="Không có bài học phù hợp">Thử từ khóa hoặc bộ lọc khác.</EmptyState> : visibleLessons.map((lesson, index) => <button className={`lesson-list-item ${selectedLesson?.id === lesson.id ? 'selected' : ''}`} type="button" key={lesson.id} onClick={() => selectLesson(lesson.id)}><span>{String(index + 1).padStart(2, '0')}</span><span><strong>{lesson.title}</strong><small>{!isInstructor && lesson.isCompleted ? 'Đã hoàn thành' : lesson.documentName ? 'Có tài liệu' : 'Bài học'}</small></span></button>)}
+    {selectedLesson && !visibleLessons.some((lesson) => lesson.id === selectedLesson.id) && <p className="lesson-filter-notice" role="status">Bài đang đọc nằm ngoài bộ lọc. Nội dung vẫn được giữ.</p>}
+    {visibleLessons.length === 0 ? <EmptyState title="Không có bài học phù hợp">Thử từ khóa hoặc bộ lọc khác.</EmptyState> : visibleLessons.map((lesson) => <button className={`lesson-list-item ${selectedLesson?.id === lesson.id ? 'selected' : ''}`} aria-label={String(lessonNumbers.get(lesson.id)).padStart(2, '0') + ' ' + lesson.title + ' ' + lessonStatus(lesson, isInstructor)} title={lesson.title} aria-current={selectedLesson?.id === lesson.id ? 'true' : undefined} type="button" key={lesson.id} onClick={() => selectLesson(lesson.id)}><span>{String(lessonNumbers.get(lesson.id)).padStart(2, '0')}</span><span><strong>{lesson.title}</strong><small>{lessonStatus(lesson, isInstructor)}</small></span></button>)}
   </aside>
-  <div className="lesson-reader-column">{!selectedLesson ? <EmptyState title="Chọn một bài học">Chọn bài học trong danh sách để đọc nội dung và  mở các công cụ học tập.</EmptyState> : <article className="lesson-reader"><header><div><span className="eyebrow">BÀI {currentLessonIndex + 1}/{course.lessons.length}</span><h2>{selectedLesson.title}</h2></div><div className="reader-navigation"><button type="button" disabled={!previousLesson} onClick={() => previousLesson && selectLesson(previousLesson.id)}>← Bài trước</button><button type="button" disabled={!nextLesson} onClick={() => nextLesson && selectLesson(nextLesson.id)}>Bài tiếp →</button></div></header>
-    {selectedLesson.content ? <div className="lesson-reading-content">{selectedLesson.content}</div> : <EmptyState title="Chưa có nội dung nhập trực tiếp">Mở tài liệu đính kèm nếu có, hoặc hỏi giảng viên về nội dung bài học.</EmptyState>}{selectedLesson.documentName && <p className="preview-note">{selectedLesson.extractionStatus === 'SUCCESS' ? 'Nguồn tra cứu và tóm tắt: văn bản trích từ tài liệu.' : selectedLesson.extractionStatus === 'NO_TEXT' ? 'Tài liệu chưa có lớp văn bản dùng được; PDF vẫn xem và tải xuống được. Có thể là bản scan hoặc PDF không có chữ.' : selectedLesson.extractionStatus === 'FAILED' ? 'Chưa trích xuất được tài liệu. Có thể thử trích xuất lại hoặc dùng nội dung nhập trực tiếp.' : 'Tài liệu chưa được xử lý. Tra cứu và tóm tắt dùng nội dung nhập trực tiếp nếu có.'}</p>}
-    {!isInstructor && <StatusMessage type={selectedLesson.isCompleted ? 'success' : 'info'}>{selectedLesson.isCompleted ? `Đã hoàn thành${selectedLesson.completedAt ? ` · ${new Date(selectedLesson.completedAt).toLocaleString('vi-VN')} (giờ địa phương)` : ''}` : 'Bài học chưa được đánh dấu hoàn thành.'}</StatusMessage>}
-    <div className="lesson-reader-actions">{!isInstructor && <button className="ui-button ui-button-secondary" type="button" disabled={operationPending[`progress:${selectedLesson.id}`]} onClick={() => toggleProgress(selectedLesson)}>{selectedLesson.isCompleted ? 'Bỏ hoàn thành' : 'Đánh dấu hoàn thành'}</button>}{selectedLesson.documentName && <><button type="button" className="ui-button ui-button-secondary" onClick={() => setPreviewLesson(selectedLesson)}>Xem tài liệu</button><button type="button" className="ui-button ui-button-secondary" disabled={operationPending[`document-download:${selectedLesson.id}`]} onClick={() => download(selectedLesson)}>{operationPending[`document-download:${selectedLesson.id}`] ? 'Đang tải…' : 'Tải xuống'}</button>{isInstructor && <button type="button" className="ui-button ui-button-secondary" disabled={operationPending[`document-process:${selectedLesson.id}`]} onClick={() => reprocessDocument(selectedLesson)}>{operationPending[`document-process:${selectedLesson.id}`] ? 'Đang trích xuất…' : 'Trích xuất lại'}</button>}</>}<button type="button" className="ui-button ui-button-primary" onClick={() => openLessonPanel('quiz')}>Ôn tập nhanh</button><button type="button" className="ui-button ui-button-secondary" onClick={() => openLessonPanel('assistant')}>Tra cứu tài liệu</button><button type="button" className="ui-button ui-button-secondary" onClick={() => openLessonPanel('summary')}>Tóm tắt</button></div>
-    {previewLesson?.id === selectedLesson.id && <DocumentPreview lesson={selectedLesson} onClose={() => setPreviewLesson(null)} />}
+  <div className="lesson-reader-column">{!selectedLesson ? selectedLessonId ? <ErrorState title="Không tìm thấy bài học đã chọn">Bài học có thể đã bị xóa hoặc địa chỉ không còn hợp lệ. Chọn một bài trong danh sách.</ErrorState> : <EmptyState title="Chọn một bài học">Chọn bài học trong danh sách để đọc nội dung và mở các công cụ học tập.</EmptyState> : <article className="lesson-reader"><header><div><span className="eyebrow">BÀI {currentLessonIndex + 1}/{course.lessons.length}</span><h2>{selectedLesson.title}</h2></div><div className="reader-navigation"><button type="button" disabled={!previousLesson} onClick={() => previousLesson && selectLesson(previousLesson.id)}>← Bài trước</button><button type="button" disabled={!nextLesson} onClick={() => nextLesson && selectLesson(nextLesson.id)}>Bài tiếp →</button></div></header>
+{selectedLesson.documentName && <p className="preview-note">{selectedLesson.extractionStatus === 'SUCCESS' ? 'Nguồn tra cứu và tóm tắt: văn bản trích từ tài liệu.' : selectedLesson.extractionStatus === 'NO_TEXT' ? 'Tài liệu chưa có lớp văn bản dùng được; PDF vẫn xem và tải xuống được. Có thể là bản scan hoặc PDF không có chữ.' : selectedLesson.extractionStatus === 'FAILED' ? 'Chưa trích xuất được tài liệu. Có thể thử trích xuất lại hoặc dùng nội dung nhập trực tiếp.' : 'Tài liệu chưa được xử lý. Tra cứu và tóm tắt dùng nội dung nhập trực tiếp nếu có.'}</p>}
+    {!isInstructor && <StatusMessage type={selectedLesson.isCompleted ? 'success' : 'info'}>{typeof selectedLesson.isCompleted !== 'boolean' ? 'Tiến độ chưa có dữ liệu.' : selectedLesson.isCompleted ? `Đã hoàn thành${selectedLesson.completedAt ? ` · ${new Date(selectedLesson.completedAt).toLocaleString('vi-VN')} (giờ địa phương)` : ''}` : 'Bài học chưa được đánh dấu hoàn thành.'}</StatusMessage>}
+    <div className="lesson-reader-actions">{!isInstructor && <button className="ui-button ui-button-secondary" type="button" disabled={operationPending[`progress:${selectedLesson.id}`] || typeof selectedLesson.isCompleted !== 'boolean'} onClick={() => toggleProgress(selectedLesson)}>{operationPending[`progress:${selectedLesson.id}`] ? 'Đang lưu tiến độ…' : selectedLesson.isCompleted ? 'Bỏ hoàn thành' : 'Đánh dấu hoàn thành'}</button>}{selectedLesson.documentName && <><button type="button" className="ui-button ui-button-secondary" onClick={() => setPreviewLesson(selectedLesson)}>Xem tài liệu</button><button type="button" className="ui-button ui-button-secondary" disabled={operationPending[`document-download:${selectedLesson.id}`]} onClick={() => download(selectedLesson)}>{operationPending[`document-download:${selectedLesson.id}`] ? 'Đang tải…' : 'Tải xuống'}</button>{isInstructor && <button type="button" className="ui-button ui-button-secondary" disabled={operationPending[`document-process:${selectedLesson.id}`]} onClick={() => reprocessDocument(selectedLesson)}>{operationPending[`document-process:${selectedLesson.id}`] ? 'Đang trích xuất…' : 'Trích xuất lại'}</button>}</>}<button type="button" className="ui-button ui-button-primary" onClick={() => openLessonPanel('quiz')}>Ôn tập nhanh</button><button type="button" className="ui-button ui-button-secondary" onClick={() => openLessonPanel('assistant')}>Tra cứu tài liệu</button><button type="button" className="ui-button ui-button-secondary" onClick={() => openLessonPanel('summary')}>Tóm tắt</button>{isInstructor && <button type="button" className="ui-button ui-button-secondary" onClick={() => changeSection('settings')}>Quản lý bài học</button>}</div>
+    {selectedLesson.content ? <div className="lesson-reading-content">{selectedLesson.content}</div> : <EmptyState title="Chưa có nội dung nhập trực tiếp">Mở tài liệu đính kèm nếu có, hoặc hỏi giảng viên về nội dung bài học.</EmptyState>}
+    {previewLesson?.id === selectedLesson.id && <DocumentPreview key={courseId + '-' + selectedLesson.id + '-' + selectedLesson.sourceRevision} lesson={selectedLesson} onClose={() => setPreviewLesson(null)} />}
     {activePanel === 'quiz' && <PracticeQuizPanel key={`${courseId}-${selectedLesson.id}`} lesson={selectedLesson} onClose={closeLessonPanel} onRegisterBeforeLeave={(flush) => { quizFlushRef.current = flush }} />}
-    {activePanel === 'assistant' && <DocumentAssistantPanel key={`${courseId}-${selectedLesson.id}`} lesson={selectedLesson} onClose={closeLessonPanel} />}
-    {activePanel === 'summary' && <LessonSummaryPanel key={`${courseId}-${selectedLesson.id}`} lesson={selectedLesson} onClose={closeLessonPanel} />}
+    {activePanel === 'assistant' && <DocumentAssistantPanel key={courseId + '-' + selectedLesson.id + '-' + selectedLesson.sourceRevision} lesson={selectedLesson} onClose={closeLessonPanel} />}
+    {activePanel === 'summary' && <LessonSummaryPanel key={courseId + '-' + selectedLesson.id + '-' + selectedLesson.sourceRevision} lesson={selectedLesson} onClose={closeLessonPanel} />}
   </article>}</div></div> : <EmptyState title="Chưa có bài học">{isInstructor ? 'Thêm bài học ngay trong phần này để bắt đầu.' : 'Giảng viên chưa đăng bài học nào.'}</EmptyState>
 
-  return <main className="workspace-main">
+  return <main className={workspaceClass}>
     <header className="course-header">
-      <div className="course-header-copy"><span className="course-context">{isInstructor ? 'KHÓA HỌC ĐANG GIẢNG DẠY' : `GIẢNG VIÊN · ${course.instructor?.name || '—'}`}</span><h1>{course.title}</h1><p>{course.description || 'Khóa học chưa có mô tả.'}</p></div>
+      <div className="course-header-copy"><span className="course-context">{isInstructor ? 'KHÓA HỌC ĐANG GIẢNG DẠY' : `GIẢNG VIÊN · ${course.instructor?.name || '—'}`}</span><h1>{course.title}</h1><p id="workspace-description" className={descriptionExpanded ? '' : 'course-description-collapsed'}>{course.description || 'Khóa học chưa có mô tả.'}</p>{course.description?.length > 180 && <button type="button" className="description-toggle" aria-expanded={descriptionExpanded} aria-controls="workspace-description" onClick={() => setDescriptionExpanded((current) => !current)}>{descriptionExpanded ? 'Thu gọn mô tả' : 'Xem mô tả đầy đủ'}</button>}</div>
       <div className="course-header-actions">
-        {isInstructor && section !== 'lessons' && <button className="ui-button ui-button-primary" type="button" onClick={() => changeSection('lessons')}>Thêm bài học</button>}
+        {isInstructor && section !== 'lessons' && <button className="ui-button ui-button-primary" type="button" onClick={() => safelyNavigateFromQuiz(() => { setParams((current) => { const next = new URLSearchParams(current); next.set('section', 'lessons'); next.delete('panel'); next.delete('lessonId'); return next }); setCreateOpen(true) })}>Thêm bài học</button>}
         {!isInstructor && course.lessons.length > 0 && <button className="ui-button ui-button-primary" type="button" onClick={() => { const next = course.lessons.find((lesson) => !lesson.isCompleted) || course.lessons[0]; selectLesson(next.id) }}>{completedLessons < course.lessons.length ? 'Tiếp tục học' : 'Xem lại bài học'}</button>}
         {!isInstructor && <button className="ui-button ui-button-secondary" type="button" disabled={operationPending['course:leave']} onClick={() => askToConfirm('Rời khóa học?', 'Bạn sẽ mất quyền mở bài học, tài liệu và bài ôn cho đến khi tham gia lại. Tiến độ và lịch sử hiện có được giữ theo dữ liệu khóa học.', leaveCourse, true, 'Rời khóa học')}>Rời khóa học</button>}
       </div>
       <div className="course-header-meta"><span><strong>{course.lessons.length}</strong> bài học</span>{isInstructor ? <span><strong>{course._count?.enrollments ?? '—'}</strong> học viên đang tham gia</span> : <span><strong>{course.assignments.length}</strong> bài tập</span>}{isInstructor && <div className="course-join-code"><span>Mã tham gia <strong>{course.joinCode}</strong></span><button className="ui-button ui-button-secondary" type="button" onClick={copyJoinCode}>Sao chép mã</button></div>}</div>
-      {!isInstructor && <div className="course-progress"><div><span>Tiến độ học tập</span><strong>{completedLessons}/{course.lessons.length} bài · {progressPercent}%</strong></div><div className="course-progress-track" role="progressbar" aria-label="Tiến độ khóa học" aria-valuemin="0" aria-valuemax="100" aria-valuenow={progressPercent}><span style={{ width: `${progressPercent}%` }} /></div></div>}
+      {!isInstructor && <div className="course-progress"><div><span>Tiến độ học tập</span><strong>{!hasProgress ? 'Chưa có dữ liệu tiến độ' : !course.lessons.length ? 'Chưa có bài học' : completedLessons + '/' + course.lessons.length + ' bài · ' + progressPercent + '%'}</strong></div>{hasProgress && course.lessons.length > 0 && <div className="course-progress-track" role="progressbar" aria-label="Tiến độ khóa học" aria-valuemin="0" aria-valuemax="100" aria-valuenow={progressPercent}><span style={{ width: progressPercent + '%' }} /></div>}</div>}
     </header>
     {notice && <StatusMessage type={notice.type} onDismiss={() => setNotice(null)}>{notice.text}</StatusMessage>}
     <nav className="workspace-tabs" aria-label="Các phần trong khóa học">{availableSections.map((key) => <Link to={`?section=${key}`} key={key} className={section === key ? 'active' : ''} aria-current={section === key ? 'page' : undefined} onClick={(event) => { event.preventDefault(); changeSection(key) }}>{sectionNames[key]}</Link>)}</nav>
     {section === 'overview' && <section className="course-overview"><div className="course-overview-heading"><div><span className="eyebrow">TỔNG QUAN</span><h2>{isInstructor ? 'Tình hình khóa học' : 'Tiến độ khóa học'}</h2></div><p>{isInstructor ? 'Quản lý nội dung và người học trong một nơi.' : 'Theo dõi bài học và bài tập của bạn.'}</p></div><div className="overview-grid"><button className="course-stat-card" type="button" onClick={() => changeSection('lessons')}><span className="course-stat-label">Bài học</span><strong>{course.lessons.length}</strong><small>Mở nội dung và học liệu</small></button><button className="course-stat-card" type="button" onClick={() => changeSection('assignments')}><span className="course-stat-label">Bài tập</span><strong>{course.assignments.length}</strong><small>{isInstructor ? 'Quản lý bài tập và bài nộp' : 'Xem yêu cầu và bài đã nộp'}</small></button>{isInstructor ? <button className="course-stat-card" type="button" onClick={() => changeSection('students')}><span className="course-stat-label">Học viên đang tham gia</span><strong>{course._count?.enrollments ?? '—'}</strong><small>Mở danh sách học viên</small></button> : <article className="course-stat-card course-progress-card"><span className="course-stat-label">Bài học đã hoàn thành</span><strong>{progressPercent}%</strong><small>{completedLessons} trên {course.lessons.length} bài học</small><div className="course-progress-track" role="progressbar" aria-label="Tiến độ khóa học" aria-valuemin="0" aria-valuemax="100" aria-valuenow={progressPercent}><span style={{ width: `${progressPercent}%` }} /></div></article>}</div>{isInstructor && course.lessons.length === 0 && <EmptyState title="Bắt đầu xây dựng khóa học">Thêm bài học đầu tiên để học viên có thể bắt đầu học. Dùng nút “Thêm bài học” phía trên để tạo nội dung đầu tiên.</EmptyState>}</section>}
-    {section === 'lessons' && <section className="course-section"><div className="section-title"><div><span className="eyebrow">NỘI DUNG KHÓA HỌC</span><h2>Bài học</h2></div><span>{course.lessons.length} bài</span></div>{isInstructor && <section className="management-card lesson-create-card"><h3>Thêm bài học</h3><p>Thêm nội dung hoặc tài liệu để học viên có thể học theo thứ tự.</p><form onSubmit={createLesson}><div className="lesson-create-fields"><label htmlFor="lesson-title">Tiêu đề<input id="lesson-title" value={lessonDraft.title} onChange={(event) => setLessonDraft({ ...lessonDraft, title: event.target.value })} minLength="2" maxLength="160" required /></label><label htmlFor="lesson-order">Thứ tự<input id="lesson-order" type="number" min="0" max="10000" value={lessonDraft.order} onChange={(event) => setLessonDraft({ ...lessonDraft, order: event.target.value })} /></label></div><label htmlFor="lesson-content">Nội dung<textarea id="lesson-content" value={lessonDraft.content} onChange={(event) => setLessonDraft({ ...lessonDraft, content: event.target.value })} maxLength="100000" rows="4" /></label><DocumentSelection file={lessonDraft.file} error={lessonDraft.fileError} onChange={chooseDocument} onRemove={() => setLessonDraft({ ...lessonDraft, file: null, fileError: '' })} disabled={operationPending['lesson:create']} /><small>PDF có thể xem và tải; Lumina không trích xuất văn bản PDF. TXT, Markdown và CSV được dùng nếu backend nhận diện được kiểu tệp. Giới hạn 10 MiB.</small><button className="ui-button ui-button-primary" disabled={operationPending['lesson:create']}>{operationPending['lesson:create'] ? 'Đang tải lên…' : 'Thêm bài học'}</button></form></section>}{lessonList}</section>}
+    {section === 'lessons' && <section className="course-section">
+      <div className="section-title"><div><span className="eyebrow">NỘI DUNG KHÓA HỌC</span><h2>Bài học</h2></div><span>{course.lessons.length} bài</span></div>
+      {isInstructor && <LessonCreateDisclosure open={createOpen} onOpenChange={setCreateOpen} draft={lessonDraft} errors={createErrors} pending={Boolean(operationPending['lesson:create'])} resetVersion={createReset}
+        onChange={(name, value) => { setLessonDraft((current) => ({ ...current, [name]: value })); setCreateErrors((current) => ({ ...current, [name]: '' })) }}
+        onFile={chooseDocument} onRemove={() => setLessonDraft((current) => ({ ...current, file: null, fileError: '' }))} onSubmit={createLesson} />}
+      {lessonList}
+    </section>}
     {section === 'assignments' && <AssignmentsPanel key={courseId} course={course} isInstructor={isInstructor} onAssignmentsChange={(assignments) => updateCourseState((current) => ({ ...current, assignments }))} onNotice={(text, type = 'info') => setNotice({ text, type })} onRefresh={loadCourse} />}
     {section === 'students' && isInstructor && <section className="management-card roster-card"><div className="section-title"><div><span className="eyebrow">HỌC VIÊN</span><h2>Danh sách tham gia</h2></div><span>{studentsLoading ? 'Đang tải…' : studentsError ? '' : `${students.length} học viên`}</span></div>{studentsError ? <ErrorState onRetry={() => setStudentReload((value) => value + 1)}>{studentsError}</ErrorState> : studentsLoading ? <LoadingState>Đang tải danh sách học viên…</LoadingState> : students.length === 0 ? <EmptyState title="Chưa có học viên">Chia sẻ mã tham gia {course.joinCode} để học viên tham gia khóa học.</EmptyState> : <ul>{students.map((student) => <li key={student.id}><span className="student-avatar">{student.name?.slice(0, 1).toUpperCase() || '?'}</span><span><strong>{student.name}</strong><small className="break-long">{student.email}</small><small>Hoàn thành {student.completedLessons}/{student.totalLessons} bài ({student.progressPercent}%)</small></span><time dateTime={student.enrolledAt}>{new Date(student.enrolledAt).toLocaleString('vi-VN', { dateStyle: 'medium' })} (giờ địa phương)</time></li>)}</ul>}</section>}
     {section === 'settings' && isInstructor && <section className="course-settings"><section className="management-card"><h2>Thông tin khóa học</h2><form onSubmit={saveCourse}><label htmlFor="course-edit-title">Tên khóa học<input id="course-edit-title" value={courseDraft.title} onChange={(event) => setCourseDraft({ ...courseDraft, title: event.target.value })} minLength="3" maxLength="120" required /></label><label htmlFor="course-edit-description">Mô tả<textarea id="course-edit-description" value={courseDraft.description} onChange={(event) => setCourseDraft({ ...courseDraft, description: event.target.value })} maxLength="4000" rows="4" /></label><button className="primary-button" disabled={operationPending['course:update']}>{operationPending['course:update'] ? 'Đang lưu…' : 'Lưu thay đổi'}</button></form></section>

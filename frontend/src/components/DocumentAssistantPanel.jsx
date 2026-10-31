@@ -55,7 +55,7 @@ function DocumentAssistantPanel({ lesson, onClose }) {
       setHasNewReply(!nearBottomRef.current)
     } catch (error) {
       if (!guard.current.isCurrent(request)) return
-      setSendError(error.status === 422 ? 'Bài học chưa có văn bản để tra cứu. PDF hiện chỉ xem và tải được; hệ thống chưa trích xuất nội dung PDF.' : error.message)
+      setSendError(error.status === 422 ? 'Bài học chưa có nguồn văn bản dùng được để tra cứu. PDF cần có lớp văn bản trích xuất được; bản scan không được hỗ trợ OCR. Có thể dùng nội dung nhập trực tiếp.' : error.message)
     } finally {
       if (guard.current.isCurrent(request)) setSending(false)
     }
