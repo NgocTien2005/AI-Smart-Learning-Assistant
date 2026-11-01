@@ -1,0 +1,84 @@
+/* Study-tool styles are scoped; course shell, reader, quiz and other panels stay unchanged. */
+.assistant-panel.lookup-workspace,
+.lesson-summary-panel.summary-workspace {
+  min-width: 0;
+  margin-top: 20px;
+  padding: 0;
+  border: 1px solid #dfe6ef;
+  border-radius: 14px;
+  background: #fff;
+  color: #172b46;
+  box-shadow: 0 3px 14px #172b5408;
+  overflow-wrap: anywhere;
+}
+.assistant-panel.lookup-workspace > .study-panel-header,
+.lesson-summary-panel.summary-workspace > .study-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid #e5ebf3;
+  background: #f8faff;
+  color: #172b46;
+}
+.lookup-workspace .study-panel-header > div,
+.summary-workspace .study-panel-header > div { display: block; min-width: 0; }
+.lookup-workspace .study-panel-header h2,
+.summary-workspace .study-panel-header h3 { margin: 5px 0 0; font-family: inherit; font-size: 18px; line-height: 1.45; }
+.lookup-workspace .study-panel-header .ui-button,
+.summary-workspace .study-panel-header .ui-button { flex: 0 0 auto; font-size: 13px; color: #26486f; background: #fff; border: 1px solid #cbd7e7; }
+.lookup-workspace .eyebrow,
+.summary-workspace .eyebrow { font-size: 11px; color: #526b8b; letter-spacing: .07em; }
+.lookup-workspace .study-panel-intro,
+.summary-workspace .study-panel-intro { margin: 0; padding: 14px 20px; color: #52637a; font-size: 13px; line-height: 1.6; }
+.lookup-workspace .lookup-history-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 4px 20px 8px; }
+.lookup-workspace .lookup-history-toolbar h3 { margin: 0 0 4px; font-size: 15px; }
+.lookup-workspace .lookup-history-toolbar small,
+.lookup-workspace .lookup-composer small { color: #5b6b80; font-size: 12px; line-height: 1.5; }
+.lookup-workspace .lookup-history-note { margin: 0; padding: 0 20px 12px; color: #5b6b80; font-size: 12px; line-height: 1.6; }
+.lookup-workspace > .state-card { margin: 0 20px 12px; }
+.lookup-workspace .chat-history {
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  max-height: clamp(18rem, 45vh, 32rem);
+  min-height: 8rem;
+  overflow: auto;
+  scrollbar-gutter: stable;
+  overflow-anchor: none;
+  padding: 16px 20px;
+  border-top: 1px solid #edf1f6;
+  background: #fff;
+}
+.lookup-workspace .chat-history:empty { min-height: 0; padding-block: 0; border-top: 0; }
+.lookup-workspace .chat-pair { display: grid; gap: 10px; min-width: 0; }
+.lookup-workspace .chat-pair .question,
+.lookup-workspace .chat-pair .answer { justify-self: stretch; min-width: 0; padding: 12px 14px; border-radius: 8px; }
+.lookup-workspace .chat-pair .question { background: #f1f5fa; color: #263e5b; }
+.lookup-workspace .chat-pair .answer { background: #fff; color: #25354b; border-left: 3px solid #82ace7; border-radius: 0 8px 8px 0; }
+.lookup-workspace .chat-pair p { display: block; max-width: 72ch; margin: 6px 0 0; padding: 0; border-radius: 0; white-space: pre-wrap; font-size: 16px; line-height: 1.75; }
+.lookup-workspace .lookup-message-label { font-size: 11px; font-weight: 700; color: #4c6483; letter-spacing: .03em; }
+.lookup-workspace .new-reply-button { display: block; max-width: calc(100% - 40px); margin: 0 20px 14px; white-space: normal; text-align: left; }
+.lookup-workspace .lookup-composer { padding: 16px 20px; border-top: 1px solid #dfe6ef; background: #f8faff; }
+.lookup-workspace .lookup-composer form { display: grid; gap: 8px; }
+.lookup-workspace .lookup-composer label { color: #243b59; font-size: 13px; font-weight: 700; }
+.lookup-workspace .lookup-composer textarea { box-sizing: border-box; width: 100%; min-height: 4.5rem; max-height: 12rem; resize: vertical; padding: 10px 12px; border: 1px solid #bfcde0; border-radius: 9px; background: #fff; color: #172b46; font: inherit; font-size: 14px; line-height: 1.5; }
+.lookup-workspace .lookup-composer textarea[aria-invalid="true"] { border-color: #b42336; }
+.lookup-workspace .lookup-composer-actions { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.lookup-workspace .lookup-composer-actions .ui-button { flex-shrink: 0; }
+.lookup-workspace .lookup-composer .status-message { margin-top: 12px; }
+.lookup-workspace .lookup-composer [role="alert"] + .ui-button { margin-top: 8px; }
+.summary-workspace .summary-source { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 20px 16px; padding: 12px 14px; border: 1px solid #dfe7f2; border-radius: 9px; background: #f8faff; font-size: 12px; line-height: 1.6; color: #52637a; }
+.summary-workspace .summary-source p { margin: 0; }
+.summary-workspace > .state-card,
+.summary-workspace > .status-message { margin: 0 20px 16px; }
+.summary-workspace .summary-points { display: grid; gap: 18px; margin: 0 20px 20px; padding-left: 24px; line-height: 1.75; }
+.summary-workspace .summary-points li { padding-left: 4px; min-width: 0; }
+.summary-workspace .summary-points p { max-width: 72ch; margin: 0; white-space: pre-wrap; font-size: 16px; }
+.summary-workspace .summary-points small { display: inline-block; margin-top: 6px; padding: 2px 8px; border-radius: 5px; background: #eef4fd; color: #365b87; font-size: 12px; }
+.summary-workspace .summary-recovery { padding: 0 20px 16px; }
+.lookup-workspace :is(button, textarea, [tabindex]):focus-visible,
+.summary-workspace :is(button, [tabindex]):focus-visible { outline: 2px solid #1769e0; outline-offset: 3px; }
+.lookup-workspace button:disabled,
+.summary-workspace button:disabled { opacity: .6; cursor: not-allowed; }
