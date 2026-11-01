@@ -1,0 +1,58 @@
+/* Account-only styles preserve the shell and learning surfaces. */
+.learning-page .account-main.account-workspace {
+  width: min(1080px, calc(100% - 64px));
+  margin: 0 auto;
+  padding: 32px 0 64px;
+  font: 400 16px/1.6 Inter, 'Segoe UI', sans-serif;
+  overflow-wrap: anywhere;
+}
+.account-workspace .account-heading { margin-bottom: 28px; }
+.account-workspace .account-columns { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 24px; align-items: start; }
+.account-workspace .account-columns > *, .account-workspace .account-forms > * { min-width: 0; }
+.account-workspace .account-forms { display: grid; gap: 20px; }
+.account-workspace :is(.account-identity, .account-profile-card, .account-password-card, .account-password-recovery, .account-verification) {
+  padding: 24px;
+  border: 1px solid #dfe6ef;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 3px 14px #172b5408;
+}
+.account-workspace h2 { margin: 0 0 8px; color: #17243b; font: 700 20px/1.4 Lexend, sans-serif; }
+.account-workspace p { margin: 0 0 16px; color: #5f6e83; }
+.account-workspace .account-identity dl { display: grid; gap: 18px; margin: 24px 0; }
+.account-workspace .account-identity dt { color: #5f6e83; font-size: 14px; }
+.account-workspace .account-identity dd { margin: 4px 0 0; font-weight: 600; color: #17243b; }
+.account-workspace small { display: block; color: #5f6e83; font-size: 14px; line-height: 1.6; }
+.account-workspace form { display: grid; gap: 10px; }
+.account-workspace label { color: #33445d; font-size: 16px; font-weight: 600; }
+.account-workspace input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 11px 12px;
+  border: 1px solid #bac8da;
+  border-radius: 9px;
+  background: #fff;
+  color: #17243b;
+  font: inherit;
+}
+.account-workspace input[aria-invalid="true"] { border-color: #bd2735; }
+.account-workspace input:read-only, .account-workspace input:disabled { background: #f1f4f8; color: #5f6e83; }
+.learning-page .account-workspace .ui-button { min-height: 44px; padding: 11px 16px; font-size: 16px; white-space: normal; }
+.account-workspace form > .ui-button { justify-self: start; margin-top: 8px; }
+.account-workspace :is(button, input):focus-visible { outline: 3px solid #77a8ef; outline-offset: 3px; }
+.account-workspace button:disabled { opacity: .55; cursor: not-allowed; }
+.account-workspace .field-error { color: #a82030; font-size: 14px; }
+.account-workspace .status-message { margin-top: 16px; overflow-wrap: anywhere; }
+.account-workspace .account-password-heading { display: flex; flex-wrap: wrap; align-items: start; justify-content: space-between; gap: 16px; }
+.account-workspace .account-password-heading > div { flex: 1 1 300px; min-width: 0; }
+.account-workspace .account-password-heading p { margin-bottom: 0; }
+.account-workspace .account-password-heading > button { flex: 0 1 auto; }
+.account-workspace .account-password-form { margin-top: 24px; padding-top: 24px; border-top: 1px solid #e1e7f0; }
+.account-workspace .account-password-form > p { margin-bottom: 6px; }
+.account-workspace .account-password-field { display: grid; gap: 8px; }
+.account-workspace .account-password-field + .account-password-field { margin-top: 6px; }
+.account-workspace .account-verification { margin-bottom: 24px; border-color: #e3c49a; }
+.account-workspace .account-verification > p { margin-top: 16px; }
+.account-workspace :is(.account-verification, .account-password-recovery) > .ui-button { margin: 12px 12px 0 0; }

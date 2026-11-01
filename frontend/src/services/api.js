@@ -2,6 +2,9 @@ import { isSessionExpiration, readApiError, SESSION_EXPIRED_EVENT } from './apiE
 
 export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
 
+let sessionGeneration = 0
+export const getSessionGeneration = () => sessionGeneration
+
 export const getToken = () => localStorage.getItem('luminaToken') || sessionStorage.getItem('luminaToken')
 
 export const getStoredUser = () => {
@@ -16,13 +19,25 @@ export const getStoredUser = () => {
 }
 
 export const clearSession = () => {
+  sessionGeneration += 1
   for (const storage of [localStorage, sessionStorage]) {
     storage.removeItem('luminaToken')
     storage.removeItem('luminaUser')
   }
 }
 
-const handleSessionError = (error) => {
+export const installCredentials = (token, rememberMe = true) => {
+  sessionGeneration += 1
+  const target = rememberMe ? localStorage : sessionStorage
+  const other = rememberMe ? sessionStorage : localStorage
+  target.setItem('luminaToken', token)
+  target.removeItem('luminaUser')
+  other.removeItem('luminaToken')
+  other.removeItem('luminaUser')
+}
+
+const handleSessionError = (error, generation, token) => {
+  if (generation !== sessionGeneration || token !== getToken()) return
   if (!isSessionExpiration(error)) return
   clearSession()
   window.dispatchEvent(new CustomEvent(SESSION_EXPIRED_EVENT))
@@ -35,6 +50,7 @@ export const updateStoredUser = (user) => {
 
 export const apiRequest = async (path, options = {}) => {
   const token = getToken()
+  const generation = sessionGeneration
   const headers = new Headers(options.headers)
   if (token) headers.set('Authorization', `Bearer ${token}`)
   if (options.body && !(options.body instanceof FormData)) headers.set('Content-Type', 'application/json')
@@ -53,7 +69,7 @@ export const apiRequest = async (path, options = {}) => {
   if (response.status === 204) return null
   if (!response.ok) {
     const error = await readApiError(response)
-    handleSessionError(error)
+    handleSessionError(error, generation, token)
     throw error
   }
 
@@ -62,12 +78,13 @@ export const apiRequest = async (path, options = {}) => {
 
 export const fetchDocument = async (lessonId) => {
   const token = getToken()
+  const generation = sessionGeneration
   const response = await fetch(`${API_URL}/api/courses/lessons/${lessonId}/document`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   })
   if (!response.ok) {
     const error = await readApiError(response, 'Không thể tải tài liệu')
-    handleSessionError(error)
+    handleSessionError(error, generation, token)
     throw error
   }
   return response.blob()

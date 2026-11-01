@@ -24,12 +24,13 @@ function SessionRecovery() {
   return <main className="session-recovery"><ErrorState title="Không thể xác minh tài khoản" >{error?.message}</ErrorState><div><button className="ui-button ui-button-primary" type="button" onClick={() => refresh().catch(() => {})}>Thử lại</button><button className="ui-button ui-button-secondary" type="button" onClick={logout}>Đăng xuất</button></div></main>
 }
 
-function GuardedRoute({ roles, children }) {
-  const { status, user, sessionExpired } = useSession()
+function GuardedRoute({ roles, retainAccount = false, children }) {
+  const { status, user, sessionExpired, passwordChanged } = useSession()
   const location = useLocation()
+  if (retainAccount && user && (status === 'loading' || status === 'error')) return children
   if (status === 'loading') return <LoadingState>Đang xác minh phiên đăng nhập…</LoadingState>
   if (status === 'error') return <SessionRecovery />
-  if (status !== 'authenticated') return <Navigate to="/auth" state={{ from: location, sessionExpired }} replace />
+  if (status !== 'authenticated') return <Navigate to="/auth" state={{ from: location, sessionExpired, passwordChanged }} replace />
   if (roles && !roles.includes(user?.role)) return <ForbiddenPage />
   return children
 }
@@ -54,7 +55,7 @@ function AdminRoute() {
 }
 
 function AccountRoute() {
-  return <GuardedRoute><AppLayout><AccountPage /></AppLayout></GuardedRoute>
+  return <GuardedRoute retainAccount><AppLayout><AccountPage /></AppLayout></GuardedRoute>
 }
 
 function CourseRoute() {
