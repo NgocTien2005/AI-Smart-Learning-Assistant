@@ -1,0 +1,36 @@
+.practice-panel.quiz-workspace { min-width: 0; padding: 20px; gap: 16px; color: var(--lumina-ink, #17243b); font: 400 14px/1.5 Inter, 'Segoe UI', sans-serif; }
+.practice-panel.quiz-workspace > header { justify-content: space-between; align-items: start; gap: 16px; }
+.practice-panel.quiz-workspace h3 { font: 600 20px/28px Lexend, sans-serif; overflow-wrap: anywhere; }
+.practice-panel.quiz-workspace h4 { font: 600 16px/24px Lexend, sans-serif; margin: 0; overflow-wrap: anywhere; }
+.practice-panel.quiz-workspace .qw-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 20px; align-items: start; }
+.practice-panel.quiz-workspace :is(.qw-detail, .qw-heading-text, .qw-create, .qw-create-body) { min-width: 0; }
+.practice-panel.quiz-workspace .qw-history { min-width: 0; max-height: 620px; overflow-y: auto; border: 1px solid #dfe6ef; border-radius: 10px; padding: 14px; background: #fbfcff; }
+.practice-panel.quiz-workspace .qw-history-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.practice-panel.quiz-workspace .qw-history label { display: grid; gap: 6px; font-weight: 600; font-size: 13px; }
+.practice-panel.quiz-workspace select { min-height: 40px; max-width: 100%; padding: 8px 10px; border: 1px solid #ccd6e4; border-radius: 8px; color: inherit; background: white; font: inherit; }
+.practice-panel.quiz-workspace .qw-history-items { display: grid; gap: 8px; margin-top: 12px; }
+.practice-panel.quiz-workspace .qw-history-item { display: grid; gap: 4px; min-width: 0; width: 100%; padding: 10px; border: 1px solid #dfe6ef; border-radius: 8px; background: white; color: inherit; text-align: left; font: inherit; cursor: pointer; }
+.practice-panel.quiz-workspace .qw-history-item:hover { background: #f0f6ff; }
+.practice-panel.quiz-workspace .qw-history-item.is-selected { border-color: #1769e0; box-shadow: inset 3px 0 #1769e0; background: #edf5ff; }
+.practice-panel.quiz-workspace .qw-history-item :is(span, small) { font-size: 12px; overflow-wrap: anywhere; }
+.practice-panel.quiz-workspace .qw-muted { margin: 6px 0 10px; color: #63728a; font-size: 13px; overflow-wrap: anywhere; }
+.practice-panel.quiz-workspace .qw-create { margin-bottom: 14px; }
+.practice-panel.quiz-workspace .qw-create-body { padding: 14px; margin-top: 10px; border: 1px solid #dfe6ef; border-radius: 10px; background: #f8faff; }
+.practice-panel.quiz-workspace .practice-create { gap: 10px; }
+.practice-panel.quiz-workspace .practice-create label { min-width: 0; }
+.practice-panel.quiz-workspace .practice-save-status { margin: 12px 0; padding: 10px; gap: 10px; }
+.practice-panel.quiz-workspace .practice-save-status.is-unsaved { background: #fff8e8; color: #755411; }
+.practice-panel.quiz-workspace .practice-save-status.is-saved { background: #edf8f0; color: #216641; }
+.practice-panel.quiz-workspace .practice-questions { margin-top: 14px; gap: 14px; }
+.practice-panel.quiz-workspace .practice-questions fieldset { min-width: 0; padding: 12px; }
+.practice-panel.quiz-workspace .practice-questions legend { max-width: 100%; box-sizing: border-box; font-size: 15px; overflow-wrap: anywhere; }
+.practice-panel.quiz-workspace .practice-questions label { min-width: 0; overflow-wrap: anywhere; font-size: 15px; line-height: 1.6; padding: 6px; border-radius: 6px; }
+.practice-panel.quiz-workspace .practice-questions label:has(input:checked) { background: #edf5ff; color: #1559a8; }
+.practice-panel.quiz-workspace .practice-questions input { width: 16px; height: 16px; flex-shrink: 0; }
+.practice-panel.quiz-workspace .practice-result :is(p, blockquote, b, a) { overflow-wrap: anywhere; white-space: pre-wrap; }
+.practice-panel.quiz-workspace .practice-result article { min-width: 0; margin: 0; padding: 14px; }
+.practice-panel.quiz-workspace .practice-result nav { margin: 8px 0; gap: 10px; }
+.practice-panel.quiz-workspace :is(button, select, input, a, [tabindex]):focus-visible { outline: 3px solid #77a8ef; outline-offset: 3px; }
+.practice-panel.quiz-workspace :is(button, input, select):disabled { opacity: .6; cursor: not-allowed; }
+.practice-panel.quiz-workspace .ui-button { min-height: 38px; }
+.practice-panel.quiz-workspace :is(.status-message, .state-card) { overflow-wrap: anywhere; min-width: 0; }

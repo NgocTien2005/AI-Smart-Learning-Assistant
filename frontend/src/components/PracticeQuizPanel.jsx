@@ -1,263 +1,407 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { apiRequest } from '../services/api.js'
 import ConfirmDialog from './ui/ConfirmDialog.jsx'
+import Button from './ui/Button.jsx'
 import { EmptyState, ErrorState, LoadingState, StatusMessage } from './ui/Feedback.jsx'
+import QuizHistory from './QuizHistory.jsx'
+import QuizCreateDisclosure from './QuizCreateDisclosure.jsx'
+import './PracticeQuizPanel.css'
 
-const lessonQuizPath = (lessonId) => `/api/courses/lessons/${lessonId}/quizzes`
-const attemptPath = (attemptId) => `/api/courses/quiz-attempts/${attemptId}`
-const copyAnswers = (answers) => answers?.map((answer) => answer ?? null) || []
+const lessonQuizPath = (id) => '/api/courses/lessons/' + id + '/quizzes'
+const attemptPath = (id) => '/api/courses/quiz-attempts/' + id
+const copy = (answers) => answers.map((answer) => answer ?? null)
+const same = (a, b) => a.length === b.length && a.every((answer, index) => answer === b[index])
+const labels = { unsaved: 'Chưa lưu thay đổi', saving: 'Đang lưu…', saved: 'Đã lưu trên máy chủ', failed: 'Lưu thất bại', conflicted: 'Xung đột phiên bản' }
 
-function PracticeQuizPanel({ lesson, onClose, onRegisterBeforeLeave }) {
-  const [attempts, setAttempts] = useState([])
+function QuizWorkspace({ lesson, onClose, onRegisterBeforeLeave }) {
+  const [attempts, setAttempts] = useState(null)
+  const [filter, setFilter] = useState('all')
+  const [historyLoading, setHistoryLoading] = useState(true)
+  const [historyError, setHistoryError] = useState('')
   const [quiz, setQuiz] = useState(null)
   const [answers, setAnswers] = useState([])
   const [result, setResult] = useState(null)
-  const [count, setCount] = useState(5)
-  const [message, setMessage] = useState('')
   const [saveState, setSaveState] = useState('saved')
-  const [historyLoading, setHistoryLoading] = useState(true)
-  const [historyError, setHistoryError] = useState('')
-  const [attemptLoading, setAttemptLoading] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [creating, setCreating] = useState(false)
+  const [busy, setBusy] = useState('')
+  const [opening, setOpening] = useState(null)
+  const [openError, setOpenError] = useState(null)
+  const [message, setMessage] = useState('')
+  const [createError, setCreateError] = useState('')
+  const [createdVersion, setCreatedVersion] = useState(0)
   const [confirmation, setConfirmation] = useState(null)
-  const timerRef = useRef(null)
-  const mountedRef = useRef(false)
-  const epochRef = useRef(0)
-  const revisionRef = useRef(0)
-  const currentAttemptRef = useRef(null)
-  const answersRef = useRef([])
-  const savedAnswersRef = useRef([])
-  const versionsRef = useRef(new Map())
-  const savingPromiseRef = useRef(Promise.resolve())
-  const stateRef = useRef({ quiz: null, result: null, saveState: 'saved' })
+  const mounted = useRef(false)
+  const lifecycle = useRef(0)
+  const sessionRef = useRef(null)
+  const actionLock = useRef('')
+  const timer = useRef(null)
+  const historySequence = useRef(0)
+  const mutationGeneration = useRef(0)
+  const historyController = useRef(null)
+  const detailSequence = useRef(0)
+  const detailController = useRef(null)
+  const detailBusy = useRef(false)
+  const historyHeading = useRef(null)
+  const detailHeading = useRef(null)
+  const activeId = quiz?.attemptId ?? result?.attemptId ?? null
+  const activeIdRef = useRef(null)
 
-  useEffect(() => { stateRef.current = { quiz, result, saveState } }, [quiz, result, saveState])
-
+  const isCurrent = useCallback((session) => mounted.current && sessionRef.current === session && lifecycle.current === session.generation, [])
   const refreshHistory = useCallback(async () => {
+    historyController.current?.abort()
+    const controller = new AbortController()
+    historyController.current = controller
+    const sequence = ++historySequence.current
+    const generation = mutationGeneration.current
+    const epoch = lifecycle.current
     setHistoryLoading(true)
     setHistoryError('')
     try {
-      const data = await apiRequest(lessonQuizPath(lesson.id))
-      if (mountedRef.current) setAttempts(data.attempts)
+      const data = await apiRequest(lessonQuizPath(lesson.id), { signal: controller.signal })
+      if (!mounted.current || lifecycle.current !== epoch || sequence !== historySequence.current || generation !== mutationGeneration.current) return
+      if (!Array.isArray(data.attempts)) throw new Error('Máy chủ chưa trả lịch sử ôn tập.')
+      setAttempts(data.attempts)
     } catch (error) {
-      if (mountedRef.current) setHistoryError(error.message)
-    } finally { if (mountedRef.current) setHistoryLoading(false) }
+      if (mounted.current && lifecycle.current === epoch && sequence === historySequence.current && error.name !== 'AbortError') setHistoryError(error.message)
+    } finally {
+      if (mounted.current && lifecycle.current === epoch && sequence === historySequence.current) setHistoryLoading(false)
+    }
   }, [lesson.id])
 
   useEffect(() => {
-    mountedRef.current = true
-    queueMicrotask(refreshHistory)
+    mounted.current = true
+    lifecycle.current += 1
+    let active = true
+    queueMicrotask(() => { if (active) void refreshHistory() })
     return () => {
-      mountedRef.current = false
-      clearTimeout(timerRef.current)
-      epochRef.current += 1
+      active = false
+      mounted.current = false
+      lifecycle.current += 1
+      historySequence.current += 1
+      detailSequence.current += 1
+      historyController.current?.abort()
+      detailController.current?.abort()
+      clearTimeout(timer.current)
     }
   }, [refreshHistory])
 
-  const saveDraft = useCallback((attemptId, draft, revision, epoch) => {
-    if (JSON.stringify(draft) === JSON.stringify(savedAnswersRef.current)) {
-      setSaveState('saved')
-      return Promise.resolve(true)
-    }
-    clearTimeout(timerRef.current)
+  // Compare inside the queue: a pending older write may change the server baseline.
+  const saveDraft = useCallback((session, snapshot) => {
+    if (!isCurrent(session) || session.blocked) return Promise.resolve(false)
+    session.pending += 1
     setSaving(true)
     setSaveState('saving')
-    const operation = savingPromiseRef.current.catch(() => {}).then(async () => {
-      if (epoch !== epochRef.current || attemptId !== currentAttemptRef.current) return false
-      const data = await apiRequest(`${attemptPath(attemptId)}/draft`, {
-        method: 'PUT',
-        body: JSON.stringify({ answers: draft, version: versionsRef.current.get(attemptId) }),
-      })
-      versionsRef.current.set(attemptId, data.version)
-      savedAnswersRef.current = copyAnswers(draft)
-      if (mountedRef.current && epoch === epochRef.current && attemptId === currentAttemptRef.current && revision === revisionRef.current) setSaveState('saved')
-      return true
-    })
-    savingPromiseRef.current = operation
-    operation.catch((error) => {
-      if (!mountedRef.current || epoch !== epochRef.current || attemptId !== currentAttemptRef.current) return
-      setSaveState(error.status === 409 ? 'conflicted' : 'failed')
-      setMessage(error.status === 409 ? 'Bản nháp đã thay đổi ở một thẻ khác. Câu trả lời trên màn hình vẫn được giữ; hãy chọn cách khôi phục.' : error.message)
+    const operation = session.tail.then(async () => {
+      if (!isCurrent(session) || session.blocked) return false
+      if (!session.uncertain && same(snapshot, session.saved)) return true
+      try {
+        const data = await apiRequest(attemptPath(session.id) + '/draft', {
+          method: 'PUT', body: JSON.stringify({ answers: snapshot, version: session.version }),
+        })
+        if (!isCurrent(session)) return false
+        if (!Number.isInteger(data.version)) throw new Error('Máy chủ chưa xác nhận phiên bản bản nháp.')
+        session.version = data.version
+        session.saved = copy(snapshot)
+        session.uncertain = false
+        return true
+      } catch (error) {
+        if (isCurrent(session)) {
+          session.uncertain = true
+          session.blocked = error.status === 409 ? 'conflicted' : 'failed'
+          setSaveState(session.blocked)
+          setMessage(error.status === 409 ? 'Bản nháp đã thay đổi hoặc được nộp ở thẻ khác. Câu trả lời hiện tại vẫn được giữ; hãy chọn cách khôi phục.' : error.message)
+        }
+        return false
+      }
     }).finally(() => {
-      if (mountedRef.current && epoch === epochRef.current && attemptId === currentAttemptRef.current && revision === revisionRef.current) setSaving(false)
+      session.pending -= 1
+      if (!isCurrent(session)) return
+      setSaving(session.pending > 0)
+      setSaveState(session.blocked || (session.pending ? 'saving' : same(session.answers, session.saved) ? 'saved' : 'unsaved'))
     })
+    session.tail = operation
     return operation
-  }, [])
+  }, [isCurrent])
 
   const flushBeforeLeave = useCallback(async () => {
-    const current = stateRef.current
-    if (!current.quiz || JSON.stringify(answersRef.current) === JSON.stringify(savedAnswersRef.current)) return true
-    clearTimeout(timerRef.current)
-    const attemptId = current.quiz.attemptId
-    const epoch = epochRef.current
-    try {
-      const saved = await saveDraft(attemptId, copyAnswers(answersRef.current), revisionRef.current, epoch)
-      if (saved && epoch === epochRef.current && attemptId === currentAttemptRef.current) return true
-    } catch { /* Preserve edits and offer an explicit recovery choice. */ }
+    clearTimeout(timer.current)
+    const session = sessionRef.current
+    if (!session) return true
+    await session.tail
+    while (isCurrent(session)) {
+      if (session.blocked) return false
+      if (!session.pending && !session.uncertain && same(session.answers, session.saved)) return true
+      if (!await saveDraft(session, copy(session.answers))) return false
+    }
     return false
-  }, [saveDraft])
+  }, [isCurrent, saveDraft])
 
   useEffect(() => {
     onRegisterBeforeLeave?.(flushBeforeLeave)
     return () => onRegisterBeforeLeave?.(null)
-  }, [flushBeforeLeave, onRegisterBeforeLeave])
+  }, [onRegisterBeforeLeave, flushBeforeLeave])
 
   useEffect(() => {
-    const dirty = quiz && JSON.stringify(answers) !== JSON.stringify(savedAnswersRef.current)
-    if (!dirty) return undefined
-    const handleBeforeUnload = (event) => { event.preventDefault(); event.returnValue = '' }
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [answers, quiz])
+    const session = sessionRef.current
+    if (!quiz || !session || saveState !== 'unsaved' || session.blocked) return undefined
+    timer.current = setTimeout(() => { void saveDraft(session, copy(session.answers)) }, 550)
+    return () => clearTimeout(timer.current)
+  }, [answers, quiz, saveState, saveDraft])
 
   useEffect(() => {
-    if (!quiz || result || saveState === 'conflicted') return undefined
-    if (JSON.stringify(answers) === JSON.stringify(savedAnswersRef.current)) return undefined
-    clearTimeout(timerRef.current)
-    const attemptId = quiz.attemptId
-    const epoch = epochRef.current
-    const revision = revisionRef.current
-    timerRef.current = setTimeout(() => { void saveDraft(attemptId, copyAnswers(answers), revision, epoch) }, 550)
-    return () => clearTimeout(timerRef.current)
-  }, [answers, quiz, result, saveState, saveDraft])
+    const session = sessionRef.current
+    if (!quiz || !session || (!saving && !session.blocked && !session.uncertain && same(answers, session.saved))) return undefined
+    const warn = (event) => { event.preventDefault(); event.returnValue = '' }
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [answers, quiz, saving, saveState])
 
-  const prepareAttempt = (attemptId, nextAnswers, version) => {
-    currentAttemptRef.current = attemptId
-    answersRef.current = copyAnswers(nextAnswers)
-    savedAnswersRef.current = copyAnswers(nextAnswers)
-    versionsRef.current.set(attemptId, version)
-    revisionRef.current += 1
-    setAnswers(copyAnswers(nextAnswers))
+  useEffect(() => { if (activeId !== null) detailHeading.current?.focus() }, [activeId])
+
+  const invalidateDetails = () => {
+    detailSequence.current += 1
+    detailController.current?.abort()
+    detailBusy.current = false
+    setOpening(null)
+  }
+  const invalidateHistory = () => {
+    mutationGeneration.current += 1
+    historySequence.current += 1
+    historyController.current?.abort()
+    setHistoryLoading(false)
+  }
+  const activate = (data, id) => {
+    clearTimeout(timer.current)
+    activeIdRef.current = id
+    setMessage('')
+    setOpenError(null)
+    setSaving(false)
     setSaveState('saved')
-    setMessage('')
-  }
-
-  const createQuiz = async (event) => {
-    event.preventDefault()
-    const epoch = ++epochRef.current
-    setCreating(true)
-    setMessage('')
-    try {
-      const data = await apiRequest(lessonQuizPath(lesson.id), { method: 'POST', body: JSON.stringify({ count: Number(count) }) })
-      if (!mountedRef.current || epoch !== epochRef.current) return
-      prepareAttempt(data.attemptId, data.questions.map(() => null), data.version)
-      setQuiz(data)
+    if (data.submittedAt) {
+      sessionRef.current = null
+      setQuiz(null)
+      setResult({ ...data, attemptId: id })
+    } else {
+      const saved = data.questions.map((_, index) => data.answers?.[index] ?? null)
+      sessionRef.current = { id, generation: lifecycle.current, version: data.version, answers: copy(saved), saved: copy(saved), pending: 0, tail: Promise.resolve(true), blocked: null, uncertain: false }
+      setAnswers(copy(saved))
       setResult(null)
-      if (data.message) setMessage(data.message)
-      void refreshHistory()
-    } catch (error) { if (epoch === epochRef.current) setMessage(error.message) }
-    finally { if (epoch === epochRef.current) setCreating(false) }
+      setQuiz({ ...data, attemptId: id })
+    }
   }
-
-  const startOpenAttempt = async (attemptId) => {
-    clearTimeout(timerRef.current)
-    const epoch = ++epochRef.current
-    currentAttemptRef.current = attemptId
-    setAttemptLoading(true)
-    setMessage('')
+  const discardSession = () => {
+    clearTimeout(timer.current)
+    sessionRef.current = null
+    activeIdRef.current = null
     setQuiz(null)
     setResult(null)
-    try {
-      const data = await apiRequest(attemptPath(attemptId))
-      if (!mountedRef.current || epoch !== epochRef.current) return
-      if (data.submittedAt) { currentAttemptRef.current = null; setResult(data); setSaveState('saved') }
-      else {
-        prepareAttempt(attemptId, data.answers, data.version)
-        setQuiz({ attemptId, questions: data.questions })
-      }
-    } catch (error) { if (epoch === epochRef.current) setMessage(error.message) }
-    finally { if (epoch === epochRef.current) setAttemptLoading(false) }
+    setSaving(false)
+    setMessage('')
   }
+  const beginAction = (name) => {
+    if (actionLock.current) return false
+    actionLock.current = name
+    setBusy(name)
+    invalidateDetails()
+    return true
+  }
+  const finishAction = (name, epoch) => {
+    if (mounted.current && lifecycle.current === epoch && actionLock.current === name) {
+      actionLock.current = ''
+      setBusy('')
+    }
+  }
+  const askDiscard = (onConfirm, confirmLabel) => setConfirmation({
+    title: 'Bản nháp chưa lưu',
+    message: 'Câu trả lời hiện tại chưa được xác nhận trên máy chủ. Bạn có thể ở lại để thử lại hoặc tiếp tục và bỏ thay đổi chưa lưu.',
+    confirmLabel,
+    onConfirm,
+  })
 
-  const openAttempt = async (attemptId) => {
-    if (currentAttemptRef.current && currentAttemptRef.current !== attemptId && await flushBeforeLeave() === false) {
-      setConfirmation({ title: 'B?n nh?p ch?a l?u', message: 'Kh?ng l?u ???c c?c c?u tr? l?i m?i nh?t. B?n c? th? ? l?i ho?c m? b?i kh?c v? b? thay ??i ch?a l?u.', confirmLabel: 'M? b?i kh?c v? b? thay ??i', onConfirm: () => { currentAttemptRef.current = null; startOpenAttempt(attemptId) } })
+  const performOpen = async (id, sequence) => {
+    const epoch = lifecycle.current
+    const controller = new AbortController()
+    detailController.current?.abort()
+    detailController.current = controller
+    detailBusy.current = true
+    setOpening(id)
+    setOpenError(null)
+    try {
+      const data = await apiRequest(attemptPath(id), { signal: controller.signal })
+      if (!mounted.current || lifecycle.current !== epoch || sequence !== detailSequence.current) return
+      if (!Array.isArray(data.questions)) throw new Error('Máy chủ chưa trả nội dung bài ôn.')
+      activate(data, id)
+    } catch (error) {
+      if (mounted.current && lifecycle.current === epoch && sequence === detailSequence.current && error.name !== 'AbortError') setOpenError({ id, message: error.message })
+    } finally {
+      if (mounted.current && lifecycle.current === epoch && sequence === detailSequence.current) {
+        detailBusy.current = false
+        setOpening(null)
+      }
+    }
+  }
+  const openAttempt = async (id) => {
+    if (actionLock.current) return
+    if (activeIdRef.current === id) { invalidateDetails(); return }
+    const sequence = ++detailSequence.current
+    const epoch = lifecycle.current
+    detailBusy.current = true
+    setOpening(id)
+    const flushed = await flushBeforeLeave()
+    if (!mounted.current || lifecycle.current !== epoch || sequence !== detailSequence.current) return
+    if (!flushed) {
+      detailBusy.current = false
+      setOpening(null)
+      askDiscard(() => { discardSession(); void performOpen(id, ++detailSequence.current) }, 'Mở bài khác và bỏ thay đổi')
       return
     }
-    await startOpenAttempt(attemptId)
+    await performOpen(id, sequence)
+  }
+  const chooseAnswer = (index, option) => {
+    const session = sessionRef.current
+    if (!session || actionLock.current || detailBusy.current) return
+    session.answers = session.answers.map((answer, i) => i === index ? option : answer)
+    setAnswers(copy(session.answers))
+    setSaveState(session.blocked || 'unsaved')
+    if (!session.blocked) setMessage('')
   }
 
-  const chooseAnswer = (questionIndex, optionIndex) => {
-    const next = answersRef.current.map((answer, index) => index === questionIndex ? optionIndex : answer)
-    answersRef.current = next
-    revisionRef.current += 1
-    setAnswers(next)
-    setSaveState('unsaved')
-    setMessage('')
+  const createQuiz = async (count) => {
+    if (!Number.isInteger(count) || count < 3 || count > 10) { setCreateError('Số câu hỏi phải từ 3 đến 10.'); return }
+    if (!beginAction('create')) return
+    const epoch = lifecycle.current
+    setCreateError('')
+    try {
+      if (!await flushBeforeLeave()) {
+        if (mounted.current && lifecycle.current === epoch) askDiscard(() => { discardSession(); void createQuiz(count) }, 'Tạo bài mới và bỏ thay đổi')
+        return
+      }
+      if (!mounted.current || lifecycle.current !== epoch) return
+      invalidateHistory()
+      const data = await apiRequest(lessonQuizPath(lesson.id), { method: 'POST', body: JSON.stringify({ count }) })
+      if (!mounted.current || lifecycle.current !== epoch) return
+      activate(data, data.attemptId)
+      setCreatedVersion((value) => value + 1)
+      invalidateHistory()
+      void refreshHistory()
+    } catch (error) {
+      if (mounted.current && lifecycle.current === epoch) setCreateError(error.message)
+    } finally { finishAction('create', epoch) }
   }
 
   const retrySave = async () => {
-    if (!quiz) return
-    const attemptId = quiz.attemptId
-    const epoch = epochRef.current
-    const revision = revisionRef.current
+    const session = sessionRef.current
+    if (!session || !beginAction('recovery')) return
+    const epoch = lifecycle.current
+    setMessage('')
     try {
-      if (saveState === 'conflicted') {
-        const current = await apiRequest(attemptPath(attemptId))
-        if (epoch !== epochRef.current || attemptId !== currentAttemptRef.current) return
-        if (current.submittedAt) { setMessage('Bài ôn tập đã được nộp trong một thẻ khác.'); setSaveState('conflicted'); return }
-        versionsRef.current.set(attemptId, current.version)
+      await session.tail
+      if (!isCurrent(session)) return
+      if (session.blocked === 'conflicted') {
+        const current = await apiRequest(attemptPath(session.id))
+        if (!isCurrent(session)) return
+        if (current.submittedAt) { setMessage('Bài ôn tập đã được nộp trong một thẻ khác. Chọn Tải bản đã lưu để xem kết quả.'); return }
+        if (!Number.isInteger(current.version) || !Array.isArray(current.answers)) throw new Error('Máy chủ chưa trả trạng thái bản nháp hợp lệ.')
+        session.version = current.version
+        session.saved = copy(current.answers)
+        session.uncertain = false
       }
-      await saveDraft(attemptId, copyAnswers(answersRef.current), revision, epoch)
-      setMessage('')
-    } catch { /* saveDraft publishes the recoverable error state. */ }
+      session.blocked = null
+      if (await saveDraft(session, copy(session.answers)) && isCurrent(session)) setMessage('')
+    } catch (error) {
+      if (isCurrent(session)) setMessage('Không tải được trạng thái mới: ' + error.message + ' Câu trả lời hiện tại vẫn được giữ.')
+    } finally { finishAction('recovery', epoch) }
+  }
+
+  const loadSaved = async () => {
+    const session = sessionRef.current
+    if (!session || !beginAction('recovery')) return
+    const epoch = lifecycle.current
+    try {
+      await session.tail
+      const data = await apiRequest(attemptPath(session.id))
+      if (isCurrent(session)) activate(data, session.id)
+    } catch (error) {
+      if (isCurrent(session)) setMessage('Không tải được bản đã lưu: ' + error.message)
+    } finally { finishAction('recovery', epoch) }
+  }
+  const requestLoadSaved = () => {
+    const session = sessionRef.current
+    if (!session || actionLock.current) return
+    if (session.blocked || session.pending || !same(session.answers, session.saved)) askDiscard(loadSaved, 'Tải bản đã lưu và bỏ thay đổi')
+    else void loadSaved()
   }
 
   const submitQuiz = async (event) => {
     event.preventDefault()
-    if (!quiz || answersRef.current.some((answer) => answer === null)) return
-    clearTimeout(timerRef.current)
-    const attemptId = quiz.attemptId
-    const epoch = epochRef.current
-    const finalAnswers = copyAnswers(answersRef.current)
-    setAttemptLoading(true)
+    const session = sessionRef.current
+    if (!session || !session.answers.length || session.answers.some((answer) => answer === null) || !beginAction('submit')) return
+    const epoch = lifecycle.current
     setMessage('')
     try {
-      const flushed = await saveDraft(attemptId, finalAnswers, revisionRef.current, epoch)
-      if (!flushed || epoch !== epochRef.current || attemptId !== currentAttemptRef.current) throw new Error('Không thể xác nhận bản nháp mới nhất. Hãy thử lưu lại trước khi nộp.')
-      const data = await apiRequest(`${attemptPath(attemptId)}/submit`, { method: 'POST', body: JSON.stringify({ answers: finalAnswers, version: versionsRef.current.get(attemptId) }) })
-      if (!mountedRef.current || epoch !== epochRef.current || attemptId !== currentAttemptRef.current) return
-      currentAttemptRef.current = null
-      setQuiz(null)
-      setResult(data)
-      setSaveState('saved')
+      if (!await flushBeforeLeave()) return
+      if (!isCurrent(session)) return
+      const latestAnswers = copy(session.answers)
+      invalidateHistory()
+      const data = await apiRequest(attemptPath(session.id) + '/submit', { method: 'POST', body: JSON.stringify({ answers: latestAnswers, version: session.version }) })
+      if (!isCurrent(session)) return
+      activate(data, session.id)
+      invalidateHistory()
       void refreshHistory()
     } catch (error) {
-      if (epoch === epochRef.current && attemptId === currentAttemptRef.current) {
+      if (isCurrent(session)) {
+        if (error.status === 409) { session.blocked = 'conflicted'; setSaveState('conflicted') }
         setMessage(error.status === 409 ? 'Có xung đột phiên bản hoặc bài đã được nộp. Câu trả lời hiện tại vẫn được giữ.' : error.message)
-        if (error.status === 409) setSaveState('conflicted')
       }
-    } finally { if (epoch === epochRef.current) setAttemptLoading(false) }
+    } finally { finishAction('submit', epoch) }
   }
 
   const closePanel = async () => {
-    if (await flushBeforeLeave()) { onClose(); return }
-    setConfirmation({ title: 'Bản nháp chưa lưu', message: 'Lưu bản nháp không thành công. Bạn có thể ở lại để thử lại hoặc đóng và bỏ các thay đổi chưa được lưu.', confirmLabel: 'Đóng và bỏ thay đổi', onConfirm: onClose })
+    if (!beginAction('close')) return
+    const epoch = lifecycle.current
+    try {
+      if (await flushBeforeLeave()) {
+        if (mounted.current && lifecycle.current === epoch) onClose()
+      } else if (mounted.current && lifecycle.current === epoch) askDiscard(onClose, 'Đóng và bỏ thay đổi')
+    } finally { finishAction('close', epoch) }
   }
 
-  const unfinished = attempts.filter((attempt) => !attempt.submittedAt)
-  const submitted = attempts.filter((attempt) => attempt.submittedAt)
-  const saveLabel = { unsaved: 'Chưa lưu thay đổi', saving: 'Đang lưu…', saved: 'Đã lưu trên máy chủ', failed: 'Lưu thất bại', conflicted: 'Xung đột phiên bản' }[saveState]
-  return <section className="practice-panel" aria-labelledby="practice-title">
-    <header><div><span aria-hidden="true">✦</span><div><small>ÔN TẬP CỤC BỘ</small><h3 id="practice-title">{lesson.title}</h3></div></div><button type="button" aria-label="Đóng bài ôn tập" onClick={closePanel}>×</button></header>
-    <p className="practice-note">Tạo câu hỏi luyện tập cục bộ từ các mẫu câu được hỗ trợ trong nội dung bài học. Không sử dụng dịch vụ AI bên ngoài.</p>
-    {message && <StatusMessage type={saveState === 'failed' || saveState === 'conflicted' ? 'error' : 'info'}>{message}</StatusMessage>}
-    {historyError && <ErrorState title="Không tải được lịch sử ôn tập" onRetry={refreshHistory}>{historyError}</ErrorState>}
-    {historyLoading && attempts.length === 0 && <LoadingState>Đang tải lịch sử ôn tập…</LoadingState>}
-    {attemptLoading && <LoadingState>Đang mở hoặc nộp bài ôn tập…</LoadingState>}
-    {!quiz && !result && !attemptLoading && <form className="practice-create" onSubmit={createQuiz}><label htmlFor="practice-count">Số câu hỏi<select id="practice-count" value={count} onChange={(event) => setCount(event.target.value)}>{Array.from({ length: 8 }, (_, index) => index + 3).map((value) => <option key={value} value={value}>{value} câu</option>)}</select></label><button className="primary-button" disabled={creating}>{creating ? 'Đang tạo…' : 'Tạo bài ôn nhanh'}</button></form>}
-    {quiz && <><div className={`practice-save-status is-${saveState}`} role="status">{saveLabel} · Đã trả lời {answers.filter((answer) => answer !== null).length}/{quiz.questions.length}{(saveState === 'failed' || saveState === 'conflicted') && <button type="button" onClick={retrySave}>Thử lưu lại</button>}</div>
-      {quiz.actualCount && quiz.actualCount < quiz.requestedCount && <p className="practice-note">Chỉ tạo được {quiz.actualCount} câu phù hợp từ nội dung hiện có.</p>}
-      <form className="practice-questions" onSubmit={submitQuiz}>{quiz.questions.map((question, questionIndex) => <fieldset key={question.id}><legend>{questionIndex + 1}. {question.prompt}</legend>{question.options.map((option, optionIndex) => <label key={`${question.id}-${optionIndex}`}><input type="radio" name={`question-${question.id}`} checked={answers[questionIndex] === optionIndex} onChange={() => chooseAnswer(questionIndex, optionIndex)} disabled={attemptLoading} />{option}</label>)}</fieldset>)}<button className="primary-button" type="submit" disabled={attemptLoading || saving || answers.some((answer) => answer === null)}>{attemptLoading ? 'Đang nộp…' : `Nộp bài (${answers.filter((answer) => answer !== null).length}/${quiz.questions.length})`}</button></form>
-    </>}
-    {result && <section className="practice-result" aria-labelledby="quiz-result-title"><h4 id="quiz-result-title">Kết quả: {result.score}/{result.total}</h4>{result.legacyAnswersUnavailable && <StatusMessage type="warning">Đáp án đã chọn không được lưu ở phiên bản trước</StatusMessage>}<nav aria-label="Điều hướng câu hỏi">{result.questions.map((question, index) => <a key={index} href={`#result-question-${index + 1}`}>Câu {index + 1}</a>)}</nav>{result.questions.map((question, index) => <article id={`result-question-${index + 1}`} className={question.isCorrect ? 'practice-correct' : 'practice-incorrect'} key={`${result.attemptId}-${index}`}><b>{index + 1}. {question.isCorrect === null ? 'Kết quả cũ' : question.isCorrect ? 'Đúng' : 'Chưa đúng'}</b><p>{question.prompt}</p><p>Đáp án đã chọn: {question.selectedIndex === null ? 'Đáp án đã chọn không được lưu ở phiên bản trước' : question.options[question.selectedIndex]}</p><p>Đáp án đúng: {question.options[question.correctIndex]}</p>{question.explanation && <p>Giải thích: {question.explanation}</p>}{question.sourcePassage && <blockquote>Nội dung nguồn: “{question.sourcePassage}”</blockquote>}</article>)}<button type="button" onClick={() => setResult(null)}>Quay lại lịch sử</button></section>}
-    <div className="practice-history"><h4>Lịch sử ôn tập</h4>{historyLoading ? <LoadingState>Đang tải lịch sử…</LoadingState> : attempts.length === 0 ? <EmptyState title="Chưa có bài ôn tập">Tạo bài đầu tiên từ nội dung phía trên.</EmptyState> : <>
-      {unfinished.length > 0 && <ul aria-label="Bài ôn tập chưa nộp">{unfinished.map((attempt) => <li key={attempt.id}><span>{new Date(attempt.createdAt).toLocaleString('vi-VN')} · {attempt.questionCount} câu</span><button type="button" onClick={() => openAttempt(attempt.id)} disabled={attemptLoading}>Tiếp tục</button></li>)}</ul>}
-      {submitted.length > 0 && <ul aria-label="Bài ôn tập đã nộp">{submitted.map((attempt) => <li key={attempt.id}><span>{new Date(attempt.createdAt).toLocaleString('vi-VN')} · {attempt.score ?? '—'}/{attempt.questionCount}</span><button type="button" onClick={() => openAttempt(attempt.id)} disabled={attemptLoading}>Xem kết quả</button></li>)}</ul>}
-    </>}</div>
-    {confirmation && <ConfirmDialog {...confirmation} onCancel={() => setConfirmation(null)} onConfirm={async () => { const action = confirmation.onConfirm; setConfirmation(null); await action() }} />}
+  return <section className="practice-panel quiz-workspace" aria-labelledby="practice-title">
+    <header><div className="qw-heading-text"><span aria-hidden="true">✦</span><div><small>ÔN TẬP CỤC BỘ</small><h3 id="practice-title">{lesson.title}</h3></div></div><Button variant="secondary" aria-label="Đóng bài ôn tập" disabled={Boolean(busy)} onClick={closePanel}>×</Button></header>
+    <p className="practice-note">Luyện tập từ mẫu câu định nghĩa giới hạn trong bài học. Lịch sử và bản nháp thuộc tài khoản của bạn.</p>
+    <div className="qw-layout">
+      <QuizHistory attempts={attempts} loading={historyLoading} error={historyError} filter={filter} onFilter={setFilter} selectedId={activeId} onSelect={openAttempt} onRetry={refreshHistory} disabled={Boolean(busy)} headingRef={historyHeading} />
+      <div className="qw-detail">
+        <QuizCreateDisclosure pending={busy === 'create'} disabled={Boolean(busy) || opening !== null} error={createError} successVersion={createdVersion} onCreate={createQuiz} />
+        {openError && <ErrorState title={'Không mở được bài ôn #' + openError.id}>{openError.message}<Button variant="secondary" onClick={() => openAttempt(openError.id)}>Thử mở lại bài #{openError.id}</Button></ErrorState>}
+        {opening !== null && <LoadingState>Đang mở bài ôn #{opening}… Nội dung hiện tại vẫn được giữ.</LoadingState>}
+        {message && <StatusMessage type={saveState === 'conflicted' || saveState === 'failed' ? 'error' : 'info'}>{message}</StatusMessage>}
+        {!quiz && !result && <EmptyState title="Chọn bài ôn tập">Chọn Tiếp tục hoặc Xem kết quả từ lịch sử; mở Tạo bài ôn mới khi cần.</EmptyState>}
+        {quiz && <section aria-label={'Bài đang làm #' + quiz.attemptId}>
+          <h4 tabIndex="-1" ref={detailHeading}>Bài đang làm #{quiz.attemptId}</h4>
+          <div className={'practice-save-status is-' + saveState} role="status">{labels[saveState]} · Đã trả lời {answers.filter((answer) => answer !== null).length}/{quiz.questions.length}
+            {(saveState === 'failed' || saveState === 'conflicted') && <><Button variant="secondary" disabled={Boolean(busy)} onClick={retrySave}>{saveState === 'conflicted' ? 'Lưu câu trả lời hiện tại' : 'Thử lưu lại'}</Button><Button variant="secondary" disabled={Boolean(busy)} onClick={requestLoadSaved}>Tải bản đã lưu</Button></>}
+          </div>
+          {Number.isInteger(quiz.actualCount) && Number.isInteger(quiz.requestedCount) && quiz.actualCount < quiz.requestedCount && <p className="qw-muted">Chỉ tạo được {quiz.actualCount} câu phù hợp từ nội dung hiện có (yêu cầu {quiz.requestedCount}).</p>}
+          <form className="practice-questions" onSubmit={submitQuiz} aria-label="Câu hỏi ôn tập" aria-busy={busy === 'submit'}>{quiz.questions.map((question, index) => <fieldset key={question.id}><legend>{index + 1}. {question.prompt}</legend>{question.options.map((option, optionIndex) => <label key={optionIndex}><input type="radio" name={'quiz-' + quiz.attemptId + '-question-' + question.id} checked={answers[index] === optionIndex} onChange={() => chooseAnswer(index, optionIndex)} disabled={Boolean(busy) || opening !== null} />{option}</label>)}</fieldset>)}
+            <Button type="submit" disabled={Boolean(busy) || opening !== null || saving || saveState === 'conflicted' || saveState === 'failed' || answers.some((answer) => answer === null)}>{busy === 'submit' ? 'Đang nộp…' : 'Nộp bài (' + answers.filter((answer) => answer !== null).length + '/' + quiz.questions.length + ')'}</Button>
+          </form>
+        </section>}
+        {result && <section className="practice-result" aria-labelledby="quiz-result-title">
+          <h4 id="quiz-result-title" tabIndex="-1" ref={detailHeading}>Kết quả: {result.score ?? '—'}/{result.total ?? '—'}</h4>
+          {result.legacyAnswersUnavailable && <StatusMessage type="warning">Đáp án đã chọn không được lưu ở phiên bản trước</StatusMessage>}
+          <nav aria-label="Điều hướng câu hỏi">{result.questions.map((_, index) => <a key={index} href={'#quiz-' + result.attemptId + '-result-' + index}>Câu {index + 1}</a>)}</nav>
+          {result.questions.map((question, index) => <article id={'quiz-' + result.attemptId + '-result-' + index} className={question.isCorrect === null ? '' : question.isCorrect ? 'practice-correct' : 'practice-incorrect'} key={index}>
+            <b>{index + 1}. {question.isCorrect === null ? 'Kết quả cũ' : question.isCorrect ? 'Đúng' : 'Chưa đúng'}</b><p>{question.prompt}</p><p>Đáp án đã chọn: {question.selectedIndex === null ? 'Đáp án đã chọn không được lưu ở phiên bản trước' : question.options[question.selectedIndex]}</p><p>Đáp án đúng: {question.options[question.correctIndex]}</p>{question.explanation && <p>Giải thích: {question.explanation}</p>}{question.sourcePassage && <blockquote>Nội dung nguồn: “{question.sourcePassage}”</blockquote>}
+          </article>)}
+          <Button variant="secondary" onClick={() => { invalidateDetails(); activeIdRef.current = null; setResult(null); historyHeading.current?.focus() }}>Quay lại lịch sử</Button>
+        </section>}
+      </div>
+    </div>
+    {confirmation && <ConfirmDialog {...confirmation} onCancel={() => setConfirmation(null)} onConfirm={() => { const action = confirmation.onConfirm; setConfirmation(null); void action() }} />}
   </section>
 }
 
-export default PracticeQuizPanel
+export default function PracticeQuizPanel(props) {
+  return <QuizWorkspace key={props.lesson.id} {...props} />
+}
