@@ -24,6 +24,13 @@
 }
 .lookup-workspace .study-panel-header > div,
 .summary-workspace .study-panel-header > div { display: block; min-width: 0; }
+.assistant-panel.lookup-workspace > .study-panel-header .eyebrow {
+  display: block;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+}
 .lookup-workspace .study-panel-header h2,
 .summary-workspace .study-panel-header h3 { margin: 5px 0 0; font-family: inherit; font-size: 18px; line-height: 1.45; }
 .lookup-workspace .study-panel-header .ui-button,

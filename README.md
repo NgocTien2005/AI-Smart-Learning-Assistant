@@ -123,4 +123,4 @@ PDF preview displays the uploaded document but does not extract PDF text. Assist
 
 Run frontend checks from `frontend/`: `npm test`, `npm run lint`, and `npm run build`.
 
-Backend-dependent backlog: PDF text extraction/OCR, summaries, learning recommendations, notifications, OAuth, and global analytics need supported APIs and authorization contracts before UI implementation.
+Local PDF text-layer extraction and extractive summaries are implemented. OCR, learning recommendations, notifications, OAuth, and global analytics remain outside the current supported APIs and scope.

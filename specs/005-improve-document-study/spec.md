@@ -2,7 +2,7 @@
 
 **Feature Branch**: `005-improve-document-study` (artifact identifier; Git branch is independent)
 **Created**: 2026-11-01
-**Status**: Specified
+**Status**: Accepted — 2026-11-02, isolated acceptance stack; see verification.md.
 **Input**: Improve local lookup history, compact question entry/recovery and extractive lesson summaries within Lumina's existing course workspace.
 
 ## User Scenarios & Testing *(mandatory)*
