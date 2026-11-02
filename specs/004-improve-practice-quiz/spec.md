@@ -2,7 +2,7 @@
 
 **Feature Branch**: Unchanged Git branch; official feature directory004-improve-practice-quiz.
 **Created**: 2026-11-01
-**Status**: Draft; implementation acceptance pending.
+**Status**: Accepted — 2026-11-02, isolated acceptance stack; see verification.md.
 **Input**: Improve finding/resuming attempts, question focus, compact creation and truthful save/recovery feedback. Preserve existing business rules and permissions.
 
 ## User Scenarios & Testing *(mandatory)*

@@ -1435,13 +1435,18 @@ const tickQuizSave = () => act(async () => { await new Promise((resolve) => setT
 async function showQuiz(id = 1) { await userEvent.click(await screen.findByRole('button', { name: 'Tiếp tục bài ôn #' + id })); return screen.findByRole('radio', { name: 'Lựa chọn A' }) }
 
 test('quiz workspace history precedes detail, filters keep selection and creation starts collapsed', async () => {
-  const calls = quizApi([quizHistory(2, { submittedAt: '2026-02-01', score: 0 }), quizHistory(1)])
+  const historyRead = studyDeferred()
+  const calls = quizApi(undefined, ({ path, method }) => path.endsWith('/quizzes') && method === 'GET' ? historyRead.promise : undefined)
   render(h(PracticeQuizPanel, { lesson: { id: 9, title: 'Ôn tập' }, onClose: vi.fn() }))
   const history = await screen.findByRole('region', { name: 'Lịch sử ôn tập' })
   assert.equal(screen.queryByRole('button', { name: 'Tạo bài ôn nhanh' }), null)
   assert.ok(screen.getByRole('button', { name: 'Tạo bài ôn mới', expanded: false }))
   assert.equal(calls.length, 1)
-  assert.ok(within(history).getByText('0/1 điểm'))
+  // The history region mounts before its asynchronous GET has rendered rows.
+  assert.ok(within(history).getByText('Đang tải lịch sử…'))
+  assert.equal(within(history).queryByText('0/1 điểm'), null)
+  await act(async () => historyRead.resolve(jsonResponse({ attempts: [quizHistory(2, { submittedAt: '2026-02-01', score: 0 }), quizHistory(1)] })))
+  assert.ok(await within(history).findByText('0/1 điểm'))
   await showQuiz()
   await userEvent.selectOptions(screen.getByLabelText('Trạng thái bài ôn'), 'submitted')
   assert.ok(screen.getByText(/Bài đang xem nằm ngoài bộ lọc/))
