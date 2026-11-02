@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { after, before, test } from 'node:test'
+import { test } from 'node:test'
 import { createApp } from '../app.js'
 
 const users = []
@@ -24,19 +24,15 @@ const request = async (path, options = {}) => {
   return { response, body: await response.json() }
 }
 
-before(async () => {
+test('authentication flow', async (t) => {
   const app = createApp({ prisma, jwtSecret: 'test-secret' })
   await new Promise((resolve) => {
     server = app.listen(0, '127.0.0.1', resolve)
   })
   baseUrl = `http://127.0.0.1:${server.address().port}`
-})
-
-after(async () => {
-  await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()))
-})
-
-test('authentication flow', async (t) => {
+  t.after(async () => {
+    await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()))
+  })
   let token
 
   await t.test('rejects an incomplete registration', async () => {

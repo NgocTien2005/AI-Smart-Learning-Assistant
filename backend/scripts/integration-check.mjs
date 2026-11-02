@@ -1,8 +1,19 @@
-import { spawnSync } from 'node:child_process'
+import { pdfFixture } from './fixtures/pdf.mjs'
+import { writeFile } from 'node:fs/promises'
+import { createIntegrationTarget } from './integration-target.mjs'
 import { createHash } from 'node:crypto'
 import bcrypt from 'bcryptjs'
 
-const baseUrl = process.env.TEST_API_URL || 'http://localhost:8080/api'
+const target = createIntegrationTarget()
+const { baseUrl } = target
+const evidence = { time: new Date().toISOString(), project: target.project, baseUrl, database: target.database, requests: [], resources: [] }
+const actualFetch = globalThis.fetch
+globalThis.fetch = async (url, options) => {
+  const entry = { method: options?.method || 'GET', path: new URL(url).pathname }
+  evidence.requests.push(entry)
+  try { const response = await actualFetch(url, options); entry.status = response.status; return response }
+  catch (error) { entry.failure = error.name; throw error }
+}
 const stamp = Date.now()
 const instructorEmail = `integration-instructor-${stamp}@example.com`
 const studentEmail = `integration-student-${stamp}@example.com`
@@ -18,6 +29,7 @@ const request = async (path, options = {}) => {
   const response = await fetch(`${baseUrl}${path}`, options)
   const data = response.status === 204 ? null : await response.json()
   if (!response.ok) throw new Error(`${options.method || 'GET'} ${path}: ${response.status} ${data?.error || ''}`)
+  for (const key of ['user', 'course', 'lesson', 'assignment', 'submission']) if (data?.[key]?.id) evidence.resources.push({ kind: key, id: data[key].id })
   return data
 }
 
@@ -32,45 +44,25 @@ const jsonOptions = (method, body, token) => ({
 
 const cleanupUsers = () => {
   const sql = `DELETE FROM "User" WHERE email IN ('${instructorEmail}', '${studentEmail}', '${managedEmail}', '${adminEmail}');`
-  const result = spawnSync('docker', ['compose', 'exec', '-T', 'db', 'psql', '-q', '-U', 'postgres', '-d', 'lumina_lms', '-c', sql], {
-    cwd: new URL('../..', import.meta.url),
-    stdio: 'pipe',
-    shell: false,
-  })
-  if (result.status !== 0) process.stderr.write('Không thể dọn tài khoản integration test.\n')
+  target.query(sql)
 }
 
 const createAdmin = async () => {
   const passwordHash = await bcrypt.hash(adminPassword, 10)
   const sql = `INSERT INTO "User" (name, email, password, role, "isActive") VALUES ('Integration Admin', '${adminEmail}', '${passwordHash}', 'ADMIN', TRUE);`
-  const result = spawnSync('docker', ['compose', 'exec', '-T', 'db', 'psql', '-q', '-U', 'postgres', '-d', 'lumina_lms', '-c', sql], {
-    cwd: new URL('../..', import.meta.url),
-    stdio: 'pipe',
-    shell: false,
-  })
-  if (result.status !== 0) throw new Error('Could not provision integration admin account')
+  target.query(sql)
 }
 
 const seedResetToken = (email, token) => {
   const tokenHash = createHash('sha256').update(token).digest('hex')
   const sql = `UPDATE "User" SET "passwordResetTokenHash" = '${tokenHash}', "passwordResetExpiresAt" = NOW() + INTERVAL '30 minutes', "passwordResetRequestedAt" = NOW() WHERE email = '${email}';`
-  const result = spawnSync('docker', ['compose', 'exec', '-T', 'db', 'psql', '-q', '-U', 'postgres', '-d', 'lumina_lms', '-c', sql], {
-    cwd: new URL('../..', import.meta.url),
-    stdio: 'pipe',
-    shell: false,
-  })
-  if (result.status !== 0) throw new Error('Không thể chuẩn bị token đặt lại mật khẩu cho integration test')
+  target.query(sql)
 }
 
 const seedChatHistory = (email, lessonId, count) => {
   const timestamp = '2099-01-01T00:00:00.000Z'
   const sql = `INSERT INTO "ChatMessage" (question, answer, "userId", "lessonId", "createdAt") SELECT 'history-' || n, 'answer-' || n, u.id, ${lessonId}, '${timestamp}'::timestamptz FROM "User" u CROSS JOIN generate_series(1, ${count}) AS n WHERE u.email = '${email}';`
-  const result = spawnSync('docker', ['compose', 'exec', '-T', 'db', 'psql', '-q', '-U', 'postgres', '-d', 'lumina_lms', '-c', sql], {
-    cwd: new URL('../..', import.meta.url),
-    stdio: 'pipe',
-    shell: false,
-  })
-  if (result.status !== 0) throw new Error('Could not prepare deterministic chat history')
+  target.query(sql)
 }
 
 try {
@@ -225,10 +217,17 @@ try {
     title: 'Source transition checks', content: 'Original PDF fallback content is available.', order: 3,
   }, instructorToken))
   const pdfBody = new FormData()
-  pdfBody.set('document', new Blob([Buffer.from('%PDF-1.4\nnot extracted')], { type: 'application/pdf' }), 'source.pdf')
-  await request(`/courses/lessons/${sourceLesson.lesson.id}/document`, {
+  const corruptPdf = new FormData()
+  corruptPdf.set('document', new Blob([Buffer.from('%PDF-1.4\nnot extracted')], { type: 'application/pdf' }), 'corrupt.pdf')
+  const corruptResponse = await fetch(`${baseUrl}/courses/lessons/${sourceLesson.lesson.id}/document`, {
+    method: 'PATCH', headers: { Authorization: `Bearer ${instructorToken}` }, body: corruptPdf,
+  })
+  if (corruptResponse.status !== 400 || (await corruptResponse.json()).code !== 'CORRUPT_DOCUMENT') throw new Error('Corrupt PDF must fail with400 CORRUPT_DOCUMENT')
+  pdfBody.set('document', new Blob([pdfFixture('')], { type: 'application/pdf' }), 'source.pdf')
+  const blankPdf = await request(`/courses/lessons/${sourceLesson.lesson.id}/document`, {
     method: 'PATCH', headers: { Authorization: `Bearer ${instructorToken}` }, body: pdfBody,
   })
+  if (blankPdf.lesson.extractionStatus !== 'NO_TEXT') throw new Error('Valid blank PDF must report NO_TEXT')
   await request(`/courses/lessons/${sourceLesson.lesson.id}`, jsonOptions('PATCH', { content: fallbackSource }, instructorToken))
   const pdfFallbackChat = await request(`/courses/lessons/${sourceLesson.lesson.id}/chat`, jsonOptions('POST', {
     question: 'updated PDF fallback marker',
@@ -450,4 +449,8 @@ try {
     await fetch(`${baseUrl}/courses/${courseId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${instructorToken}` } }).catch(() => {})
   }
   cleanupUsers()
+  evidence.remainingOwnedUsers = Number(target.query(`SELECT COUNT(*) FROM "User" WHERE email IN ('${instructorEmail}', '${studentEmail}', '${managedEmail}', '${adminEmail}');`))
+  globalThis.fetch = actualFetch
+  if (process.env.TEST_EVIDENCE_PATH) await writeFile(process.env.TEST_EVIDENCE_PATH, JSON.stringify(evidence, null, 2))
+  if (evidence.remainingOwnedUsers !== 0) throw new Error('Integration cleanup left owned test accounts')
 }

@@ -92,7 +92,7 @@ npm run lint
 npm run build
 ```
 
-`npm run test:integration` yêu cầu Docker stack đang chạy. Script tạo dữ liệu riêng, kiểm tra toàn bộ luồng qua `http://localhost:8080/api` rồi xóa dữ liệu kiểm thử.
+`npm run test:integration` yêu cầu stack kiểm thử tách biệt, healthy. Đặt rõ `TEST_COMPOSE_PROJECT=lumina-acceptance-*` và `TEST_API_URL=http://127.0.0.1:PORT/api`. Script xác minh project/container, cổng HTTP, network, volume và database trước khi tạo/dọn dữ liệu; không dùng Compose mặc định của repository. Xem [hướng dẫn kiểm thử tách biệt](docs/acceptance-testing.md).
 
 Đăng nhập hiện dùng email và mật khẩu. OAuth Google/Microsoft chưa được bật vì repository chưa có OAuth client và callback domain cho môi trường triển khai.
 
