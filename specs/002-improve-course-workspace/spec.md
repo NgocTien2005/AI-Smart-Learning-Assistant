@@ -2,7 +2,7 @@
 
 **Feature Branch**: `002-improve-course-workspace` (artifact identifier; Git branch không đổi)
 **Created**: 2026-10-31
-**Status**: Ready for planning
+**Status**: Accepted — 2026-11-02, isolated acceptance stack; see verification.md.
 **Input**: Cải thiện desktop course shell, section Bài học và vùng đọc cho STUDENT/INSTRUCTOR; giữ contract, quyền và nghiệp vụ hiện có.
 
 ## User Scenarios & Testing
