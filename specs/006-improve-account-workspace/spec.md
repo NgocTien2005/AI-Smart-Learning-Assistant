@@ -2,7 +2,7 @@
 
 **Feature Branch**: `006-improve-account-workspace` (artifact ID, independent of Git branch)
 **Created**:2026-11-01
-**Status**: Clarified
+**Status**: Accepted — 2026-11-02, isolated acceptance stack; see verification.md.
 **Input**: Improve account identity, display-name editing and password management for ADMIN, INSTRUCTOR and STUDENT without new account capabilities.
 
 ## Clarifications
