@@ -6,6 +6,12 @@ Tài liệu này được đối chiếu ngày **2026-10-28** với code trong w
 Specify CLI cục bộ và [repository chính thức](https://github.com/github/spec-kit).
 Các ghi nhận hiện trạng dưới đây là mốc khảo sát, cần kiểm tra lại khi sử dụng.
 
+Đợt [nghiệm thu 001–007 ngày 2026-11-02](acceptance-20261102.md) bổ sung kết quả
+runtime trên stack riêng, sửa các mô tả README/fixture integration đã lỗi thời
+và xác nhận tooling đã được init từ các feature trước. Các ghi nhận ngày
+2026-10-28 bên dưới vẫn là lịch sử khảo sát; không dùng trạng thái thiếu runtime
+hoặc thiếu `.specify/` tại mốc đó để mô tả repository hiện tại.
+
 ## Kết quả khảo sát và giới hạn bằng chứng
 
 | Phần đã đọc | Implementation và ý nghĩa khi phát triển |
