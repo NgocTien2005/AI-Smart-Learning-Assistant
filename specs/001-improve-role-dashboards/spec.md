@@ -6,7 +6,7 @@
 
 **Created**: 2026-10-28
 
-**Status**: Draft — đã rà soát chất lượng đặc tả; chưa triển khai hoặc nghiệm thu sản phẩm.
+**Status**: Accepted — 2026-11-02, isolated acceptance stack; see verification.md.
 
 **Input**: Cải thiện dashboard Lumina cho STUDENT, INSTRUCTOR và ADMIN. Học viên dễ tìm khóa học và tiếp tục học; giảng viên dễ xem các khóa đang dạy và truy cập quản lý; quản trị viên dễ tìm và quản lý tài khoản theo quyền hiện có. Ưu tiên danh sách công việc theo vai trò, thu gọn biểu mẫu tạo/tham gia nhưng vẫn dễ tìm; thống nhất chữ, khoảng cách, nút và phản hồi. Chỉ desktop; giữ chức năng, quyền, contract, màn hình bài học và dữ liệu hiện có. Lần này chỉ viết đặc tả.
 
