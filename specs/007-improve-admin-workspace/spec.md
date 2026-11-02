@@ -2,7 +2,7 @@
 
 **Feature Branch**: `007-improve-admin-workspace` (artifact ID, independent of Git branch)
 **Created**:2026-11-01
-**Status**: Specified
+**Status**: Accepted — 2026-11-02, isolated acceptance stack; see verification.md.
 **Input**: Improve existing ADMIN account discovery, selected-account editing and recovery; no new account capabilities.
 
 ## User Scenarios & Testing *(mandatory)*
