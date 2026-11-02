@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-31
 
-**Status**: Draft — chưa nghiệm thu implementation.
+**Status**: Accepted — 2026-11-02, isolated acceptance stack; see verification.md.
 
 **Input**: Cải thiện trải nghiệm bài tập và chấm bài cho STUDENT/INSTRUCTOR, ưu tiên danh sách và nội dung cần xử lý, giữ nghiệp vụ và quyền hiện có.
 

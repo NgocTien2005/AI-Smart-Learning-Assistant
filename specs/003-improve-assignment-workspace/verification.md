@@ -107,3 +107,39 @@ Kết quả converge: **tasks_appended**,2partial/HIGH,0missing/contradicts/unre
 **Hiện tại21/25 tasks hoàn tất**; T021/T022/T024/T025 mở, đại diện2 nhóm nghiệm thu còn thiếu và task tiếp nối của chúng. Feature003 **chưa hoàn tất**. Cần frontend implementation mới được phục vụ trong môi trường kiểm thử được phép, browser control hoạt động lại và phiên/tài nguyên thử hiện có được xác định trước khi hoàn tất desktop/HTTP acceptance rồi chạy converge lại. Giai đoạn implement/verify nêu trên không commit/push/PR/merge/deploy hoặc thay dữ liệu/schema/backend.
 
 Cập nhật bàn giao source: người dùng sau đó yêu cầu commit và push phần feature đã làm được. Việc đóng gói source không thay đổi kết quả nghiệm thu:21/25 tasks hoàn tất,4 task trên vẫn mở, converge vẫn là tasks_appended. Không tạo PR hoặc deploy theo yêu cầu này; các log .artifacts vẫn là bằng chứng local được ignore.
+
+
+## Acceptance continuation — 2026-11-02
+
+Kết quả hiện hành của đợt nghiệm thu 001–007; các mục trạng thái trước đây được giữ làm lịch sử. Quyền provisioning/cleanup và automation credentials chỉ áp dụng stack riêng do yêu cầu nghiệm thu mới cấp, thay thế điều kiện thiếu tài nguyên/user-action trong báo cáo cũ; không đổi contract hoặc acceptance criteria.
+
+**Kết quả: đạt phạm vi feature trên stack nghiệm thu riêng.** Hai vai trò, nội dung requirements/submission20.000 ký tự và feedback5.000 ký tự, vùng dài focus/scroll được. Nộp/cập nhật/chấm thật, grade0, feedback-only/null sau hạn, refresh lỗi giữ draft, responseA không ghi đè lựa chọn/draftB, create pending không gửi lặp, native delete cancellation, deadline interval và dispatched focus event trong browser thật. Back/forward/refresh giữ selection; focus-event test không được mô tả là thao tác OS focus. Cross-resource/role/owner/enrollment denial qua server.
+
+Baseline HEAD c55d0054c1ffc029b5f65f0713034a273fdbfdc3, working tree ban đầu sạch; bản source được định danh bằng [source-integrity.json](../../.artifacts/acceptance-20261102/source-integrity.json). Browser Chrome 156 thực, fresh isolated contexts, viewport1280×800/1440×900, deviceScaleFactor1/visualViewport.scale1, zoom mặc định 100%, fonts loaded. HTTP127.0.0.1:8082/api, Compose lumina-acceptance-20261102, DB lumina_acceptance, volume/network riêng; không mutate stack local 8081. [Môi trường cuối](../../.artifacts/acceptance-20261102/environment-final.json).
+
+Bằng chứng **A-FE**: frontend full5 service+184 component PASS, lint/build PASS; **A-BE**:38 backend tests PASS; **A-QUIZ**: production quiz regression được filter thực sự chọn (các file wrapper khác không được tính thành8 quiz cases). **H-INT**: [integration real HTTP/database](../../.artifacts/acceptance-20261102/integration-isolation-confirmed-http.json), cleanup0. Command/cwd/exit/log trong [commands.json](../../.artifacts/acceptance-20261102/commands.json). Component boundaries/races và source review bổ sung cho live, không được coi là từng biến thể đều chạy end-to-end.
+
+**B003**: [browser checks](../../.artifacts/acceptance-20261102/browser-checks.json) theo prefix 003 và layout/current/final/fixed tương ứng; [screenshot PNG](../../.artifacts/acceptance-20261102/screenshots/) và bounds JSON cùng tên nằm trong evidence directory. Trạng thái tổng:280 records,277 PASS và3 historical failed assertions của harness; không xóa failed records. Wrong expected auth return/clipboard wording và capture cũ trước navigation/assets-ready đều có corrected checks; xem [harness-notes.json](../../.artifacts/acceptance-20261102/harness-notes.json). Ảnh lookup fixed-005-* mới thay cho ảnh nhãn bị tràn. Lỗi frontend full suite183/184 được giữ và sửa đúng async test lifecycle; xem [báo cáo chung](../../docs/acceptance-20261102.md).
+
+### Task closure theo bằng chứng
+
+| Task | Phạm vi đã review | Bằng chứng | Kết quả |
+| --- | --- | --- | --- |
+| T021 | Desktop/state/regression | A-FE + B003 + cross-feature live regression | Đạt toàn nhóm; continuation giữ trong đúng feature |
+| T022 | Production HTTP/database/authorization | A-BE/A-QUIZ + H-INT + production role/resource denials | Đạt toàn nhóm; continuation giữ trong đúng feature |
+| T024 | Desktop/state/regression | A-FE + B003 + cross-feature live regression | Đạt toàn nhóm; continuation giữ trong đúng feature |
+| T025 | Production HTTP/database/authorization | A-BE/A-QUIZ + H-INT + production role/resource denials | Đạt toàn nhóm; continuation giữ trong đúng feature |
+
+Không chuyển task sang feature khác. Các task converge trên là continuation của cùng nhóm nghiệm thu, được đối chiếu riêng trước khi đổi marker; nguyên văn task được giữ. [Closure ledger](../../.artifacts/acceptance-20261102/task-closures.json) giữ mô tả gốc/căn cứ từng ID.
+
+### FR / US / AC / SC traceability
+
+[Ma trận51 dòng](acceptance-20261102.csv) nối toàn bộ22 FR,21US/AC và8 SC → task → typed evidence → kết quả. Mapping FR/AC/SC kế thừa bảng traceability trong artifacts của chính feature; không đặt ID mới hoặc hạ tiêu chí. Những biên chỉ có component/source được nêu rõ trong narrative và báo cáo chung.
+
+Source touch-points đã đối chiếu: `frontend/src/components/AssignmentsPanel.jsx`, `frontend/src/services/assignmentView.js`, `frontend/src/components/AssignmentsPanel.css` cùng production authentication/routes/Prisma. API/backend production/schema/migrations/dependencies không đổi. Checklist markers giữ nguyên. Spec Status được cập nhật; nội dung requirements/plan không bị sửa để hợp thức hóa code.
+
+### Dữ liệu / giới hạn / convergence
+
+[Owned inventory trước cleanup](../../.artifacts/acceptance-20261102/owned-before-cleanup.json):34 users,3 courses,9 lessons,4 assignments,3 submissions, 6 attempts, 59 chat messages và2 progress rows. [Cleanup](../../.artifacts/acceptance-20261102/cleanup.json) chỉ exact owned ID+canonical email; course API dọn upload, các bảng trở về 0; không drop/reset DB hoặc xóa volume. Integration tự dọn các ID riêng của mỗi lượt. Không lặp mutation demo 28 local.
+
+Analyze read-only: không còn findings actionable, coverage30/30 FR+SC có task,21 AC được truy vết; constitution5 principles được giữ. Managed final converge: **converged**, 0 findings/0 tasks_appended; tasks.md giữ nguyên byte trong bước converge. [Kết quả từng feature](../../.artifacts/acceptance-20261102/converge-final.json). Không dùng converge thay runtime evidence. Public deploy/TLS/SMTP/backup/load/security vận hành chưa nghiệm thu.
