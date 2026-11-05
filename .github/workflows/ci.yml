@@ -1,0 +1,106 @@
+name: Lumina CI
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install, test, lint and build frontend
+        run: node scripts/ci/check-package.mjs frontend
+      - name: Preserve sanitized frontend outcomes
+        if: ${{ always() }}
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: frontend-outcomes
+          path: ci-results/frontend/summary.json
+          if-no-files-found: error
+          retention-days: 7
+          include-hidden-files: false
+
+  backend:
+    name: Backend
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install, test backend, quiz and CI safety regressions
+        run: node scripts/ci/check-package.mjs backend
+      - name: Preserve sanitized backend outcomes
+        if: ${{ always() }}
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: backend-outcomes
+          path: ci-results/backend/summary.json
+          if-no-files-found: error
+          retention-days: 7
+          include-hidden-files: false
+
+  integration:
+    name: HTTP and database integration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install integration harness dependencies
+        run: node scripts/ci/check-package.mjs integration-deps
+      - name: Build isolated stack, verify target and exercise production HTTP/database
+        id: integration
+        run: node scripts/ci/integration.mjs
+      - name: Preserve sanitized dependency outcomes
+        if: ${{ always() }}
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: integration-dependency-outcomes
+          path: ci-results/integration-deps/summary.json
+          if-no-files-found: error
+          retention-days: 7
+          include-hidden-files: false
+      - name: Preserve sanitized integration outcomes
+        if: ${{ always() && steps.integration.outcome != 'skipped' }}
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: integration-outcomes
+          path: ci-results/integration/summary.json
+          if-no-files-found: error
+          retention-days: 7
+          include-hidden-files: false
+      - name: Preserve sanitized HTTP evidence
+        if: ${{ always() && hashFiles('ci-results/integration/http.json') != '' }}
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: integration-http
+          path: ci-results/integration/http.json
+          if-no-files-found: error
+          retention-days: 7
+          include-hidden-files: false
