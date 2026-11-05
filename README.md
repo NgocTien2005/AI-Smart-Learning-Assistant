@@ -14,6 +14,16 @@ AI-Powered LMS là nền tảng quản lý học tập trực tuyến giúp gi�
 
 `frontend/src/assets` chỉ chứa asset được ứng dụng sử dụng. Prisma client trong `backend/generated/prisma` là mã sinh tự động, không chỉnh sửa thủ công.
 
+## Continuous integration
+
+[Lumina CI](.github/workflows/ci.yml) kiểm tra frontend, backend và HTTP/database
+trên stack Docker riêng khi pull request, push hoặc chạy tay. Dùng Node 24,
+`npm ci` và lockfiles hiện có; CI cơ bản không cần production/Gmail credentials.
+Xem [hướng dẫn CI](docs/continuous-integration.md) để chạy lại, đọc evidence an
+toàn và phân biệt local checks với hosted run. Trạng thái từng lần chạy được
+ghi trong [verification 009](specs/009-setup-quality-ci/verification.md);
+nghiệm thu email thật vẫn thuộc feature 008.
+
 ## Chạy bằng Docker
 
 Yêu cầu Docker Desktop đang chạy. Tạo cấu hình local:
