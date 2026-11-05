@@ -60,7 +60,7 @@ Văn bản đã trích được lưu riêng khỏi nội dung nhập tay, cùng 
 
 ## Chức năng LMS hiện có
 
-- Đăng ký, đăng nhập, quên/đặt lại mật khẩu qua Gmail SMTP và kiểm tra phiên cho vai trò `INSTRUCTOR` và `STUDENT`.
+- Đăng nhập và kiểm tra phiên cho `ADMIN`, `INSTRUCTOR`, `STUDENT`; đăng ký công khai chỉ cho `INSTRUCTOR` và `STUDENT`. Quên mật khẩu dùng Gmail SMTP khi được cấu hình; phản hồi chung không xác nhận email tồn tại hoặc đã được chuyển đến hộp thư. Đặt lại mật khẩu giữ validation hiện có và thu hồi phiên cũ.
 - Giảng viên tạo, sửa, xóa khóa học; hệ thống sinh mã tham gia 8 ký tự.
 - Học viên tham gia bằng mã và chỉ truy cập khóa học đã tham gia.
 - Giảng viên thêm/xóa bài học, nhập nội dung hoặc upload tài liệu.
