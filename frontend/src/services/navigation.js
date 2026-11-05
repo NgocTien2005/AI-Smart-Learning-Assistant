@@ -13,8 +13,9 @@ export const resolvePostLoginDestination = (from, role, origin = 'http://localho
   } catch {
     return fallback
   }
-  if (destination.origin !== origin || ['/auth', '/reset-password'].includes(destination.pathname)) return fallback
-  if (role === 'ADMIN' && !['/admin', '/account'].includes(destination.pathname)) return fallback
-  if (role !== 'ADMIN' && destination.pathname.startsWith('/admin')) return fallback
+  const routePath = destination.pathname.replace(/\/+$/, '').toLowerCase()
+  if (destination.origin !== origin || ['/auth', '/reset-password'].includes(routePath)) return fallback
+  if (role === 'ADMIN' && !['/admin', '/account'].includes(routePath)) return fallback
+  if (role !== 'ADMIN' && routePath.startsWith('/admin')) return fallback
   return `${destination.pathname}${destination.search}${destination.hash}`
 }
