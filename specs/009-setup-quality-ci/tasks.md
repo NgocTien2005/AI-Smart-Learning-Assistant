@@ -36,7 +36,7 @@
 
 - [x] T016 Record every FR/US-AC/SC→task→typed evidence/status in specs/009-setup-quality-ci/traceability.csv and verification.md; freeze checklist markers and audit preserved001–008/application/lockfiles. FR-011/014/015/017;US3-AC1–4;SC-007. Depends:T011,T013,T014,T015.
 - [x] T017 Run managed analyze read-only and converge append-only for009; record findings/unchanged tasks or append work in specs/009-setup-quality-ci/verification.md. FR-016/017;US3-AC3/4;SC-007. Do not duplicate external blockers. Depends:T016.
-- [ ] T018 Verify the first actual GitHub-hosted run of .github/workflows/ci.yml for the delivered revision and all three groups; record run URL/SHA/job outcomes in specs/009-setup-quality-ci/verification.md. FR-013;US1-AC1,US3-AC3;SC-001/008. EXTERNAL:requires later authorized publication/execution; no push in this task. Depends:T017.
+- [x] T018 Verify the first actual GitHub-hosted run of .github/workflows/ci.yml for the delivered revision and all three groups; record run URL/SHA/job outcomes in specs/009-setup-quality-ci/verification.md. FR-013;US1-AC1,US3-AC3;SC-001/008. Publication authorized by user follow-up2026-11-05; run42060354382 for6046690034326b6d0c6e164986069007758882ce:all three jobs PASS, allowed artifacts validated. Depends:T017.
 
 ## Dependencies and delivery
 

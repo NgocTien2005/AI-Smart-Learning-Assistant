@@ -1,9 +1,11 @@
 # Verification: Lumina CI
 
-Date:2026-11-05 (Asia/Bangkok). **Local workflow validation/package checks and
-isolated integration PASS. GitHub-hosted acceptance NOT RUN; T018 remains OPEN.**
-Feature009 is not fully accepted without the required hosted run. Feature008
-T023/T026 remain owned there and open. No commit/push/PR/merge/deploy.
+Date:2026-11-05 (Asia/Bangkok). **Local checks and GitHub-hosted push run PASS;
+feature009 has18/18 tasks closed.** Hosted evidence for revision6046690 is
+recorded in the final section below. Earlier NOT RUN/no-push statements are
+historical local-phase evidence. Feature008 T023/T026 remain owned there and
+open. The user authorized feature-scoped commits/pushes afterward; no PR,
+merge or deployment performed.
 
 ## Baseline, scope and workflow
 
@@ -225,3 +227,59 @@ do not imply a new source test run. T018 stays OPEN until an actual hosted run
 for the published implementation is observed and recorded. Feature008T023/T026
 remain separate and open; no real email is sent by CI. Ignored evidence, env,
 profiles and secrets are excluded. No PR/merge/deployment requested.
+
+## First GitHub-hosted verification — 2026-11-05
+
+[Run42060354382](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42060354382)
+completed successfully for **6046690034326b6d0c6e164986069007758882ce**, event
+**push**, branch **main**, workflow **Lumina CI**. The implementation is the
+same source already checked locally; publication separates008implementation
+and evidence from009runner/workflow and documentation. The first four commits
+are f3a1c36,4530fe7,b97e93e,6046690. No force push or application change.
+
+| Hosted job | Result | UTC execution | Required checks |
+| --- | --- | --- | --- |
+| Frontend |PASS|15:58:24–15:59:13|npm ci/test/lint/build, each exit0 |
+| Backend |PASS|15:58:24–15:58:57|npm ci/full test/quiz/runner safety regression, each exit0 |
+| HTTP and database integration |PASS|15:58:23–15:59:42|backend npm ci, isolated Compose build/health/target verification, production suite and scoped shutdown, each exit0 |
+
+Downloaded only the five named allowlisted artifacts into ignored
+`.artifacts/publish-20261105/hosted-42060354382/`. Exact extracted file paths
+are frontend-outcomes/summary.json,backend-outcomes/summary.json,
+integration-dependency-outcomes/summary.json,integration-outcomes/summary.json
+and integration-http/http.json. All summaries identify the reviewed revision,
+GitHub-hosted checkout, Linux and **Node24.22.2**. Commands/cwd/duration/exit
+were checked. Artifact metadata confirms7day expiration (2026-11-12); no
+additional artifact or hidden/private file was uploaded. HTTP/resource entries
+contain only allowed metadata fields. No raw logs/authenticated exchanges,
+env, credentials, reset links/tokens or browser profiles downloaded/exported.
+
+Hosted project:`lumina-acceptance-ci-1793894322089-5eb444b3`;
+HTTP:`http://127.0.0.1:44805/api`; database:`lumina_acceptance`.
+Actual backend target verified before provisioning; suite recorded **85HTTP
+operations/32resource records/0remaining owned users**. The count differs from
+the earlier local86/33 because the suite conditionally retries concurrent
+submission/grading outcomes; this is not a missing required command. Scoped
+shutdown succeeded, primary failure null, no named-volume removal. These
+resources belonged to the hosted runner; no local8081/SMTP stack action.
+
+Public run/job metadata and validated summaries are recorded in ignored
+hosted-run.json and hosted-evidence-validation.json under the publication
+evidence root. T018 is now satisfied by this actual first hosted run and is
+marked closed outside any converge operation. **Feature009:18/18**. Traceability
+updates distinguish actual hosted push execution from inspected PR/manual
+configuration; no actual PR/workflow_dispatch run is claimed.008 remains24/26
+with T023/T026 open, and no additional email was sent. No PR/merge/deployment.
+
+The subsequent documentation-only commit records this completed run. Its
+push-triggered verification is checked separately without rewriting the tested
+implementation or claiming evidence for an unobserved revision.
+
+Post-hosted managed analyze was read-only:17FR/8SC/14AC,39/39 trace rows and
+18/18tasks,0unmapped or critical/high inconsistency. Managed converge assessed
+8plan decisions and5principles against current files and hosted evidence:
+**converged**,0findings/0tasks appended. Spec/plan/tasks/constitution/state
+remained byte-identical during converge; tasks SHA256
+`3dfb0da59cea625658c577c01bc10308eaba8ed4b038717ca886be71e2240f4a`.
+Hooks absent. Checklist markers unchanged. This follow-up records the closed
+hosted condition and does not repeat008's unchanged external blockers.

@@ -63,3 +63,9 @@ types only. Docker host/context ambiguity is refused. Linux child process groups
 receive termination with a forced deadline fallback. Regression tests exercise
 these boundaries without production mutation. No application code or contract
 change is needed. Current evidence directory is `.artifacts/ci-20261105/`.
+
+Publication follow-up2026-11-05:the user subsequently authorized feature-scoped
+commits/pushes. The first hosted push run42060354382 passed all three jobs for
+6046690and its allowed artifacts were validated; T018 is closed. This changes
+the previously external execution condition, not the implementation design.
+See verification.md for revision, results, evidence limits and008open tasks.
