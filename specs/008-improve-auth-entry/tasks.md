@@ -48,7 +48,7 @@
 - [x] T020 Verify real isolated three-role login/register, safe return, reset/relogin/old-session denial and actual503/429; label DB-prepared link fixture. FR001/004/008/011/014/019;US1-AC1/5,US2-AC1/3,US3-AC2,US4-AC1/4/6;SC005/007/008. **Depends**: T018,T019.
 - [x] T021 Verify delayed/dropped production responses, duplicate, verification recovery and context/history races in real browser; component evidence for deterministic matrix remains separate. FR006/007/009/010/015/016;US1-AC2–4,US2-AC2/3,US3-AC3,US4-AC3/5/6;SC002–005. **Depends**: T020.
 - [x] T022 Regress001–007 current source with full component suite and real isolated HTTP/browser role/course/document/assignment/quiz/account/admin flows; cite exact coverage/limits in verification.md. FR018/019;US5-AC4;SC007. **Depends**: T018,T021.
-- [ ] T023 [US3] Verify actual SMTP delivery only with safe configured transport and authorized test recipient; otherwise record NOT RUN and keep open in verification.md. FR011/019;US3-AC1 delivery limit;SC008. No real recipient or backend mail change. **Depends**: T020.
+- [x] T023 [US3] Verify actual SMTP delivery only with safe configured transport and authorized test recipient; otherwise record NOT RUN and keep open in verification.md. FR011/019;US3-AC1 delivery limit;SC008. No real recipient or backend mail change. **Depends**: T020.
 - [x] T024 Correct README.md authentication role wording; record per-AC FR/US/SC traceability, cleanup exact own IDs and final scope hashes in verification.md/traceability.csv. FR016/018/019;US5-AC5;SC008. **Depends**: T022.
 - [x] T025 Run managed analyze read-only and converge append-only for008; record status/open external task in verification.md; implement actionable appended tasks if any. FR019;US5-AC5;SC008. **Depends**: T024.
 
@@ -63,3 +63,14 @@ Setup → foundation → US1 → US2 → US3; US4 can proceed after foundation i
 ## Acceptance follow-up — 2026-11-03
 
 Recounted **24/26 closed**; T023/T026 remain open. T023 is waiting for user-configured test Gmail SMTP, a designated permitted mailbox and permission for up to three messages. A secret-free isolated-stack setup is prepared but not executed; no mail/account mutation occurred. T026 was checked again: exact workspace path, no reparse point in its parent chain, no matching active browser process; automatic approval review again rejected the scoped deletion with `blocked by policy` before command execution. No alternate deletion method attempted. See [verification.md](verification.md#acceptance-follow-up--2026-11-03) and [traceability.csv](traceability.csv). No new or duplicated convergence task; checklist/task markers unchanged in this follow-up.
+
+## User-confirmed email acceptance — 2026-11-07
+
+The user explicitly confirmed all four requested private UI outcomes:actual
+mailbox receipt, reset from the received link, login with the new password and
+rejection after submitting the already-used received link. Combined with the
+previous independent original-password/session401 evidence, **T023 is closed;
+25/26tasks complete, only T026 remains open**. This is typed user attestation,
+not agent mailbox observation or a new automated SMTP run. See
+[verification](verification.md#user-confirmed-email-acceptance--2026-11-07).
+No email/password mutation or cleanup occurred in this confirmation follow-up.

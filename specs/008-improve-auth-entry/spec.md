@@ -2,7 +2,7 @@
 
 **Feature Branch**: Existing Git branch unchanged; official feature directory008-improve-auth-entry.
 **Created**: 2026-11-02
-**Status**: Implemented; independent runtime checks passed; actual SMTP delivery and temporary browser-profile cleanup pending
+**Status**: Implemented; runtime checks passed; real email/reset acceptance user-confirmed (T023 closed);25/26tasks, T026 profile cleanup policy-blocked
 **Input**: Improve login, registration, forgot/reset password with existing contracts, identity verification and role boundaries.
 
 ## User Scenarios & Testing

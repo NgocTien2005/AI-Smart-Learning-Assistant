@@ -1,6 +1,17 @@
 # Verification: Feature008 authentication entry
 
-**Current status — 2026-11-07:** **24/26 tasks; T023 OPEN/PARTIAL, T026
+**Current status after user confirmation — 2026-11-07:** **25/26tasks; T023
+CLOSED (USER-CONFIRMED REAL EMAIL/UI), T026 OPEN/POLICY-BLOCKED.** The user
+explicitly reported all four requested outcomes passed:actual email receipt,
+reset from its link, login with the new password and rejection when submitting
+the used received link. Prior independent original-password/session401 proof
+completes the revocation check. No new email, reset, mailbox access or cleanup
+was performed by the agent. This is private UI user attestation, not a claim of
+agent-observed mailbox delivery or an automated end-to-end SMTP test.
+See [confirmation record](#user-confirmed-email-acceptance--2026-11-07).
+The partial/open statements below are earlier snapshots, preserved as history.
+
+**Earlier audit snapshot — 2026-11-07, before confirmation:** **24/26 tasks; T023 OPEN/PARTIAL, T026
 OPEN/POLICY-BLOCKED.** One authorized real forgot UI attempt was submitted on
 2026-11-05 out of a total maximum3; no further email in this audit. Mailbox
 receipt, conclusively reported original-user new-password login and actual
@@ -365,3 +376,41 @@ was corrected to compare new mailbox literals against the baseline. Token/key
 checks stayed enabled. Both attempts are retained in ignored evidence, not
 reported as an application failure. `git diff --check` passed. T023/T026 remain
 open; no completed-app claim is made from this documentation pass.
+
+## User-confirmed email acceptance — 2026-11-07
+
+In direct reply to the explicit four-result request, the user reported
+“Thử hết rồi ok r”. The request named these outcomes and instructed the user
+to mark untested items as such, with no passwords/tokens/URLs. Therefore record
+the following as **user-confirmed private UI outcomes**, not agent observations:
+
+| Outcome | Evidence type | Result |
+| --- | --- | --- |
+| Actual recovery email received in permitted mailbox | Explicit user confirmation | PASS |
+| Reset submitted successfully from the received email link | Explicit user confirmation | PASS |
+| Login with the new password succeeded | Explicit user confirmation | PASS |
+| Form submitted again with the used received link was rejected | Explicit user confirmation | PASS |
+| Original old password and session rejected | Previous independent production HTTP401 evidence in smtp-acceptance-20261105/acceptance.json | PASS |
+
+The separate technical fixture already proves reused-token400 with unchanged
+state/new-session validity; it remains labelled fixture evidence and is not
+substituted for mailbox receipt. The confirmation does not provide timestamps,
+HTTP status/message or additional-send counts; none are invented. Earlier
+“only opened the form” clarification is superseded by this explicit report of
+having completed the requested submission checks. No claim is made about
+independently observing the private link or its exact rejection cause.
+
+T023 is now checked outside converge; requirement/endpoint/password policy and
+all other task/checklist markers remain unchanged. **25/26tasks; T026 alone
+remains open.** Current Docker probe still exits1; current transport/DB state
+is unknown, which does not replace or invalidate the user's reported completed
+checks. No new SMTP/API/password action was attempted, no controller restarted,
+no profile contents read/deleted and no local8081/database/volume touched.
+
+Evidence is ignored `.artifacts/auth-user-confirmation-20261107/`:
+baseline.json, user-confirmation.json and docker-probe.json. Agent ledger still
+records one reserved/submitted request out of maximum3; this follow-up sends0.
+The user did not report whether additional self-initiated sends occurred, so
+no remaining-send budget is inferred for a future run. Original test user1
+remains retained at last database observation; no fresh cleanup is claimed.
+Production deployment/domain/TLS/backup readiness is still separate.
