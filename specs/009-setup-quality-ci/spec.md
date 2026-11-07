@@ -2,7 +2,7 @@
 
 **Feature directory**:009-setup-quality-ci, allocated by the installed official script; independent of Git branch.
 **Created**:2026-11-03
-**Status**:Specified
+**Status**:Implemented and verified;18/18tasks, actual hosted push CI passed.008T023/T026 remain separate/open.
 **Input**:Automate frontend/backend/isolated integration verification; preserve email/password authentication and track feature008 SMTP acceptance separately.
 
 ## User Scenarios & Testing

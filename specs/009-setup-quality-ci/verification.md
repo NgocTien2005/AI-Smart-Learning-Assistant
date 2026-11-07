@@ -1,5 +1,13 @@
 # Verification: Lumina CI
 
+**Current review — 2026-11-07:** **18/18tasks**. The subsequent published
+revisionef3cbf1 also passed all three actual hosted jobs in
+[run42061961868](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42061961868).
+The status was queried again during this read-only MVP audit. Current local
+Docker is unavailable; no new local integration/mail/browser run is claimed.
+See [MVP handoff](../../docs/mvp-handoff.md) and
+[production readiness](../../docs/production-readiness.md).008remains24/26.
+
 Date:2026-11-05 (Asia/Bangkok). **Local checks and GitHub-hosted push run PASS;
 feature009 has18/18 tasks closed.** Hosted evidence for revision6046690 is
 recorded in the final section below. Earlier NOT RUN/no-push statements are
@@ -283,3 +291,56 @@ remained byte-identical during converge; tasks SHA256
 `3dfb0da59cea625658c577c01bc10308eaba8ed4b038717ca886be71e2240f4a`.
 Hooks absent. Checklist markers unchanged. This follow-up records the closed
 hosted condition and does not repeat008's unchanged external blockers.
+
+## MVP handoff review — 2026-11-07
+
+Baselineef3cbf1 was clean and already published. Querying actual
+run42061961868 confirms headShaef3cbf1, completed/success and all three jobs
+successful:frontend127365891552, backend127365774366 and HTTP/database
+integration127365773276. This is a subsequent push run, separate from the first
+run42060354382 recorded above. No PR/workflow_dispatch execution is claimed.
+No old success is attributed to a not-yet-published documentation revision.
+
+Official no-persist prerequisites still resolve009from stored state; process
+override resolves008without changing that state. Spec Kit1.2.3 integration
+status reports zero modified/missing managed files; extension hooks are absent.
+Built-in16/16/custom12/12 gates remain read-only. Pre-edit analyze covered
+17FR/14AC/8SC,18tasks with full coverage, zero unmapped009tasks or CRITICAL/HIGH
+issues and no core/state byte changes during analysis. Spec status wording and
+historical no-publication traceability wording were updated under the user's
+explicit remediation/publication authorization; requirements/design did not
+change. Tasks/checklists and001–007artifacts remain unchanged.
+
+All application/CI/Docker/schema/lockfile source matches the passing hosted
+revision, and seven008auth source hashes match their latest manifests.
+Current audit evidence is ignored `.artifacts/mvp-handoff-20261107/` with
+command/cwd/exit/source hashes; older fixture hash limitations are disclosed in
+[MVP handoff](../../docs/mvp-handoff.md). No app bug was reproduced or source
+modified in this documentation follow-up. No extra local full suite/browser
+run is required for these documentation-only edits.
+
+Current Docker probe exits1 because the Linux engine pipe is unavailable.
+No local integration or current SMTP readiness is claimed;008historical
+configured:true cannot stand for current readiness/delivery. Its T023 stays
+OPEN/PARTIAL (1of3attempts used), and T026 remains policy-blocked. No email,
+test data, old stack/volume or profile mutation occurred. Branch main currently
+reports protected:false; [production readiness](../../docs/production-readiness.md)
+records the remaining deployment-specific decisions without changing settings,
+creating a feature or adding prior blockers as CI tasks.
+
+Managed converge assessed17FR,8SC,14AC,8plan decisions,5constitution principles
+and18tasks against current scoped code/evidence: **converged**,0findings and
+0tasks appended. Spec/plan/tasks/constitution/state hashes stayed unchanged
+during convergence; no Git operation occurred inside that assessment.008was
+not rerun through unchanged convergence and no duplicate blockers were created.
+
+Documentation verification:8allowed files;22new local links/anchors;
+23auth/39CItraceability rows retain required IDs;116source files and65protected
+artifacts unchanged; status metadata is the only009spec change. Scoped secret
+checks found no new mailbox/token/key literal and `git diff --check` passed.
+An initial local checker exit1 on unchanged README mailbox examples was
+diagnosed and corrected without weakening token/key checks; both attempts are
+retained. Evidence:ignored mvp-handoff-20261107/verification.json,
+verification-attempts.json and converge-009.json. Later actual hosted outcomes
+for the documentation publication must be checked against its own SHA; these
+older passing runs are not substituted for that future result.
