@@ -2,7 +2,7 @@
 
 Đối chiếu ngày **2026-11-07**, baseline `ef3cbf1c06a8fcdd5738252506671c3fb298b311`,
 working tree sạch trước lượt này. Phạm vi là các feature 001–009 hiện có.
-**Chưa hoàn tất nghiệm thu toàn bộ: feature 008 còn T023 và T026.** Không có
+**Cập nhật sau xác nhận người dùng: 008 đạt 25/26, T023 đã đóng; T026 còn mở.** Không có
 thay đổi production, schema, migration, dependency hoặc giao diện trong lượt
 đối chiếu này. Không có lỗi production mới được tái hiện để sửa.
 
@@ -17,7 +17,7 @@ thay đổi production, schema, migration, dependency hoặc giao diện trong l
 | [005](../specs/005-improve-document-study/verification.md) | Tra cứu cục bộ, PDF text-layer và tóm tắt trích xuất | 28/28 | Nguồn/revision, extraction, HTTP/DB và desktop; không OCR/AI ngoài |
 | [006](../specs/006-improve-account-workspace/verification.md) | Tài khoản, đổi mật khẩu, thu hồi phiên | 25/25 | Ba vai trò, recovery, phiên cũ và browser |
 | [007](../specs/007-improve-admin-workspace/verification.md) | Quản trị tài khoản, role, khóa/mở và tìm kiếm | 25/25 | Quyền server, pending/races và browser; ADMIN không mặc định bypass nội dung khóa học |
-| [008](../specs/008-improve-auth-entry/verification.md) | Auth hai cột, email/mật khẩu, forgot/reset và recovery | **24/26** | Component, production HTTP/DB và desktop đã có; email-origin acceptance còn một phần, cleanup bị chặn |
+| [008](../specs/008-improve-auth-entry/verification.md) | Auth hai cột, email/mật khẩu, forgot/reset và recovery | **25/26** | Email/reset thật được người dùng xác nhận; HTTP revocation độc lập đã có; T026 cleanup bị chặn |
 | [009](../specs/009-setup-quality-ci/verification.md) | Frontend/backend/HTTP-database CI riêng biệt | **18/18** | Workflow/local/Linux checks và actual hosted push đã pass |
 
 [Nghiệm thu 001–007](acceptance-20261102.md) ghi 175 task, 187 FR/SC và 144
@@ -51,38 +51,45 @@ trong `.artifacts/mvp-handoff-20261107/`, bị Git ignore. Evidence cũ vẫn n�
 trong các thư mục ignored đã dẫn ở verification từng feature. Clone repository
 mới không tự có các tệp này; artifact hosted có thời hạn 7 ngày theo workflow.
 
-## T023 — phần còn thiếu và cách tiếp tục an toàn
+## T023 — đã đóng theo xác nhận UI của người dùng
 
 Nhật ký ngày 2026-11-05 ghi một forgot request qua UI trên project riêng
 `lumina-acceptance-smtp-20261103`, HTTP `http://127.0.0.1:8084/api`, database
 `lumina_acceptance`. Recipient đã được người dùng chỉ định và cấp tổng quyền
-tối đa **3 email**; **1 lượt đã reserved/submitted, còn tối đa 2 lượt**. Không
-ghi địa chỉ riêng hoặc credentials vào báo cáo. Không gửi email mới trong audit.
+tối đa **3 email**; ledger agent ghi **1 lượt reserved/submitted**. Lượt xác
+nhận này không gửi thêm. Người dùng không báo số lần tự gửi bổ sung, nên không
+suy ngân sách còn lại cho lượt tương lai. Không ghi địa chỉ/credentials vào báo cáo.
 
 Đã có: generic confirmation và reset-pending booleans; user báo reset, cùng
 HTTP độc lập chứng minh mật khẩu/phiên ban đầu bị từ chối. Một tài khoản kỹ
 thuật riêng chứng minh reset200 → dùng lại token400, login mới200 và không
 thay đổi state khi từ chối; đây là **DB fixture**, đã dọn về 0.
 
-Chưa có kết quả đủ rõ cho mailbox receipt, login mới trên chính tài khoản của
-lượt email và POST reuse của chính link nhận từ email. Người dùng đã xác nhận
-chỉ mở trang nhập mật khẩu ở bước dùng lại link. ResetPasswordPage chỉ kiểm
-định dạng khi mở; `POST /api/auth/reset-password` mới kiểm single use. Không
-có bằng chứng reset lần hai được chấp nhận, nên không đổi UI/API để che form.
+Sau yêu cầu nêu rõ bốn kết quả, người dùng trả lời “Thử hết rồi ok r”, xác nhận:
 
-Để tiếp tục, cần Docker sẵn sàng và xác minh lại đúng project/container,
+1. Đã nhận email khôi phục thật.
+2. Reset thành công từ link trong email.
+3. Đăng nhập bằng mật khẩu mới thành công.
+4. Gửi lại form bằng link đã dùng bị từ chối.
+
+Đây là **user attestation của thao tác mailbox/UI riêng**, không phải agent
+quan sát mailbox hoặc SMTP end-to-end tự động. Kết hợp bằng chứng độc lập về
+mật khẩu/phiên cũ401, **T023 đã đóng**. Không tự suy timestamp, HTTP status hay
+nguyên nhân chính xác của lần từ chối từ lời xác nhận. Fixture kỹ thuật vẫn
+được ghi riêng. Xem [record trong 008](../specs/008-improve-auth-entry/verification.md#user-confirmed-email-acceptance--2026-11-07).
+
+Trước bất kỳ lượt thử/mutation mới nào, cần Docker sẵn sàng và xác minh đúng project/container,
 loopback port, network/volume cùng actual backend database bằng
 `backend/scripts/integration-target.mjs` **trước mọi mutation**. SMTP config
 chỉ kiểm boolean bằng service hiện có; không đọc environment/credentials.
 Không chạy lại launcher với secret mới trên project cũ, không phục hồi mật
 khẩu/token từ profile hoặc khởi động lại controller đã mất credentials.
 
-Người dùng tự xem email/link, nhập mật khẩu và báo riêng từng kết quả. Khi cần
-lượt mới phải kiểm tra ngân sách và quyền gửi trước; sau reset cần login mới,
-từ chối mật khẩu/phiên cũ và submit lại link ngay khi còn hạn. Link quá hạn
-30 phút không đủ phân biệt “đã dùng” với “hết hạn”. Không replay password
-mutation khi kết quả chưa chắc chắn. Generic200, SMTP accepted và fixture không
-được dùng để đóng T023; task vẫn **OPEN/PARTIAL**.
+Không có nhu cầu gửi lại hoặc replay reset để ghi bằng chứng. Docker local vẫn
+không truy cập được ở probe xác nhận, nên không tuyên bố current readiness/DB
+state hoặc cleanup tài khoản thử đã đạt. Không đọc secret, mailbox, password,
+token hay reset URL. Generic200/SMTP accepted/fixture không thay cho xác nhận
+mailbox của người dùng; không thay UI/API chỉ vì link cũ vẫn mở được form.
 
 ## Dữ liệu thử và cleanup
 
@@ -90,7 +97,7 @@ mutation khi kết quả chưa chắc chắn. Generic200, SMTP accepted và fixt
 | --- | --- | --- |
 | Dữ liệu nghiệm thu 001–007 | Registry/cleanup cũ ghi 0 sau khi dọn đúng owner/ID | Không tạo/dọn lại |
 | Integration CI | Run trước ghi 0 owned users; named volumes không bị down -v | Không thao tác Docker local |
-| SMTP test user ID 1 | Còn giữ ở lần quan sát 2026-11-05 cho nghiệm thu email | DB hôm nay chưa xác minh; không reset/xóa |
+| SMTP test user ID 1 | Còn giữ ở lần quan sát 2026-11-05; email acceptance nay user-confirmed | DB hôm nay chưa xác minh; không tự reset/xóa trong lượt xác nhận |
 | Technical used-token fixture user ID 2 | Đã dọn, 0 fixture users theo evidence ngày 2026-11-05 | Không tạo lại |
 | `.artifacts/auth-entry-20261102/chrome` | Directory còn tồn tại; T026 OPEN | Chỉ kiểm tra tồn tại, không đọc nội dung/xóa |
 | `.artifacts/auth-visual-fix-20261103/chrome` | Directory còn tồn tại; cleanup limitation ghi riêng | Chỉ kiểm tra tồn tại, không đọc nội dung/xóa |
@@ -102,8 +109,8 @@ reset/drop, xóa volume, gửi thêm email hoặc truy cập mailbox trong lư�
 
 ## Điều kiện bàn giao tiếp theo
 
-Giữ T023/T026 trong 008; không tạo convergence task trùng blocker. Chỉ đóng
-khi có đủ bằng chứng tương ứng. 009 hoàn thành phạm vi CI, không chứng nhận
+T023 đã đóng trong 008 theo bằng chứng được phân loại rõ; T026 vẫn mở và không
+tạo convergence task trùng blocker. 009 hoàn thành phạm vi CI, không chứng nhận
 mailbox delivery hay production readiness. [Checklist trước triển khai công
 khai](production-readiness.md) ghi riêng những quyết định/vận hành chưa kiểm
 chứng; chưa tạo feature mới hoặc thay production config cho những phần đó.

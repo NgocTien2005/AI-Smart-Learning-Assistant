@@ -5,8 +5,9 @@ AI-Powered LMS là nền tảng quản lý học tập trực tuyến giúp gi�
 
 [Báo cáo bàn giao](docs/mvp-handoff.md) đối chiếu các feature 001–009 và loại
 bằng chứng đã có. Ngày 2026-11-07: 001–007 đạt 175/175 task, 009 đạt 18/18 với
-hosted CI đã pass; 008 còn T023 nghiệm thu email thật và T026 cleanup profile
-bị policy chặn. Chưa tuyên bố nghiệm thu toàn bộ hoặc sẵn sàng production.
+hosted CI đã pass; 008 đạt 25/26 sau khi người dùng xác nhận luồng email/reset
+thật. Task T026 cleanup profile vẫn bị policy chặn. Chưa tuyên bố nghiệm thu
+toàn bộ hoặc sẵn sàng production.
 Xem [checklist production readiness](docs/production-readiness.md) trước khi
 chuẩn bị triển khai công khai; CI không thực hiện deploy hoặc gửi email thật.
 
