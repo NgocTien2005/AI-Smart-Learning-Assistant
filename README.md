@@ -1,6 +1,15 @@
 # AI-Smart-Learning-Assistant
 AI-Powered LMS là nền tảng quản lý học tập trực tuyến giúp giảng viên quản lý khóa học, bài giảng, bài tập và kết quả học tập. Sinh viên có thể học, làm bài và theo dõi tiến độ. Hệ thống có trợ lý tra cứu tài liệu cục bộ, tóm tắt trích xuất và bài ôn dựa trên mẫu câu hỗ trợ; không dùng dịch vụ AI bên ngoài cho nội dung tài liệu.
 
+## Trạng thái bàn giao MVP
+
+[Báo cáo bàn giao](docs/mvp-handoff.md) đối chiếu các feature 001–009 và loại
+bằng chứng đã có. Ngày 2026-11-07: 001–007 đạt 175/175 task, 009 đạt 18/18 với
+hosted CI đã pass; 008 còn T023 nghiệm thu email thật và T026 cleanup profile
+bị policy chặn. Chưa tuyên bố nghiệm thu toàn bộ hoặc sẵn sàng production.
+Xem [checklist production readiness](docs/production-readiness.md) trước khi
+chuẩn bị triển khai công khai; CI không thực hiện deploy hoặc gửi email thật.
+
 ## Cấu trúc repository
 
 - `frontend/src/app`: application shell và route composition.
