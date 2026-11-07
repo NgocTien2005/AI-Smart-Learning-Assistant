@@ -1,5 +1,13 @@
 # Verification: Lumina CI
 
+**Acceptance update after user confirmation — 2026-11-07:**009remains18/18.
+008is now25/26:its T023 is closed on explicit private email/UI user attestation
+combined with prior HTTP revocation proof; only T026 remains open. This is008
+evidence, not a CI/mailbox test. The latest completed hosted push at this
+snapshot is82a1970, [run42358674146](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42358674146),
+all three jobs PASS. Its86HTTP operations/cleanup0 are distinct from email
+acceptance. Older T023-open/count statements below are historical snapshots.
+
 **Current review — 2026-11-07:** **18/18tasks**. The subsequent published
 revisionef3cbf1 also passed all three actual hosted jobs in
 [run42061961868](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42061961868).
