@@ -14,6 +14,7 @@ chuẩn bị triển khai công khai; CI không thực hiện deploy hoặc gử
 Theo yêu cầu bổ sung ngày 2026-11-07, [feature010](specs/010-add-google-sign-in/verification.md)
 thêm Google cho tài khoản đã liên kết, kèm sửa kết nối Vite5173. Các kiểm tra
 local đã đạt; nghiệm thu Google thật còn chờ Client ID/cấu hình riêng (T016).
+[Hosted CI cho mã Google](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42391440389) đã pass cả frontend/backend/HTTP-database.
 Trạng thái này không đóng T026 của008 hoặc chứng nhận production-ready.
 
 ## Cấu trúc repository

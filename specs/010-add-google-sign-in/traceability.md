@@ -10,7 +10,7 @@
 | FR-006 | T007/009–011/013 | Session generation, component lifetime, synchronous operation gates, /me-only recovery, uncertain-link status check; stale/competition tests | PASS component fixtures |
 | FR-007, SC-003 | T007/010/011/015 | Auth/Account minimal additions; two desktop observations and screenshots, keyboard progression; inactive document focus-ring limitation | PASS observed optional UI; configured popup layout pending T016 |
 | FR-008/009, US3 | T003/009/011/012 | Disabled state, private setup guide, public ID only, env variants ignored, no Google/SMTP tokens retained | PASS code/docs/fixture scope |
-| FR-010, SC-004 | T001/002/013–017 | Verification distinguishes layers, command/cwd/exit, real DB identity/cleanup, provider gate | Local checks PASS; T016 OPEN; hosted run recorded separately |
+| FR-010, SC-004 | T001/002/013–017 | Verification distinguishes layers, command/cwd/exit, real DB identity/cleanup, provider gate | Local checks and hosted run42391440389 PASS; T016 OPEN |
 | FR-011 | T001/012/014 | Feature008 reproduced dev fix, explicit proxy/CORS and default8080 safe refresh; local8081 untouched | PASS observed |
 
 SC-001/002 have implementation and fixture/HTTP evidence; actual Google end-to-end remains T016. Counts do not replace acceptance evidence. No task moved out of008/009;008 T026 remains open under its own policy limit.

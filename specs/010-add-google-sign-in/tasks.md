@@ -42,7 +42,7 @@ Independent test: no client configuration gives honest unavailable/503 while pas
 - [x] T014 Build isolated acceptance stack, verify actual HTTP/database target, migration deploy/status and integration; record owned cleanup in verification.md; never local8081 (FR-001–005/010/011).
 - [x] T015 Inspect real browser at 1280×800/1440×900, auth optional state/layout/keyboard; record precise observed scope in verification.md (FR-007, SC-003).
 - [ ] T016 Execute real Google linking/login acceptance after private client configuration with user-operated Google UI; record original account/roles, rejected unlinked identity and preserved password access in verification.md (FR-001/002/004/010, SC-001/002/004).
-- [ ] T017 Update traceability.md, verification.md, docs/production-readiness.md and README; final read-only analyze, append-only converge, feature-scoped commits/normal push and distinguish actual hosted run (FR-010).
+- [x] T017 Update traceability.md, verification.md, docs/production-readiness.md and README; final read-only analyze, append-only converge, feature-scoped commits/normal push and distinguish actual hosted run (FR-010).
 
 ## Dependencies & execution
 
