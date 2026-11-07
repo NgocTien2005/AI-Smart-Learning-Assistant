@@ -4,6 +4,7 @@ import { useSession } from '../app/SessionContext.jsx'
 import { apiRequest, getSessionGeneration } from '../services/api.js'
 import Button from '../components/ui/Button.jsx'
 import PasswordManager from '../components/account/PasswordManager.jsx'
+import GoogleLinkPanel from '../components/account/GoogleLinkPanel.jsx'
 import { ErrorState, FieldError, LoadingState, StatusMessage } from '../components/ui/Feedback.jsx'
 import './LearningApp.css'
 import './AccountPage.css'
@@ -116,7 +117,12 @@ function AccountWorkspace({ user, generation }) {
     navigate('/auth', { replace: true })
   }
 
-  const readOnly = !verified || busy === 'verify' || busy === 'password'
+  const acquireGoogle = () => {
+    if (!isCurrent() || !verified || operation.current) return false
+    operation.current = 'google'; setBusy('google'); return true
+  }
+  const releaseGoogle = () => { if (isCurrent() && operation.current === 'google') { operation.current = ''; setBusy('') } }
+  const readOnly = !verified || busy === 'verify' || busy === 'password' || busy === 'google'
   return <main className="account-main account-workspace">
     <section className="account-heading"><span className="eyebrow">TÀI KHOẢN</span><h1>Hồ sơ cá nhân</h1><p>Cập nhật tên hiển thị và quản lý mật khẩu của bạn.</p></section>
     {!verified && <section className="account-verification" aria-label="Xác minh tài khoản">
@@ -142,6 +148,7 @@ function AccountWorkspace({ user, generation }) {
           {(operationError || verificationError) && verified && <Button variant="secondary" disabled={Boolean(busy)} onClick={checkIdentity}>Kiểm tra hồ sơ</Button>}
         </section>
         <PasswordManager key={passwordLifetime + ':' + verified} enabled={verified} busy={busy} onChangePassword={changePassword} />
+        <GoogleLinkPanel key={'google:' + passwordLifetime + ':' + verified} enabled={verified} busy={busy} generation={generation} acquire={acquireGoogle} release={releaseGoogle} />
         {passwordRecovery && <section className="account-password-recovery" aria-label="Khôi phục đổi mật khẩu"><StatusMessage type="error">{passwordRecovery}</StatusMessage><Button variant="secondary" disabled={Boolean(busy) || status === 'loading'} onClick={checkIdentity}>Kiểm tra phiên</Button><Button variant="secondary" disabled={Boolean(busy)} onClick={signInAgain}>Đăng nhập lại</Button></section>}
       </div>
     </div>

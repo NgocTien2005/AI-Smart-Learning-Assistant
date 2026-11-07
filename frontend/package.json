@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "test": "node --test src/services/apiErrors.test.js src/services/lessonRequestGuard.test.js && vitest run src/__tests__/frontend.test.js",
+    "test": "node --test src/services/apiErrors.test.js src/services/lessonRequestGuard.test.js && vitest run src/__tests__",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

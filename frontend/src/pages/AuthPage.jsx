@@ -6,6 +6,7 @@ import { resolvePostLoginDestination, roleHome } from '../services/navigation.js
 import { entryError, validateEntry } from '../services/authEntry.js'
 import AuthEntryShell, { EntryField } from '../components/AuthEntryShell.jsx'
 import { StatusMessage } from '../components/ui/Feedback.jsx'
+import GoogleIdentityButton from '../components/GoogleIdentityButton.jsx'
 
 const titles = { login: 'Đăng nhập', register: 'Tạo tài khoản', forgot: 'Quên mật khẩu' }
 const descriptions = { login: 'Dùng tài khoản Lumina để tiếp tục công việc của bạn.', register: 'Chọn vai trò và nhập thông tin để bắt đầu.', forgot: 'Nhập email để yêu cầu hướng dẫn đặt lại mật khẩu.' }
@@ -99,6 +100,20 @@ function EntryForm({ mode, draft, setDraft, switchMode, generation, onAccepted }
     }
   }
   const field = (name) => ({ id: name, name, value: name === 'password' ? password : draft[name], disabled: busy, required: true, 'aria-invalid': Boolean(errors[name]), 'aria-describedby': errors[name] ? `${name}-error` : undefined })
+  const googleLogin = async (payload) => {
+    if (pending.current || !current()) return
+    pending.current = true; setBusy(true); setOutcome(null)
+    try {
+      const data = await apiRequest('/api/auth/google/login', { method: 'POST', body: JSON.stringify(payload) })
+      if (!current()) return
+      if (typeof data?.token !== 'string' || !data.token) throw new Error('Chưa nhận được phiên đăng nhập hợp lệ.')
+      const verification = acceptCredentials(data, remember)
+      onAccepted({ kind: 'login', from: location.state?.from, generation: getSessionGeneration() })
+      verification.catch(() => {})
+    } catch (error) {
+      if (current()) setOutcome({ type: 'error', text: error.message })
+    } finally { if (current()) { pending.current = false; setBusy(false) } }
+  }
   return <AuthEntryShell title={titles[mode]} description={descriptions[mode]} headingRef={heading}>
     <form className="auth-card" noValidate onSubmit={submit} aria-busy={busy}>
       {notice && <StatusMessage>{notice}</StatusMessage>}
@@ -111,6 +126,7 @@ function EntryForm({ mode, draft, setDraft, switchMode, generation, onAccepted }
       {!isForgot && !isRegister && <div className="form-options"><label className="remember"><input type="checkbox" checked={remember} disabled={busy} onChange={(e) => setRemember(e.target.checked)} /> Ghi nhớ đăng nhập</label><button className="text-button" type="button" disabled={busy} onClick={() => switchMode('forgot')}>Quên mật khẩu?</button></div>}
       {isForgot && <p className="entry-hint">Kết quả không xác nhận email có tài khoản hay email đã được chuyển đến hộp thư.</p>}
       <button className="submit-button" type="submit" disabled={busy}>{busy ? 'Đang xử lý…' : isForgot ? 'Gửi yêu cầu đặt lại' : isRegister ? 'Tạo tài khoản' : 'Đăng nhập'}</button>
+      {!isForgot && !isRegister && <GoogleIdentityButton key={String(busy)} disabled={busy} onCredential={googleLogin} />}
       {outcome && <StatusMessage type={outcome.type}>{outcome.text}</StatusMessage>}
       <p className="switch-copy">{isForgot ? 'Đã nhớ mật khẩu?' : isRegister ? 'Đã có tài khoản?' : 'Chưa có tài khoản?'} <button type="button" disabled={busy} onClick={() => switchMode(isForgot || isRegister ? 'login' : 'register')}>{isForgot || isRegister ? 'Đăng nhập' : 'Đăng ký ngay'}</button></p>
       {isRegister && <p className="terms">Bằng việc đăng ký, bạn đồng ý với <Link to="/terms" onClick={(e) => { if (pending.current) e.preventDefault() }} aria-disabled={busy} tabIndex={busy ? -1 : undefined}>Điều khoản dịch vụ</Link> và <Link to="/privacy" onClick={(e) => { if (pending.current) e.preventDefault() }} aria-disabled={busy} tabIndex={busy ? -1 : undefined}>Chính sách bảo mật</Link>.</p>}
