@@ -414,3 +414,10 @@ The user did not report whether additional self-initiated sends occurred, so
 no remaining-send budget is inferred for a future run. Original test user1
 remains retained at last database observation; no fresh cleanup is claimed.
 Production deployment/domain/TLS/backup readiness is still separate.
+# Corrective follow-up — localhost:5173, 2026-11-07
+
+User reproduced “Không thể kết nối tới máy chủ”. Baseline main6e6c682, clean before this fix. Vite served5173, backend3000 refused host connections (Docker internal-only); Docker8080 rejected Origin5173 with403. The Vite `/api/health` path initially returned SPA HTML. Changed API default to same-origin, added Vite `/api` proxy to127.0.0.1:8080 with strict5173 and compose.dev.yaml explicit local origins; retained explicit VITE_API_URL/DEV_API_PROXY_TARGET overrides. No password/auth handler or layout change in this fix.
+
+Observed after applying dev override only to the existing verified default backend: Vite health200 JSON, /me401 JSON without token, invalid login input400; real browser synthetic nonexistent-account login returned credential denial instead of network error. Origin5173/8080 allowed; unrelated origin remains403. Default DB/frontend container IDs and DB volume unchanged; backend Prisma read-only identity matched its own database. No local8081 operation. Frontend before-Google test/lint/build passed (cwd frontend, exit0 each); added same-origin regression was red before fix then green. Safe ignored evidence `.artifacts/dev-login-google-20261107/{baseline.json,runtime-restored.json,browser-login.json,frontend-before-google.json}`. Commands/status are recorded there without credentials/raw authenticated requests.
+
+Run existing dev stack with `docker compose -f compose.yaml -f compose.dev.yaml up -d --build`, then `npm run dev` from frontend. Standalone backend host3000 uses shell DEV_API_PROXY_TARGET override. This corrective follow-up does not move or close any task: historical T023 acceptance retained; T026 remains blocked by automatic approval review, no cleanup retry. Google is separate feature010 and its evidence does not replace008 email acceptance.

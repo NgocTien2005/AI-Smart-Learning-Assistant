@@ -24,6 +24,7 @@ import App from '../app/App.jsx'
 import { assignmentId, filterAssignments, orderAssignments, studentAssignmentState } from '../services/assignmentView.js'
 
 // Synthetic component fixtures only. No real account credentials/reset links.
+const fixtureRequestUrl = (url) => new URL(String(url), window.location.href)
 function EntryControls() {
   const navigate = useNavigate()
   const session = useSession()
@@ -52,6 +53,14 @@ function resetFill(password = ' rawpw ', confirmation = password) {
   fireEvent.change(screen.getByLabelText('Xác nhận mật khẩu'), { target: { value: confirmation } })
 }
 const entrySubmit = () => fireEvent.submit(document.querySelector('form.auth-card'))
+
+test('API requests use same-origin paths for the Vite Docker proxy by default', async () => {
+  let requested
+  globalThis.fetch = async (url) => { requested = String(url); return jsonResponse({ status: 'ok' }) }
+  const result = await apiRequest('/api/health')
+  assert.equal(requested, '/api/health')
+  assert.equal(result.status, 'ok')
+})
 
 test('entry validators match normalized production boundaries without trimming passwords', () => {
   assert.deepEqual(validateEntry('register', { name: '  AB  ', email: '  USER@example.test ', password: '      ' }), {})
@@ -884,7 +893,7 @@ test('instructor cards link to course management and keep personal progress out'
 test('admin ignores an obsolete search response after a faster newer result', async () => {
   let resolveOld
   globalThis.fetch = async (url) => {
-    const query = new URL(String(url)).searchParams.get('q')
+    const query = fixtureRequestUrl(url).searchParams.get('q')
     if (query === 'old') return new Promise((resolve) => { resolveOld = resolve })
     const user = { id: query ? 2 : 1, name: query === 'new' ? 'New Learner' : 'Initial Learner', email: query === 'new' ? 'new@example.test' : 'initial@example.test', role: 'STUDENT', isActive: true, createdAt: '2026-01-01T00:00:00.000Z', _count: { enrollments: 1, submissions: 0 } }
     return new Response(JSON.stringify({ users: [user], total: 1, totalPages: 1 }), { status: 200, headers: { 'Content-Type': 'application/json' } })
@@ -1032,7 +1041,7 @@ test('failed normalized form validation never sends and server failure preserves
 test('latest continue-learning intent wins and selects first incomplete lesson', async () => {
   const details = {}
   globalThis.fetch = async (url) => {
-    const path = new URL(String(url)).pathname
+    const path = fixtureRequestUrl(url).pathname
     if (path.endsWith('/me')) return jsonResponse({ user: { id: 1, name: 'Học viên', role: 'STUDENT' } })
     if (/courses\/[12]$/.test(path)) return new Promise((resolve) => { details[path.at(-1)] = resolve })
     return jsonResponse({ courses: [learnerCourse(1), learnerCourse(2)] })
@@ -1279,7 +1288,7 @@ test('admin rename on last page clamps and fetches authoritative remaining page'
   const paths = []
   globalThis.fetch = async (url, options = {}) => {
     if (options.method === 'PATCH') { renamed = true; return jsonResponse({ user: { ...adminRecord(2), name: 'Tên ngoài query' } }) }
-    const query = new URL(String(url)).searchParams
+    const query = fixtureRequestUrl(url).searchParams
     paths.push(query.get('q') + ':' + query.get('page'))
     const secondPage = query.get('page') === '2'
     return jsonResponse({ users: renamed && secondPage ? [] : [adminRecord(secondPage ? 2 : 1)], total: renamed ? 25 : 26, totalPages: renamed ? 1 : 2 })
@@ -1302,7 +1311,7 @@ test('admin delayed write reconciles current normalized query and preserves anot
   const queries = []
   globalThis.fetch = async (url, options = {}) => {
     if (options.method === 'PATCH') return new Promise((resolve) => { resolveWrite = resolve })
-    const query = new URL(String(url)).searchParams.get('q'); queries.push(query)
+    const query = fixtureRequestUrl(url).searchParams.get('q'); queries.push(query)
     return jsonResponse({ users: query ? [adminRecord(2)] : [adminRecord(), adminRecord(2)], total: query ? 1 : 2, totalPages: 1 })
   }
   renderAdminFixture()
@@ -1653,7 +1662,7 @@ function quizResult(id, changes = {}) {
 function quizApi(history = [quizHistory(1), quizHistory(2)], handle = () => undefined) {
   const calls = []
   globalThis.fetch = (url, options = {}) => {
-    const path = new URL(String(url)).pathname, method = options.method || 'GET'
+    const path = fixtureRequestUrl(url).pathname, method = options.method || 'GET'
     const body = options.body ? JSON.parse(options.body) : undefined
     const call = { path, method, body }; calls.push(call)
     const custom = handle(call, calls)
@@ -2994,7 +3003,7 @@ test('admin workspace close switch and reopen preserve each local draft and rest
 })
 
 test('admin workspace filtered-out selection closes without auto selecting and retains dirty draft', async () => {
-  globalThis.fetch = async url => jsonResponse(adminList(new URL(String(url)).searchParams.get('q') ? [adminRecord(2)] : [adminRecord(1),adminRecord(2)]))
+  globalThis.fetch = async url => jsonResponse(adminList(fixtureRequestUrl(url).searchParams.get('q') ? [adminRecord(2)] : [adminRecord(1),adminRecord(2)]))
   renderAdminFixture()
   fireEvent.change(await selectAdmin(1), { target: { value: 'Nháp ngoài kết quả' } })
   fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'two' } })
@@ -3007,7 +3016,7 @@ test('admin workspace filtered-out selection closes without auto selecting and r
 test('admin workspace loading empty no-match and read failure have distinct totals and retry', async () => {
   const read = studyDeferred()
   let reads = 0
-  globalThis.fetch = async url => ++reads === 1 ? read.promise : new URL(String(url)).searchParams.get('q') ? jsonResponse(adminList([])) : jsonResponse({ error: 'fixture list offline' },503)
+  globalThis.fetch = async url => ++reads === 1 ? read.promise : fixtureRequestUrl(url).searchParams.get('q') ? jsonResponse(adminList([])) : jsonResponse({ error: 'fixture list offline' },503)
   renderAdminFixture()
   await screen.findByText('Đang tải tài khoản…')
   assert.equal(Boolean(screen.queryByText('0 tài khoản')), false)

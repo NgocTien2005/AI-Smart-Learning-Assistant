@@ -1,0 +1,5 @@
+# Local Vite frontend + existing Docker API. Production compose.yaml is unchanged.
+services:
+  backend:
+    environment:
+      CORS_ORIGIN: ${DEV_CORS_ORIGIN:-http://localhost:5173,http://localhost:8080}

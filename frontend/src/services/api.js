@@ -1,6 +1,6 @@
 import { isSessionExpiration, readApiError, SESSION_EXPIRED_EVENT } from './apiErrors.js'
 
-export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
+export const API_URL = import.meta.env.VITE_API_URL ?? ''
 
 let sessionGeneration = 0
 export const getSessionGeneration = () => sessionGeneration
