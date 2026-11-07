@@ -1,7 +1,11 @@
 import cors from 'cors'
 import express from 'express'
 import multer from 'multer'
-import { corsOrigins } from './config/env.js'
+import { appOrigin, corsOrigins, googleClientId } from './config/env.js'
+import { authenticate } from './middleware/authenticate.js'
+import { prisma } from './lib/prisma.js'
+import { createToken, publicUser } from './utils/auth.js'
+import { createGoogleAuthRouter } from './routes/googleAuth.js'
 import authRouter from './routes/auth.js'
 import adminRouter from './routes/admin.js'
 import coursesRouter from './routes/courses.js'
@@ -21,6 +25,7 @@ export const createApp = () => {
   }))
   app.use(express.json({ limit: '1mb' }))
   app.use('/api/health', healthRouter)
+  app.use('/api/auth/google', createGoogleAuthRouter({ prisma, authenticate, createToken, publicUser, clientId: googleClientId, secureCookie: appOrigin.startsWith('https://') }))
   app.use('/api/auth', authRouter)
   app.use('/api/admin', adminRouter)
   app.use('/api/courses', coursesRouter)
