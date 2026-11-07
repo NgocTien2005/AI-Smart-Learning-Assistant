@@ -11,6 +11,11 @@ toàn bộ hoặc sẵn sàng production.
 Xem [checklist production readiness](docs/production-readiness.md) trước khi
 chuẩn bị triển khai công khai; CI không thực hiện deploy hoặc gửi email thật.
 
+Theo yêu cầu bổ sung ngày 2026-11-07, [feature010](specs/010-add-google-sign-in/verification.md)
+thêm Google cho tài khoản đã liên kết, kèm sửa kết nối Vite5173. Các kiểm tra
+local đã đạt; nghiệm thu Google thật còn chờ Client ID/cấu hình riêng (T016).
+Trạng thái này không đóng T026 của008 hoặc chứng nhận production-ready.
+
 ## Cấu trúc repository
 
 - `frontend/src/app`: application shell và route composition.
@@ -66,7 +71,18 @@ docker compose down
 
 `docker compose down` giữ dữ liệu PostgreSQL. Chỉ dùng `docker compose down -v` khi chủ động muốn xóa volume database.
 
-Khi chạy frontend bằng Vite trên host, backend mặc định chỉ cho phép origin `http://localhost:5173`. Có thể đặt `CORS_ORIGIN` thành một hoặc nhiều origin phân tách bằng dấu phẩy cho môi trường khác.
+### Phát triển tại localhost:5173
+
+Vite gọi `/api` cùng origin và proxy sang Docker8080. Backend Docker chỉ mở cổng nội bộ3000; frontend host không gọi trực tiếp cổng đó. Chạy từ thư mục gốc:
+
+```powershell
+docker compose -f compose.yaml -f compose.dev.yaml up -d --build
+cd frontend
+npm ci
+npm run dev
+```
+
+Override dev chỉ cho phép origin `http://localhost:5173,http://localhost:8080`; Compose mặc định giữ cấu hình production theo `APP_ORIGIN`. Có thể đặt `DEV_CORS_ORIGIN` riêng cho port/domain local khác. Nếu backend chạy độc lập trên host3000, đặt `$env:DEV_API_PROXY_TARGET='http://localhost:3000'` trước khi chạy Vite. `VITE_API_URL` vẫn dùng được khi cần cấu hình base URL rõ ràng. Port5173 bận sẽ báo lỗi thay vì tự chuyển port. Không dùng wildcard CORS hoặc public database để sửa lỗi kết nối.
 
 Tài liệu upload được lưu trong Docker volume `uploads_data` và chỉ tải xuống qua endpoint có authentication. Định dạng hỗ trợ là PDF, TXT, Markdown và CSV, tối đa 10 MiB. Nội dung text được dùng cho trợ lý tài liệu cục bộ; dữ liệu không được gửi sang dịch vụ AI bên ngoài.
 
@@ -114,7 +130,7 @@ npm run build
 
 `npm run test:integration` yêu cầu stack kiểm thử tách biệt, healthy. Đặt rõ `TEST_COMPOSE_PROJECT=lumina-acceptance-*` và `TEST_API_URL=http://127.0.0.1:PORT/api`. Script xác minh project/container, cổng HTTP, network, volume và database trước khi tạo/dọn dữ liệu; không dùng Compose mặc định của repository. Xem [hướng dẫn kiểm thử tách biệt](docs/acceptance-testing.md).
 
-Đăng nhập hiện dùng email và mật khẩu. OAuth Google/Microsoft chưa được bật vì repository chưa có OAuth client và callback domain cho môi trường triển khai.
+Đăng nhập email/mật khẩu tiếp tục hoạt động cho ba vai trò. Google tùy chọn chỉ dùng cho tài khoản Lumina đã có và đã chủ động liên kết trong Tài khoản; không tạo user mới hoặc tự gộp theo email. Xem [cấu hình Google riêng](docs/google-sign-in.md). Khi chưa có Client ID, nút báo chưa sẵn sàng; nghiệm thu Google thật vẫn cần cấu hình và kiểm chứng riêng. Microsoft chưa triển khai.
 
 ## Dữ liệu trải nghiệm giao diện
 

@@ -75,14 +75,14 @@ export async function prepareJob(job) {
   const jwt = randomBytes(48).toString('hex')
   if (process.env.GITHUB_ACTIONS === 'true') process.stdout.write(`::add-mask::${jwt}\n`)
   // Explicit dotenv path and overrides keep local .env / SMTP / DB credentials out.
-  const env = { ...process.env, DOTENV_CONFIG_PATH: emptyEnv, JWT_SECRET: jwt, DATABASE_URL: 'postgresql://unit:unit@127.0.0.1:1/unit', SMTP_USER: '', SMTP_APP_PASSWORD: '', NODE_ENV: 'test', CI: 'true' }
+  const env = { ...process.env, DOTENV_CONFIG_PATH: emptyEnv, JWT_SECRET: jwt, DATABASE_URL: 'postgresql://unit:unit@127.0.0.1:1/unit', SMTP_USER: '', SMTP_APP_PASSWORD: '', GOOGLE_CLIENT_ID: '', VITE_GOOGLE_CLIENT_ID: '', NODE_ENV: 'test', CI: 'true' }
   return { dir, emptyEnv, env, context: publicContext() }
 }
 
 export function exportHttpEvidence(raw, target) {
   if (!raw || raw.project !== target.project || raw.baseUrl !== target.baseUrl || raw.database !== target.database || raw.remainingOwnedUsers !== 0 || !Array.isArray(raw.requests) || !raw.requests.length || !Array.isArray(raw.resources)) throw new Error('Missing, mismatched or incomplete integration evidence')
   const requests = raw.requests.map(entry => {
-    const approvedPath = /^\/api\/(?:auth\/(?:register|login|me|forgot-password|reset-password|change-password)|admin\/users(?:\/\d+)?|courses(?:\/join|\/\d+(?:\/(?:students|lessons|assignments|enrollment))?|\/lessons\/\d+(?:\/(?:document(?:\/process)?|progress|chat|summary|quizzes))?|\/assignments\/\d+(?:\/submission|\/submissions(?:\/\d+)?)?|\/quiz-attempts\/\d+(?:\/(?:draft|submit))?)?)$/
+    const approvedPath = /^\/api\/(?:auth\/(?:register|login|me|forgot-password|reset-password|change-password|google\/(?:challenge|login|link))|admin\/users(?:\/\d+)?|courses(?:\/join|\/\d+(?:\/(?:students|lessons|assignments|enrollment))?|\/lessons\/\d+(?:\/(?:document(?:\/process)?|progress|chat|summary|quizzes))?|\/assignments\/\d+(?:\/submission|\/submissions(?:\/\d+)?)?|\/quiz-attempts\/\d+(?:\/(?:draft|submit))?)?)$/
     if (!['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(entry.method) || typeof entry.path !== 'string' || !approvedPath.test(entry.path)) throw new Error('Unsafe HTTP evidence shape')
     const safe = { method: entry.method, path: entry.path }
     if (Number.isInteger(entry.status) && entry.status >= 100 && entry.status < 600) safe.status = entry.status

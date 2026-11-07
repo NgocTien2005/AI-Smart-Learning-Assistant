@@ -114,3 +114,6 @@ tạo convergence task trùng blocker. 009 hoàn thành phạm vi CI, không ch�
 mailbox delivery hay production readiness. [Checklist trước triển khai công
 khai](production-readiness.md) ghi riêng những quyết định/vận hành chưa kiểm
 chứng; chưa tạo feature mới hoặc thay production config cho những phần đó.
+# Bổ sung sau bàn giao 001–009: Google và dev5173
+
+2026-11-07: yêu cầu mới mở feature010 bằng script chính thức. Lỗi kết nối5173 đã tái hiện/sửa bằng API same-origin + Vite proxy + dev CORS override; bằng chứng sửa lỗi nằm trong008. Google chỉ đăng nhập tài khoản đã có và đã liên kết chủ động, không tự tạo/gộp theo email. [Verification010](../specs/010-add-google-sign-in/verification.md) và [hướng dẫn cấu hình](google-sign-in.md) ghi kiểm tra local/DB/UI; Google thật chưa cấu hình và T016 còn mở. Không thay trạng thái nghiệm thu lịch sử 001–009, T023 hoặc blocker cleanup T026. Không gửi thêm email thật trong lượt này.

@@ -71,7 +71,7 @@ export async function runIntegration() {
   await writeFile(emptyEnv, '')
   const dbSecret = randomBytes(24).toString('hex'), jwt = randomBytes(48).toString('hex')
   if (process.env.GITHUB_ACTIONS === 'true') for (const secret of [dbSecret, jwt]) process.stdout.write(`::add-mask::${secret}\n`)
-  const env = { ...process.env, ACCEPTANCE_DB_PASSWORD: dbSecret, ACCEPTANCE_JWT_SECRET: jwt, DOTENV_CONFIG_PATH: emptyEnv, SMTP_USER: '', SMTP_APP_PASSWORD: '' }
+  const env = { ...process.env, ACCEPTANCE_DB_PASSWORD: dbSecret, ACCEPTANCE_JWT_SECRET: jwt, DOTENV_CONFIG_PATH: emptyEnv, SMTP_USER: '', SMTP_APP_PASSWORD: '', GOOGLE_CLIENT_ID: '', VITE_GOOGLE_CLIENT_ID: '' }
   const summary = { ...publicContext(), job: 'integration', project, commands: [], targetVerifiedBeforeProvisioning: false, suiteEvidenceAvailable: false, namedVolumesRemoved: false }
   const controller = new AbortController()
   const cancel = () => controller.abort()
@@ -113,6 +113,7 @@ export async function runIntegration() {
       summary.containers = target.containers
       summary.retainedVolumes = [project + '_postgres_data', project + '_uploads_data']
       await writeSummary('integration', summary)
+      await checked('docker', ['exec', target.containers.backend, './node_modules/.bin/prisma', 'migrate', 'status'], 'docker exec <verified isolated backend> prisma migrate status')
       await checked('npm', ['run', 'test:integration'], 'npm run test:integration', path.join(repoRoot, 'backend'))
       const exported = exportHttpEvidence(JSON.parse(await readFile(env.TEST_EVIDENCE_PATH, 'utf8')), target)
       await writeFile(path.join(dir, 'http.json'), JSON.stringify(exported, null, 2))

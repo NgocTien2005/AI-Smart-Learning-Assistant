@@ -86,6 +86,26 @@ try {
   }))
   if ('password' in student.user) throw new Error('Password leaked in student response')
 
+  // Real HTTP/DB assertions; actual Google provider acceptance is separate.
+  const googleUnavailable = await fetch(`${baseUrl}/auth/google/challenge`, jsonOptions('POST', { intent: 'login' }))
+  if (googleUnavailable.status !== 503) throw new Error('Basic CI must keep real Google unconfigured')
+  const googleAnonymous = await fetch(`${baseUrl}/auth/google/link`)
+  if (googleAnonymous.status !== 401) throw new Error('Google link status must require authentication')
+  const initialLink = await request('/auth/google/link', { headers: { Authorization: `Bearer ${student.token}` } })
+  if (initialLink.linked !== false) throw new Error('New password account must not be automatically linked')
+  const syntheticSubject = `integration-subject-${stamp}`
+  target.query(`UPDATE "User" SET "googleSubject" = '${syntheticSubject}' WHERE id = ${student.user.id};
+DO $$ BEGIN
+  BEGIN
+    UPDATE "User" SET "googleSubject" = '${syntheticSubject}' WHERE id = ${instructor.user.id};
+    RAISE EXCEPTION 'Expected Google subject uniqueness';
+  EXCEPTION WHEN unique_violation THEN NULL;
+  END;
+END $$;`)
+  const persistedLink = await request('/auth/google/link', { headers: { Authorization: `Bearer ${student.token}` } })
+  if (persistedLink.linked !== true || Object.keys(persistedLink).length !== 1) throw new Error('Google link status must expose only persisted boolean')
+  target.query(`UPDATE "User" SET "googleSubject" = NULL WHERE id = ${student.user.id};`)
+
   const publicAdminRegistration = await fetch(`${baseUrl}/auth/register`, jsonOptions('POST', {
     name: 'Public Admin', email: `public-admin-${stamp}@example.com`, password, role: 'ADMIN',
   }))
