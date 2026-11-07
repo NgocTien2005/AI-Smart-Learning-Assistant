@@ -1,5 +1,19 @@
 # Verification: Feature008 authentication entry
 
+**Current status — 2026-11-07:** **24/26 tasks; T023 OPEN/PARTIAL, T026
+OPEN/POLICY-BLOCKED.** One authorized real forgot UI attempt was submitted on
+2026-11-05 out of a total maximum3; no further email in this audit. Mailbox
+receipt, conclusively reported original-user new-password login and actual
+received-link POST reuse remain unestablished. Fixture used-token400 and
+original-session/password401 evidence do not close real-mail acceptance.
+Earlier NOT RUN/no-config statements are dated history.
+
+Source/provenance and MVP handoff: [2026-11-07 review](#mvp-handoff-review--2026-11-07)
+and [MVP handoff](../../docs/mvp-handoff.md). Docker daemon is unavailable at the
+current probe; SMTP readiness/current database state are **unknown**, not false
+or a delivery failure. No application/UI change or new browser/integration run
+is claimed. No blocked profile cleanup was retried.
+
 Date2026-11-03 (Asia/Bangkok); evidence timestamps UTC2026-11-02. Frontend implementation and independent runtime checks passed; **T023 actual SMTP delivery remains OPEN / NOT RUN**, and temporary browser-profile cleanup is blocked by automatic approval review. Feature acceptance is not declared complete. No claim of end-to-end mail delivery or public-deployment readiness.
 
 ## Baseline and workflow
@@ -293,3 +307,61 @@ desktop evidence; no additional application or SMTP mutation for publication.
 T023/T026 remain OPEN (24/26), with partial SMTP evidence and the recorded
 cleanup limitations preserved. Ignored evidence/profiles/credentials are not
 included in Git. No PR/merge/deployment requested.
+
+## MVP handoff review — 2026-11-07
+
+Resumed existing008; official prerequisite resolution used the process-only
+`SPECIFY_FEATURE_DIRECTORY=specs/008-improve-auth-entry` override with
+`SPECIFY_FEATURE_NO_PERSIST=1`. Stored009state is unchanged. Built-in16/16 and
+custom12/12 checklist gates were read, not edited. Managed analyze before
+documentation edits covered19FR+8SC/23AC/26tasks with full coverage, zero
+unmapped008tasks or CRITICAL/HIGH findings. Its spec/plan/tasks/constitution/
+feature-state hashes were unchanged. Low-severity stale summary wording was
+remediated under the user's explicit authorization; no spec/API/policy change.
+
+Re-traced AuthPage/ResetPasswordPage → SessionContext/apiRequest →
+backend/server.js → src/app.js `/api/auth` → production auth.js → Gmail service
+→ Prisma User. Backend/app.js remains legacy. Source still normalizes email,
+preserves raw passwords/public roles, distinguishes validation400 from explicit
+link400, clears the reset hash/expiry with authVersion increment atomically,
+and validates current active/authVersion on `/me`. No production file changed.
+
+The seven frontend implementation/test files match their latest008source
+manifests. All application/CI/lockfile sources are unchanged against the actual
+passing hosted revisionef3cbf1. This is provenance, not a new desktop/runtime
+observation. The broader older manifest and its fixture mismatch are disclosed
+in [MVP handoff](../../docs/mvp-handoff.md), alongside existing001–007evidence.
+
+Current read-only `docker ps` probe exits1 because Docker Desktop's Linux
+engine pipe is unavailable. Therefore current SMTP readiness and the original
+test user's database state are unknown. The historical configured:true result
+from2026-11-05 is not reused as current readiness. Ledger still reserves1of3
+authorized email attempts, leaving at most2; no resend, provisioning, password
+mutation, controller restart, secret/environment read or mailbox access occurred.
+User outcome clarification was requested while independent documentation work
+continued; absent confirmation is not acceptance. T023 stays OPEN/PARTIAL.
+
+Both exact retained-profile directories were checked for existence only and
+remain present. No contents/credential stores were read, deletion retried or
+policy bypass attempted. T026 and the separately documented visual-profile
+cleanup limitation remain open. Historical technical-fixture cleanup0 and
+original-user1retention are recorded as historical, not current DB queries.
+
+Current evidence: ignored `.artifacts/mvp-handoff-20261107/{baseline,audit}.json`
+and audit.mjs, with command/cwd/exit outcomes. The source/traceability review,
+[production checklist](../../docs/production-readiness.md) and handoff are
+documentation follow-up under existing T024/T025, not transferred CI tasks.
+Task/checklist markers remain unchanged; no repeated unchanged converge or
+duplicate blocker task is needed for008. No new browser, app suite or local
+integration execution was required for these documentation-only edits.
+
+Documentation verification passed:8allowed files,22new local links/anchors,
+23auth and39CItraceability rows with required IDs,116source files unchanged
+and65protected artifacts unchanged. No new private mailbox or credential/token
+literal was found by the scoped checks. The initial local document-checker
+attempt exited1 because its mailbox allowlist also scanned unchanged README
+examples; after checking that zero mailbox strings were introduced, the scan
+was corrected to compare new mailbox literals against the baseline. Token/key
+checks stayed enabled. Both attempts are retained in ignored evidence, not
+reported as an application failure. `git diff --check` passed. T023/T026 remain
+open; no completed-app claim is made from this documentation pass.
