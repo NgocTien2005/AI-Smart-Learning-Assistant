@@ -75,7 +75,7 @@ export async function prepareJob(job) {
   const jwt = randomBytes(48).toString('hex')
   if (process.env.GITHUB_ACTIONS === 'true') process.stdout.write(`::add-mask::${jwt}\n`)
   // Explicit dotenv path and overrides keep local .env / SMTP / DB credentials out.
-  const env = { ...process.env, DOTENV_CONFIG_PATH: emptyEnv, JWT_SECRET: jwt, DATABASE_URL: 'postgresql://unit:unit@127.0.0.1:1/unit', SMTP_USER: '', SMTP_APP_PASSWORD: '', GOOGLE_CLIENT_ID: '', VITE_GOOGLE_CLIENT_ID: '', NODE_ENV: 'test', CI: 'true' }
+  const env = { ...process.env, DOTENV_CONFIG_PATH: emptyEnv, JWT_SECRET: jwt, DATABASE_URL: 'postgresql://unit:unit@127.0.0.1:1/unit', SMTP_USER: '', SMTP_APP_PASSWORD: '', GOOGLE_CLIENT_ID: '', VITE_GOOGLE_CLIENT_ID: '', GEMINI_API_KEY: '', GEMINI_FREE_ONLY_CONFIRMED: 'false', LUMINA_DEMO_ALLOWED: 'false', NODE_ENV: 'test', CI: 'true' }
   return { dir, emptyEnv, env, context: publicContext() }
 }
 

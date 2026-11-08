@@ -10,6 +10,7 @@ import authRouter from './routes/auth.js'
 import adminRouter from './routes/admin.js'
 import coursesRouter from './routes/courses.js'
 import healthRouter from './routes/health.js'
+import { createDemoCloudRouter } from './routes/demoCloudAssistant.js'
 
 export const createApp = () => {
   const app = express()
@@ -28,6 +29,7 @@ export const createApp = () => {
   app.use('/api/auth/google', createGoogleAuthRouter({ prisma, authenticate, createToken, publicUser, clientId: googleClientId, secureCookie: appOrigin.startsWith('https://') }))
   app.use('/api/auth', authRouter)
   app.use('/api/admin', adminRouter)
+  app.use('/api/courses/lessons', createDemoCloudRouter({ prisma, authenticate }))
   app.use('/api/courses', coursesRouter)
   app.use((_request, response) => {
     response.status(404).json({ error: 'Không tìm thấy endpoint' })

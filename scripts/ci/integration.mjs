@@ -71,7 +71,7 @@ export async function runIntegration() {
   await writeFile(emptyEnv, '')
   const dbSecret = randomBytes(24).toString('hex'), jwt = randomBytes(48).toString('hex')
   if (process.env.GITHUB_ACTIONS === 'true') for (const secret of [dbSecret, jwt]) process.stdout.write(`::add-mask::${secret}\n`)
-  const env = { ...process.env, ACCEPTANCE_DB_PASSWORD: dbSecret, ACCEPTANCE_JWT_SECRET: jwt, DOTENV_CONFIG_PATH: emptyEnv, SMTP_USER: '', SMTP_APP_PASSWORD: '', GOOGLE_CLIENT_ID: '', VITE_GOOGLE_CLIENT_ID: '' }
+  const env = { ...process.env, ACCEPTANCE_DB_PASSWORD: dbSecret, ACCEPTANCE_JWT_SECRET: jwt, DOTENV_CONFIG_PATH: emptyEnv, SMTP_USER: '', SMTP_APP_PASSWORD: '', GOOGLE_CLIENT_ID: '', VITE_GOOGLE_CLIENT_ID: '', GEMINI_API_KEY: '', GEMINI_FREE_ONLY_CONFIRMED: 'false' }
   const summary = { ...publicContext(), job: 'integration', project, commands: [], targetVerifiedBeforeProvisioning: false, suiteEvidenceAvailable: false, namedVolumesRemoved: false }
   const controller = new AbortController()
   const cancel = () => controller.abort()

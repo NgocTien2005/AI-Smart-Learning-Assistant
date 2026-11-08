@@ -3,4 +3,6 @@ services:
   backend:
     environment:
       LUMINA_DEMO_ALLOWED: "true"
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_FREE_ONLY_CONFIRMED: ${GEMINI_FREE_ONLY_CONFIRMED:-false}
       CORS_ORIGIN: ${DEV_CORS_ORIGIN:-http://localhost:5173,http://localhost:8080}
