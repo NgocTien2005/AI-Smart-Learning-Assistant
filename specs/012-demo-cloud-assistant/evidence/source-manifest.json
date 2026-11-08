@@ -1,0 +1,102 @@
+{
+  "base": "91207e3f9d3f438b97e0c74971804b7a06de0280",
+  "sourceType": "verified local working tree before scoped commits",
+  "files": [
+    {
+      "path": "backend/prisma/schema.prisma",
+      "sha256": "95be4054b726a506ccf50c3c5c290dd6b0d340ecc0b06a13d44bcc090732dd6e"
+    },
+    {
+      "path": "backend/scripts/seed-demo.mjs",
+      "sha256": "cb94e1fa2b4f67f385ff7e1780cb9dd12c64f3c83dcdd440beab320de895283d"
+    },
+    {
+      "path": "backend/src/app.js",
+      "sha256": "a1dc5eb3095cf2ea519996cb9e2555be573106006270224fef95c6694e0765dd"
+    },
+    {
+      "path": "compose.acceptance.yaml",
+      "sha256": "ece571731d7465304e3729672b9dba405b57b437cf6206067a2f297d9b2e3671"
+    },
+    {
+      "path": "compose.dev.yaml",
+      "sha256": "d77250a929f14801cf001cc545c1367f7a7d957e959b6d5b00a7a6f8d6db8448"
+    },
+    {
+      "path": "frontend/src/pages/CourseWorkspacePage.jsx",
+      "sha256": "103e18146d436ac864005e7de3d353e0060a0b1f91ae136ab50a5a924d41431c"
+    },
+    {
+      "path": "scripts/ci/common.mjs",
+      "sha256": "21f716d14d3674c0f1547de298a4f98e07ee763fbfafc8fd495028b69bc00027"
+    },
+    {
+      "path": "scripts/ci/integration.mjs",
+      "sha256": "2e04b0e0bfaed289a211901b50d7d6af7ce81604d8410e5878c2085ce3469e8d"
+    },
+    {
+      "path": "backend/prisma/migrations/20261108013000_add_demo_dataset_registry/migration.sql",
+      "sha256": "4602aa849207bdea9130d2c699a1c827745d3ac36cb5562dcfad1fe1a0014062"
+    },
+    {
+      "path": "backend/scripts/demo-seed/browser-verify.mjs",
+      "sha256": "c20ec566ef5eeff34b7c9b0382932041043a8458f5ff48fcb3e94e04f2f9dee1"
+    },
+    {
+      "path": "backend/scripts/demo-seed/dataset.mjs",
+      "sha256": "940693b9caeff47825484673c60e1a4d563023bce765ac4ef183b1b7b130fd13"
+    },
+    {
+      "path": "backend/scripts/demo-seed/documents/build-html.mjs",
+      "sha256": "1b8f0d6cdefb300fe5e815d56c92fc5f78e6c548199aeb45dcc79f71fed1e1d8"
+    },
+    {
+      "path": "backend/scripts/demo-seed/seed.mjs",
+      "sha256": "fbe299103ff1c323c70a9c15df900c90dd1a6a2e85af00e84306ba4fe4f0f498"
+    },
+    {
+      "path": "backend/scripts/demo-seed/target.mjs",
+      "sha256": "13e9070e0677bcecd4f70813cb187c2bd7f9a2247e353b133548ea68e1e7609a"
+    },
+    {
+      "path": "backend/scripts/demo-seed/verify.mjs",
+      "sha256": "d2efaa87d5f70387f8960761297daac2702508219a610ee91a44a78a7d7b5db2"
+    },
+    {
+      "path": "backend/scripts/demo-seed/worker.mjs",
+      "sha256": "f0ec481524810b97a5711547a4c8884a6ee5c3389aad55ac5b94476514a5b2c6"
+    },
+    {
+      "path": "backend/src/routes/demoCloudAssistant.js",
+      "sha256": "7db285f99c758e580ee26daccff803f4770bc9282f29796c0a754b08cfd1c98f"
+    },
+    {
+      "path": "backend/src/services/demoCloudAssistant.js",
+      "sha256": "cd10ea5561811504a97667d39d1cf2ac62dae2291636d37d5eeb2a62997cb814"
+    },
+    {
+      "path": "backend/test/demoCloudAssistant.test.js",
+      "sha256": "6c056f60a80ca51a5b2cd6bca9c241633484031602b9795dc352f6c38e101d36"
+    },
+    {
+      "path": "backend/test/demoSeed.test.js",
+      "sha256": "2cb5747234fb5a442f1f25caba7bc10469e2efcd079a407409364d7ed941fa43"
+    },
+    {
+      "path": "frontend/src/__tests__/DemoCloudAssistantPanel.test.jsx",
+      "sha256": "a726c785a4a8848acb03d58ccf5ffae669f13febe09c2232513e004703d0a5da"
+    },
+    {
+      "path": "frontend/src/components/DemoCloudAssistantPanel.css",
+      "sha256": "19f38686eae475fb0a290ef5d5f3a9f57698a81c4aa174d1bae9e6f1f4dbb9d5"
+    },
+    {
+      "path": "frontend/src/components/DemoCloudAssistantPanel.jsx",
+      "sha256": "b08c1160ee05ebf4ba5b75a441fb3ab5c0695ce2ad938b95ed40987cb60dbc97"
+    },
+    {
+      "path": "scripts/ci/seed-integration.mjs",
+      "sha256": "c8a166d9c58b4014422d8ac7179e5a31beae6a369070bd1e0e7d561056634ea2"
+    }
+  ]
+}

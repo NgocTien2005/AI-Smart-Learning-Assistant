@@ -1,0 +1,16 @@
+[
+  {
+    "command": "npm test",
+    "cwd": "backend",
+    "durationMs": 1173,
+    "exitCode": 0,
+    "status": "passed"
+  },
+  {
+    "command": "node --test scripts/ci/test/ci.test.mjs",
+    "cwd": ".",
+    "durationMs": 752,
+    "exitCode": 0,
+    "status": "passed"
+  }
+]

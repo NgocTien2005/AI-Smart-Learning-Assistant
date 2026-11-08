@@ -1,0 +1,1251 @@
+{
+  "project": "lumina-acceptance-ci-demo-1794155484066-1648dd",
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 401
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/users",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/users",
+      "status": 403
+    },
+    {
+      "method": "HEAD",
+      "path": "/api/courses/lessons/1/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/1/cloud-assistant",
+      "status": 401
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/1/cloud-assistant",
+      "status": 403
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/lessons/1/cloud-assistant",
+      "status": 403
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/lessons/1/cloud-assistant",
+      "status": 400
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/lessons/1/cloud-assistant",
+      "status": 503
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/1/students",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/3/students",
+      "status": 403
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/1",
+      "status": 403
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/1",
+      "status": 403
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/2/document",
+      "status": 403
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/1",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/1/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/1/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/1/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/1",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/1",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/2/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/2/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/2/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/2/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/3/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/3/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/3/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/4/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/4/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/4/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/4/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/5/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/5/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/5/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/5/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/6/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/6/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/6/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/6/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/2",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/7/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/7/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/7/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/5",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/5",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/8/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/8/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/8/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/8/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/9/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/9/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/9/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/10/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/10/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/10/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/10/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/11/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/11/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/11/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/11/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/12/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/12/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/12/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/12/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/3",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/13/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/13/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/13/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/10",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/10",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/14/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/14/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/14/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/14/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/15/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/15/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/15/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/16/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/16/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/16/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/16/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/17/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/17/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/17/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/17/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/18/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/18/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/18/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/4",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/19/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/19/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/19/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/15",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/15",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/20/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/20/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/20/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/20/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/21/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/21/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/21/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/22/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/22/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/22/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/22/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/23/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/23/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/23/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/23/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/24/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/24/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/24/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/5",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/25/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/25/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/25/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/19",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/19",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/26/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/26/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/26/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/26/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/27/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/27/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/27/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/28/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/28/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/28/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/28/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/29/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/29/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/29/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/29/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/30/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/30/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/30/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/6",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/31/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/31/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/31/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/24",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/24",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/32/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/32/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/32/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/32/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/33/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/33/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/33/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/34/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/34/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/34/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/34/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/35/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/35/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/35/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/35/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/36/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/36/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/36/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/7",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/37/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/37/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/37/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/29",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/29",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/38/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/38/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/38/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/38/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/39/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/39/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/39/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/40/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/40/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/40/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/40/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/41/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/41/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/41/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/41/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/42/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/42/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/42/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/8",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/43/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/43/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/43/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/33",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/33",
+      "status": 404
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/44/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/44/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/44/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/44/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/45/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/45/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/45/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/46/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/46/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/46/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/46/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/47/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/47/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/47/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/47/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/48/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/48/summary",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/48/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/2/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/2",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/1/cloud-assistant",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/lessons/1/cloud-assistant",
+      "status": 403
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/1/cloud-assistant",
+      "status": 200
+    }
+  ],
+  "coverage": {
+    "submitted": 8,
+    "draft": 1,
+    "unstarted": 40,
+    "graded": 8,
+    "pending": 8,
+    "notSubmitted": 8,
+    "documents": 26
+  },
+  "realEmailsSent": 0,
+  "providerRequests": 0
+}

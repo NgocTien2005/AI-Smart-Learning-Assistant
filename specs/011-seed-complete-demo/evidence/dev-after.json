@@ -1,0 +1,24 @@
+{
+  "identity": {
+    "database": "lumina_lms",
+    "address": "172.20.0.4"
+  },
+  "preexistingUserDigest": "b263594882a7e80b582d69a7449a3365ef3625d845ab9d580019cae04f6ff255",
+  "preexistingUsers": 5,
+  "counts": {
+    "user": 23,
+    "course": 11,
+    "lesson": 54,
+    "enrollment": 40,
+    "assignment": 25,
+    "assignmentSubmission": 75,
+    "quizAttempt": 39,
+    "lessonProgress": 111,
+    "chatMessage": 52
+  },
+  "containers": {
+    "db": "486d6fd02ff9",
+    "backend": "3f47adef2122",
+    "frontend": "2a7341b6e541"
+  }
+}

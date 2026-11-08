@@ -77,6 +77,20 @@ jobs:
       - name: Build isolated stack, verify target and exercise production HTTP/database
         id: integration
         run: node scripts/ci/integration.mjs
+      - name: Verify create-only demo seed in a second fresh isolated stack
+        id: seed
+        run: node scripts/ci/seed-integration.mjs
+      - name: Preserve sanitized demo seed evidence
+        if: ${{ always() && steps.seed.outcome != 'skipped' }}
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: seed-integration-outcomes
+          path: |
+            ci-results/seed-integration/summary.json
+            ci-results/seed-integration/http.json
+          if-no-files-found: error
+          retention-days: 7
+          include-hidden-files: false
       - name: Preserve sanitized dependency outcomes
         if: ${{ always() }}
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0

@@ -1,0 +1,2 @@
+﻿# Quickstart
+See docs/demo-cloud-ai.md for private free-project configuration. Never place GEMINI_API_KEY in Vite or chat. Default disabled. Confirm source from011 is unchanged, then use lesson cloud panel; explicitly request all four actions and inspect citations. PR CI uses controlled transport/disabled provider only; actual Gemini acceptance stays open without configured calls. No model download, paid billing, real-user documents or arbitrary question text authorized.

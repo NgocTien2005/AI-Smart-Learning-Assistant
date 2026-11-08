@@ -117,3 +117,24 @@ chứng; chưa tạo feature mới hoặc thay production config cho những ph�
 # Bổ sung sau bàn giao 001–009: Google và dev5173
 
 2026-11-07: yêu cầu mới mở feature010 bằng script chính thức. Lỗi kết nối5173 đã tái hiện/sửa bằng API same-origin + Vite proxy + dev CORS override; bằng chứng sửa lỗi nằm trong008. Google chỉ đăng nhập tài khoản đã có và đã liên kết chủ động, không tự tạo/gộp theo email. [Verification010](../specs/010-add-google-sign-in/verification.md) và [hướng dẫn cấu hình](google-sign-in.md) ghi kiểm tra local/DB/UI; Google thật chưa cấu hình và T016 còn mở. Không thay trạng thái nghiệm thu lịch sử 001–009, T023 hoặc blocker cleanup T026. Không gửi thêm email thật trong lượt này.
+
+## Bổ sung 2026-11-08 — dataset011 và cloud012
+
+Dataset011 đã bổ sung development8080:18tài khoản tổng hợp,8khóa/48bài tiếng Việt,
+26tài liệu hợp lệ,24bài tập cùng enrollment/progress/bài nộp/quiz nhiều trạng thái.
+Script cũ dùng shared password và resetting upsert đã được thay bằng target guard,
+create-only transaction/ownership registry/dry-run và console riêng cấp access.
+5tài khoản có sẵn giữ nguyên thông tin được đối chiếu; chạy lại không đổi dữ liệu.
+Xem [demo guide](demo-data.md) và [verification011](../specs/011-seed-complete-demo/verification.md).
+
+Cloud012 là phần mới được người dùng cho phép: Gemini Free, ngân sách0, chỉ nguồn
+demo tổng hợp nguyên bản và câu hỏi mẫu. API/panel riêng, không thay công cụ cục bộ,
+không ghi quiz/history, không gửi dữ liệu thật; no paid fallback/retry. Full local
+checks và isolated/desktop disabled-state có evidence; chưa có key/real-model
+acceptance thì012T012 vẫn OPEN. [Cấu hình riêng](demo-cloud-ai.md),
+[verification012](../specs/012-demo-cloud-assistant/verification.md).
+
+Google010T016 vẫn cần cấu hình/nghiệm thu provider thật.008T023 giữ bằng chứng
+người dùng đã xác nhận; không tự gửi email thêm hoặc suy ngân sách gửi cũ.
+008T026 profile cleanup bị policy chặn vẫn OPEN, không retry qua cách khác.
+Không gọi toàn bộ app hoàn tất hoặc production-ready; không deploy/PR/merge.

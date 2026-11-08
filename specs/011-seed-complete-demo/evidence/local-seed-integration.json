@@ -1,0 +1,230 @@
+{
+  "time": "2026-11-08T16:13:46.073Z",
+  "revision": "91207e3f9d3f438b97e0c74971804b7a06de0280",
+  "sourceType": "local working tree; see source manifest",
+  "node": "v25.2.0",
+  "platform": "win32",
+  "project": "lumina-acceptance-ci-demo-1794154426037-f9b051",
+  "job": "seed-integration",
+  "commands": [
+    {
+      "command": "docker context show",
+      "cwd": ".",
+      "durationMs": 62,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker context inspect <endpoint only>",
+      "cwd": ".",
+      "durationMs": 60,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 67,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 67,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 68,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 66,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 67,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 66,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker compose <fresh seed project> up --build --wait",
+      "cwd": ".",
+      "durationMs": 13607,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified seed backend> prisma migrate status",
+      "cwd": ".",
+      "durationMs": 1536,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker compose <this seed run only> down (volumes retained)",
+      "cwd": ".",
+      "durationMs": 2315,
+      "exitCode": 0,
+      "status": "passed"
+    }
+  ],
+  "emailsSent": 0,
+  "providerRequests": 0,
+  "namedVolumesRemoved": false,
+  "targetVerifiedBeforeProvisioning": true,
+  "database": "lumina_acceptance",
+  "api": "http://127.0.0.1:50421/api",
+  "sentinelId": 1,
+  "counts": {
+    "users": 18,
+    "admin": 1,
+    "instructors": 4,
+    "activeStudents": 12,
+    "disabledStudents": 1,
+    "courses": 8,
+    "lessons": 48,
+    "assignments": 24,
+    "documents": 26
+  },
+  "httpOperations": 190,
+  "coverage": {
+    "submitted": 8,
+    "draft": 1,
+    "unstarted": 40,
+    "graded": 8,
+    "pending": 8,
+    "notSubmitted": 8,
+    "documents": 26
+  },
+  "dryRunNoWrites": true,
+  "collisionDenied": true,
+  "rerunNoDuplicates": true,
+  "preexistingSentinelPreserved": true,
+  "browser": [
+    {
+      "role": "admin",
+      "viewport": "1280x800",
+      "view": "home",
+      "observed": true
+    },
+    {
+      "role": "admin",
+      "viewport": "1440x900",
+      "view": "home",
+      "observed": true
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1280x800",
+      "view": "home",
+      "observed": true
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1280x800",
+      "view": "lessons",
+      "observed": true
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1280x800",
+      "view": "assignments",
+      "observed": true
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1280x800",
+      "view": "students",
+      "observed": true
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1440x900",
+      "view": "home",
+      "observed": true
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1440x900",
+      "view": "lessons",
+      "observed": true
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1440x900",
+      "view": "assignments",
+      "observed": true
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1440x900",
+      "view": "students",
+      "observed": true
+    },
+    {
+      "role": "student1",
+      "viewport": "1280x800",
+      "view": "home",
+      "observed": true
+    },
+    {
+      "role": "student1",
+      "viewport": "1280x800",
+      "view": "lessons",
+      "observed": true
+    },
+    {
+      "role": "student1",
+      "viewport": "1280x800",
+      "view": "assignments",
+      "observed": true
+    },
+    {
+      "role": "student1",
+      "viewport": "1440x900",
+      "view": "home",
+      "observed": true
+    },
+    {
+      "role": "student1",
+      "viewport": "1440x900",
+      "view": "lessons",
+      "observed": true
+    },
+    {
+      "role": "student1",
+      "viewport": "1440x900",
+      "view": "assignments",
+      "observed": true
+    }
+  ],
+  "remainingUsers": "0",
+  "retainedSyntheticDocuments": 26,
+  "retainedVolumes": [
+    "lumina-acceptance-ci-demo-1794154426037-f9b051_postgres_data",
+    "lumina-acceptance-ci-demo-1794154426037-f9b051_uploads_data"
+  ],
+  "failure": null,
+  "cleanup": {
+    "attempted": true,
+    "success": true
+  },
+  "exitCode": 0
+}

@@ -135,19 +135,14 @@ npm run build
 
 ## Dữ liệu trải nghiệm giao diện
 
-Sau khi khởi động Docker, có thể nạp dữ liệu demo vào database local để thử cả hai vai trò, khóa học, danh sách học viên, bài học, bài tập, bài ôn nhanh, tải tài liệu và trợ lý học tập:
+Dataset demo mới bao phủ ba vai trò: 18 tài khoản tổng hợp, 8 khóa học, 48 bài tiếng Việt, 26 tài liệu có thể đọc, 24 bài tập cùng tiến độ/bài nộp/quiz ở nhiều trạng thái. Chỉ thêm vào development đã xác minh; không ghi đè dữ liệu cũ.
 
 ```powershell
-docker compose exec -e NODE_ENV=development backend npm run seed:demo
+node backend/scripts/seed-demo.mjs --project ai-smart-learning-assistant --api http://localhost:8080/api --dry-run
+powershell -NoProfile -File scripts/start-demo-seed.ps1
 ```
 
-Đăng nhập bằng các tài khoản demo (mật khẩu chung `123456789`):
-
-- Giảng viên: `giangvien@lumina.local`
-- Học viên: `hocvien@lumina.local`
-- Quản trị viên: `quantri@lumina.local`
-
-Lệnh seed có thể chạy lại để cập nhật dữ liệu demo; lệnh từ chối chạy khi `NODE_ENV=production`. Chỉ dùng tài khoản mẫu trong môi trường local, không dùng chúng cho hệ thống triển khai thật.
+Launcher hiển thị mật khẩu ngẫu nhiên riêng từng tài khoản trong console riêng duy nhất lúc tạo; không lưu credentials vào source/evidence. Chạy lại báo `unchanged`, không cập nhật hoặc đổi mật khẩu. Xem [hướng dẫn seed, target guard và cleanup](docs/demo-data.md). Các tài khoản demo cũ nếu có được giữ nguyên; không dùng tài khoản mẫu cho triển khai công khai.
 
 Tài khoản quản trị môi trường triển khai không thể đăng ký từ giao diện. Hãy đặt `ADMIN_BOOTSTRAP_NAME`, `ADMIN_BOOTSTRAP_EMAIL` và `ADMIN_BOOTSTRAP_PASSWORD` trong `.env`, khởi động lại backend rồi chạy `docker compose exec backend npm run admin:create`. Sau khi tạo xong, xóa ba biến này khỏi `.env` và khởi động lại backend. Mật khẩu bootstrap cần từ 12 đến 72 ký tự; lệnh chỉ tạo tài khoản mới và không sửa tài khoản đã tồn tại.
 
@@ -156,8 +151,12 @@ Tài khoản quản trị môi trường triển khai không thể đăng ký t�
 
 The React UI supports ADMIN, INSTRUCTOR, and STUDENT sessions. It provides role-aware dashboards, course workspace sections stored in the URL, lesson reading, authenticated document preview/download, progress, assignments and grading, local source lookup, and resumable practice quizzes. Session identity is checked through `/api/auth/me`; network and server failures remain recoverable.
 
-PDF preview displays the uploaded document but does not extract PDF text. Assistant lookup uses locally available lesson text. Quiz generation uses supported local definition patterns and may return fewer questions when the source has too few suitable candidates. Drafts use server versions to resolve concurrent tabs.
+PDF preview displays the uploaded document; the backend extracts its text layer for local lookup, extractive summaries and practice questions. Scanned PDFs without text are not OCR-processed. Quiz generation uses supported local definition patterns and may return fewer questions when the source has too few suitable candidates. Drafts use server versions to resolve concurrent tabs.
 
 Run frontend checks from `frontend/`: `npm test`, `npm run lint`, and `npm run build`.
 
-Local PDF text-layer extraction and extractive summaries are implemented. OCR, learning recommendations, notifications, OAuth, and global analytics remain outside the current supported APIs and scope.
+Local PDF text-layer extraction and extractive summaries are implemented. Google identity sign-in is optional for explicitly linked existing accounts; real-provider acceptance remains separate. OCR, learning recommendations, notifications and global analytics remain outside the current supported APIs and scope.
+
+## AI cloud cho demo
+
+Panel **AI cloud demo** gọi Gemini cho hỏi theo nguồn, giải thích, tóm tắt và câu ôn tập riêng. Mặc định tắt; chỉ nguồn demo tổng hợp nguyên bản và câu hỏi mẫu được gửi sau thao tác rõ ràng. Không gửi bài/tài liệu thật, history hoặc câu hỏi riêng tư. Cần API key server nhập riêng và project Free chưa bật billing; không tự chuyển trả phí hoặc dùng local/mock để giả thành công. Xem [cấu hình, giới hạn và nghiệm thu Gemini](docs/demo-cloud-ai.md). Test/CI không chứng minh model thật đã chạy; nghiệm thu thật cần cấu hình và kết quả riêng.

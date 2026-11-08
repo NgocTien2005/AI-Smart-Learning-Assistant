@@ -1,0 +1,7 @@
+{
+  "command": "docker compose <verified dev project; preserve DB; configured backend preserved> up -d --build --no-deps --wait backend frontend",
+  "cwd": ".",
+  "durationMs": 18287,
+  "exitCode": 0,
+  "status": "passed"
+}

@@ -47,6 +47,18 @@ hoặc ghi đạt khi chưa có proof.
 
 ## Tài liệu chính thức đã đối chiếu
 
+### Bổ sung cấu hình demo 2026-11-08
+
+| Hạng mục mới | Cấu hình thực tế | Điều kiện trước public | Trạng thái |
+| --- | --- | --- | --- |
+| Dataset011 | Bảng ownership riêng;18user `.invalid`,8course/48lesson/26document; marker chỉ ở Compose dev/acceptance | Không bật marker/seed trong production; review tài khoản demo và cleanup theo yêu cầu riêng, không reset hoặc xóa theo email prefix | DEV ĐÃ SEED/ISOLATED ĐÃ KIỂM; KHÔNG SEED PRODUCTION |
+| Gemini012 | Panel/API riêng, nguồn demo nguyên bản, câu hỏi hữu hạn, optional key chỉ server; global20lượt/ngày/process, active1, cooldown20giây | Key/rotation/quyền vận hành và provider terms; billing phải tắt cho budget0; nhiều replica cần quota durable; không mở tài liệu thật khi chưa có quyền gửi riêng | LOCAL CONTROLLED/DISABLED CHECKS; REAL MODEL CHƯA NGHIỆM THU |
+| Chi phí và dữ liệu AI | Gemini3.8Flash Free tier, không tool/search/fallback/retry; store:false | App không thể xác minh project billing; cờ xác nhận không bảo đảm miễn phí nếu operator dùng key project trả phí. Free-tier data có thể cải thiện sản phẩm/human review | CHỈ DEMO TỔNG HỢP; CHƯA PRODUCTION-READY |
+
+Các bổ sung trên không đổi cổng domain/TLS/backup/monitoring/SMTP/Google còn mở.
+Không deploy trong lượt này; xem [verification011](../specs/011-seed-complete-demo/verification.md)
+và [verification012](../specs/012-demo-cloud-assistant/verification.md).
+
 - [Docker Compose in production](https://docs.docker.com/compose/how-tos/production/): xét riêng port, environment, restart và logging; chưa tạo production override.
 - [Express production security](https://expressjs.com/en/advanced/best-practice-security/): cơ sở kiểm TLS và cấu hình bảo vệ; không thêm dependency hoặc đổi chính sách.
 - [Express behind proxies](https://expressjs.com/en/guide/behind-proxies/): trust proxy phải khớp topology/forwarding headers; không đặt true mặc định.

@@ -49,6 +49,11 @@ Các điểm trên được ghi nhận, không sửa ứng dụng/tài liệu c�
 
 - Assistant tra cứu các đoạn liên quan trong tài liệu/nội dung cục bộ; không phải
   hội thoại với dịch vụ AI ngoài. Summary chọn câu nguồn dưới nhãn **Tóm tắt trích xuất**.
+- Feature012 bổ sung **AI cloud demo** riêng, mặc định tắt: Gemini chỉ nhận nguồn
+  tổng hợp nguyên bản từ dataset011 và câu hỏi mẫu sau thao tác rõ ràng. Không gửi
+  tài liệu thật hoặc history. Cần key server/private free-project setup và nghiệm
+  thu model thật riêng; xem [giới hạn cloud](demo-cloud-ai.md). Không dùng kết quả
+  controlled tests hoặc công cụ cục bộ để tuyên bố Gemini thật đã chạy.
 - Quiz dùng mẫu câu định nghĩa giới hạn trong [studyQuiz.js](../backend/src/utils/studyQuiz.js),
   có thể tạo ít câu hoặc từ chối khi thiếu nguồn phù hợp; không phải hiểu ngôn ngữ tổng quát.
 - PDF chỉ trích lớp văn bản bằng PDF.js, không OCR. Nguồn chung được resolve trong

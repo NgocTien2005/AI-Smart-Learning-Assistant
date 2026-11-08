@@ -1,0 +1,39 @@
+{
+  "time": "2026-11-08T16:03:00.841Z",
+  "revision": "91207e3f9d3f438b97e0c74971804b7a06de0280",
+  "sourceType": "local working tree; see source manifest",
+  "node": "v25.2.0",
+  "platform": "win32",
+  "job": "backend",
+  "commands": [
+    {
+      "command": "npm ci",
+      "cwd": "backend",
+      "durationMs": 27771,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "npm test",
+      "cwd": "backend",
+      "durationMs": 1487,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "npm test -- --test-name-pattern=quiz",
+      "cwd": "backend",
+      "durationMs": 1002,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "node --test ../scripts/ci/test/ci.test.mjs",
+      "cwd": "backend",
+      "durationMs": 752,
+      "exitCode": 0,
+      "status": "passed"
+    }
+  ],
+  "exitCode": 0
+}
