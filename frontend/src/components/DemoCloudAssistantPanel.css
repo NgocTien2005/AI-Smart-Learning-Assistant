@@ -1,0 +1,13 @@
+.demo-cloud-panel { margin-top: 20px; padding: 20px; border: 1px solid #dfe6ef; border-radius: 14px; background: #fff; color: #172b46; min-width: 0; overflow-wrap: anywhere; }
+.demo-cloud-panel header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.demo-cloud-panel h3 { margin: 6px 0; font-size: 20px; }
+.demo-cloud-panel p { line-height: 1.65; }
+.demo-cloud-panel .eyebrow { color: #526b8b; font-size: 11px; letter-spacing: .05em; }
+.demo-cloud-panel label { display: block; margin-bottom: 8px; font-weight: 600; }
+.demo-cloud-panel select { width: 100%; max-width: 480px; padding: 10px; border: 1px solid #cbd7e7; border-radius: 8px; background: #fff; color: inherit; }
+.demo-cloud-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+.demo-cloud-panel [role="alert"] { color: #a51c30; }
+.demo-cloud-result { border-top: 1px solid #e5ebf3; margin-top: 16px; }
+.demo-cloud-answer { white-space: pre-wrap; }
+.demo-cloud-panel blockquote { margin: 14px 0; padding: 12px 16px; border-left: 3px solid #2767c9; background: #f5f8ff; }
+.demo-cloud-panel details { margin: 12px 0; }
