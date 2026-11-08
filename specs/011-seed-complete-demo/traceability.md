@@ -10,3 +10,5 @@
 | FR010 external sends | US3 T008/012/013 | synthetic .invalid, no seed email/Google/AI requests; old008/010 gates retained PASS |
 | FR011 evidence/cleanup | T001/002/013–016 | allowlisted public JSON/commands, scoped row/container cleanup and retained volumes, no local8081/profile deletion; hosted result tracked separately |
 | SC001–004 | T014–016 | local backend/schema/HTTP+DB and actual dev seed; real desktop1280x800/1440x900; actual hosted run pending Git step |
+
+Hosted acceptance update: actual42501020428 at97603a4 passed all3jobs plus mandatory seed247HTTP checks; see evidence/hosted-seed-42501020428.json. T016 complete, all011tasks16/16; no remaining feature011 acceptance gate.

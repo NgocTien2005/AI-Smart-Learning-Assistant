@@ -1,0 +1,96 @@
+{
+  "time": "2026-11-08T16:41:01.093Z",
+  "scope": "exact projects created in this task only; no volume removal",
+  "rows": [
+    {
+      "project": "lumina-acceptance-ci-demo-1794153813309-985704",
+      "remainingContainers": 0,
+      "remainingNetworks": 0,
+      "retainedVolumes": [
+        "lumina-acceptance-ci-demo-1794153813309-985704_postgres_data",
+        "lumina-acceptance-ci-demo-1794153813309-985704_uploads_data"
+      ]
+    },
+    {
+      "project": "lumina-acceptance-ci-demo-1794154030084-bfa724",
+      "remainingContainers": 0,
+      "remainingNetworks": 0,
+      "retainedVolumes": [
+        "lumina-acceptance-ci-demo-1794154030084-bfa724_postgres_data",
+        "lumina-acceptance-ci-demo-1794154030084-bfa724_uploads_data"
+      ]
+    },
+    {
+      "project": "lumina-acceptance-ci-demo-1794154246745-f78b0e",
+      "remainingContainers": 0,
+      "remainingNetworks": 0,
+      "retainedVolumes": [
+        "lumina-acceptance-ci-demo-1794154246745-f78b0e_postgres_data",
+        "lumina-acceptance-ci-demo-1794154246745-f78b0e_uploads_data"
+      ]
+    },
+    {
+      "project": "lumina-acceptance-ci-demo-1794154355785-a4a27f",
+      "remainingContainers": 0,
+      "remainingNetworks": 0,
+      "retainedVolumes": [
+        "lumina-acceptance-ci-demo-1794154355785-a4a27f_postgres_data",
+        "lumina-acceptance-ci-demo-1794154355785-a4a27f_uploads_data"
+      ]
+    },
+    {
+      "project": "lumina-acceptance-ci-demo-1794154426037-f9b051",
+      "remainingContainers": 0,
+      "remainingNetworks": 0,
+      "retainedVolumes": [
+        "lumina-acceptance-ci-demo-1794154426037-f9b051_postgres_data",
+        "lumina-acceptance-ci-demo-1794154426037-f9b051_uploads_data"
+      ]
+    },
+    {
+      "project": "lumina-acceptance-ci-demo-1794155209949-f5b597",
+      "remainingContainers": 0,
+      "remainingNetworks": 0,
+      "retainedVolumes": [
+        "lumina-acceptance-ci-demo-1794155209949-f5b597_postgres_data",
+        "lumina-acceptance-ci-demo-1794155209949-f5b597_uploads_data"
+      ]
+    },
+    {
+      "project": "lumina-acceptance-ci-demo-1794155358508-9aec7d",
+      "remainingContainers": 0,
+      "remainingNetworks": 0,
+      "retainedVolumes": [
+        "lumina-acceptance-ci-demo-1794155358508-9aec7d_postgres_data",
+        "lumina-acceptance-ci-demo-1794155358508-9aec7d_uploads_data"
+      ]
+    },
+    {
+      "project": "lumina-acceptance-ci-demo-1794155484066-1648dd",
+      "remainingContainers": 0,
+      "remainingNetworks": 0,
+      "retainedVolumes": [
+        "lumina-acceptance-ci-demo-1794155484066-1648dd_postgres_data",
+        "lumina-acceptance-ci-demo-1794155484066-1648dd_uploads_data"
+      ]
+    },
+    {
+      "project": "lumina-acceptance-ci-1794153964633-69676e13",
+      "remainingContainers": 0,
+      "remainingNetworks": 0,
+      "retainedVolumes": [
+        "lumina-acceptance-ci-1794153964633-69676e13_postgres_data",
+        "lumina-acceptance-ci-1794153964633-69676e13_uploads_data"
+      ]
+    },
+    {
+      "project": "lumina-acceptance-ci-1794155199064-7f6fea66",
+      "remainingContainers": 0,
+      "remainingNetworks": 0,
+      "retainedVolumes": [
+        "lumina-acceptance-ci-1794155199064-7f6fea66_postgres_data",
+        "lumina-acceptance-ci-1794155199064-7f6fea66_uploads_data"
+      ]
+    }
+  ]
+}

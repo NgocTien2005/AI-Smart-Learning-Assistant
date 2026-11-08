@@ -12,3 +12,5 @@
 | FR009 honest verification | T001/006/010–013 | local/controlled/HTTP+DB/browser distinct; no real Gemini calls, no automated PR provider acceptance |
 | SC001 | T012 | OPEN: private configuration and real-model quality acceptance |
 | SC002–004 | T010/011/013 | local/isolated/desktop evidence PASS; Git/hosted tracked separately |
+
+Hosted update:42501020428 at97603a4 all3jobs PASS,247seed/cloud-disabled operations. T013 complete;T012 is the only remaining012task. No actual Gemini acceptance inferred from hosted success.

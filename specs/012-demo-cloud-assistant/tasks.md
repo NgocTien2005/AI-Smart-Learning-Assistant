@@ -1,4 +1,4 @@
-﻿# Tasks: Demo cloud assistant
+# Tasks: Demo cloud assistant
 **Input**: spec/plan/contracts/research/data-model/quickstart. Safety, tests and real acceptance required.
 ## Phase 1: Setup
 - [x] T001 Record user consent, official research and checklist review in verification.md; preserve008/010 blockers (FR006/009).
@@ -19,7 +19,6 @@ Independent test: no automatic calls, finite choices, accessible states/citation
 - [x] T010 Run full frontend test/lint/build, backend full/quiz tests and current isolated HTTP/DB/seed checks; record command/cwd/exit plus source hashes in verification.md (SC002–004).
 - [x] T011 Check cloud panel on real Chrome1280x800/1440x900, disabled/source-denial and navigation/session guards; record evidence (FR008,SC004).
 - [ ] T012 With private free-project API key and operator confirmation, evaluate all four real Gemini actions with valid source citations; do not store raw requests/key/reasoning. Keep open if configuration missing (FR004/006/009,SC001).
-- [ ] T013 Complete traceability/read-only analyze/append-only converge and scoped commits/normal push; distinguish local/hosted/real provider evidence (FR009,SC004).
+- [x] T013 Complete traceability/read-only analyze/append-only converge and scoped commits/normal push; distinguish local/hosted/real provider evidence (FR009,SC004).
 ## Dependencies and implementation strategy
 T001→T002→T003/T004→T005→T006/T007. T008 follows contract and may proceed independently of backend implementation; T009 followsT008. T010 precedesT011. T012 depends on private operator configuration and is not a CI requirement; continue independent checks if unavailable. T013 reports open gates without duplicating blockers. MVP first: privacy proof and bounded service, then mounted route and explicit UI, then actual acceptance. Independent unit/component tests may run concurrently; no parallel file editing required.
-

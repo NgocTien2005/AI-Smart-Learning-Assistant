@@ -1,4 +1,4 @@
-﻿# Tasks: Complete demo dataset
+# Tasks: Complete demo dataset
 
 **Input**: spec/plan/research/data-model/contracts/quickstart. Required safety/content/HTTP tests per FR-001–011.
 
@@ -40,9 +40,8 @@ Independent test: initial generated access appears only in a dedicated private l
 
 - [x] T014 Run backend full/quiz tests, Prisma validate/generate, isolated image build/healthy/migration status, existing HTTP integration and seed acceptance; record command/cwd/exit in verification.md (SC-001–004).
 - [x] T015 Refresh only verified dev8080 backend after checks, dry-run then apply via private console; verify counts/preexisting preservation and role browser read flows at1280×800/1440×900 without secret capture (FR-001/005–011, SC-001/003).
-- [ ] T016 Complete verification.md/traceability.md, final read-only analyze and append-only converge, then scoped commits/normal push and actual hosted outcomes (FR-011, SC-004).
+- [x] T016 Complete verification.md/traceability.md, final read-only analyze and append-only converge, then scoped commits/normal push and actual hosted outcomes (FR-011, SC-004).
 
 ## Dependencies & implementation strategy
 
 T001→T002→T003/004; T005→T006→T007. T008/009 provide validated dataset before T006 writes; T010 depends on T006/008/009. T011 depends on seed/verify/guards. T012/013 follow CLI. T014 precedes T015; T016 reports all results. Independent documents/tests can proceed in parallel after their prerequisite contracts; no parallel agents required. MVP first is safe preview/guard plus create-only transaction, then rich content/private operator access, then real default-target seed. No deployment/PR/merge checkpoint authorized.
-

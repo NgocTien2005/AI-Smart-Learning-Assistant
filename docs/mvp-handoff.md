@@ -138,3 +138,29 @@ Google010T016 vẫn cần cấu hình/nghiệm thu provider thật.008T023 giữ
 người dùng đã xác nhận; không tự gửi email thêm hoặc suy ngân sách gửi cũ.
 008T026 profile cleanup bị policy chặn vẫn OPEN, không retry qua cách khác.
 Không gọi toàn bộ app hoàn tất hoặc production-ready; không deploy/PR/merge.
+
+## Trạng thái bàn giao cập nhật2026-11-08
+
+| Feature | Trạng thái bằng chứng |
+| --- | --- |
+|001–007 |175/175, bằng chứng nghiệm thu lịch sử giữ nguyên; current full regression/HTTP suite vẫn đạt |
+|008 |25/26;T023 giữ nghiệm thu user-confirmed;T026 cleanup policy-blocked OPEN |
+|009 |18/18; hosted CI mới42501020428 cả3jobs PASS, gồm cả seed suite mới |
+|010 |16/17;T016 Google thật còn thiếu cấu hình/nghiệm thu, không tự gộp/tạo user |
+|011 |16/16; dev đã thêm18user/8course/48lesson/26document/24assignment; rerun unchanged, dữ liệu cũ giữ nguyên |
+|012 |12/13; API/panel/privacy/controlled/isolated/desktop đạt;T012 Gemini thật còn OPEN do chưa có private free-project key/acceptance |
+
+[Hosted run42501020428](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42501020428)
+kiểm commit97603a4: Frontend/Backend/HTTP-DB PASS;90LMSHTTP và247seed/cloud-disabled
+HTTP trên hai stack riêng, cleanup users0. Chưa gọi Gemini/email/Google thật.
+localhost5173 đã khởi động Vite lại;8080/5173health200 đúng origin, ngoài whitelist403.
+Demo credentials ở console riêng đã mở; không lưu file hoặc gửi chat. Cấu hình
+Gemini riêng theo docs/demo-cloud-ai.md; Google theo docs/google-sign-in.md.
+SMTP từng báo EAUTH cần operator kiểm tra riêng; không tự gửi thêm email hoặc
+suy ngân sách gửi còn lại. T023 không bị mở lại chỉ vì readiness hiện tại.
+
+Local10project kiểm thử đều dừng container/network;20named volumes riêng còn giữ,
+không xóa DB/volume. Exact inventory ở012/evidence/local-retained-resources.json.
+Không động local8081 hoặc retry cleanup profile bị policy chặn. Production vẫn
+cần các cổng domain/TLS/secrets/backup/monitoring và nghiệm thu provider phù hợp;
+không gọi app hoàn tất toàn bộ hoặc production-ready, không deploy/PR/merge.
