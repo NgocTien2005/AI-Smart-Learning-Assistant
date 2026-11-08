@@ -20,6 +20,7 @@ services:
     build: ./backend
     environment:
       NODE_ENV: production
+      LUMINA_DEMO_ALLOWED: "true"
       PORT: 3000
       DATABASE_URL: postgresql://lumina_acceptance:${ACCEPTANCE_DB_PASSWORD}@db:5432/lumina_acceptance?schema=public
       JWT_SECRET: ${ACCEPTANCE_JWT_SECRET:?Supply a fresh test-only secret}

@@ -18,6 +18,14 @@ enum Role {
   ADMIN
 }
 
+// Internal create-only demo ownership ledger; never stores credentials.
+model DemoSeedDataset {
+  id        String   @id
+  version   Int
+  manifest  Json
+  createdAt DateTime @default(now())
+}
+
 model User {
   id                       Int           @id @default(autoincrement())
   name                     String
