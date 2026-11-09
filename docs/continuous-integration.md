@@ -121,7 +121,7 @@ kết quả. Generic 200, SMTP accepted, mock và DB fixture không chứng minh
 delivery. SMTP thật không chạy tự động trên PR. Thiếu điều kiện thì T023 mở
 và CI vẫn chạy. T026 cùng các profile cleanup bị policy chặn giữ nguyên;
 không thử xóa bằng cách khác.
-# Feature-oriented coverage and evidence
+## Feature-oriented coverage and evidence
 
 Frontend component regression files now separate auth entry, sessions, dashboards,
 course workspace, assignments, quiz lifecycle, document study, account settings
@@ -144,4 +144,3 @@ Exact source hashes/test-statement inventory and results for the split belong to
 [feature016](../specs/016-production-test-organization/verification.md). Hosted
 results must match the exact pushed SHA; a previous green badge does not certify
 new code. No provider credentials or browser profiles should enter CI artifacts.
-
