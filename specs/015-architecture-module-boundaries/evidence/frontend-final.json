@@ -1,0 +1,19 @@
+{
+  "command": "npm test",
+  "cwd": "frontend",
+  "exitCode": 0,
+  "nodeTests": 5,
+  "componentTests": 226,
+  "componentDurationSeconds": 47.84,
+  "lint": {
+    "command": "npm run lint",
+    "cwd": "frontend",
+    "exitCode": 0
+  },
+  "build": {
+    "command": "npm run build",
+    "cwd": "frontend",
+    "exitCode": 0
+  },
+  "note": "Lint/build ran after the import correction in the initial package helper; test rerun passed afterward. Failed initial summary retained."
+}

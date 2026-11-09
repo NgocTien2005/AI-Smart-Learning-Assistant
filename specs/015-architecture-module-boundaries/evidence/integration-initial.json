@@ -1,0 +1,39 @@
+{
+  "time": "2026-11-09T16:37:38.682Z",
+  "revision": "2891c1126a2ec4bc91b57a35cc3fe5d3004a21dd",
+  "sourceType": "local working tree; see source manifest",
+  "node": "v25.2.0",
+  "platform": "win32",
+  "job": "integration",
+  "project": "lumina-acceptance-ci-1794242258608-fbef2dce",
+  "commands": [
+    {
+      "command": "docker compose <explicit fresh project/file/empty env> up --build --wait --wait-timeout 180",
+      "cwd": ".",
+      "durationMs": 224956,
+      "exitCode": 1,
+      "status": "failed"
+    },
+    {
+      "command": "docker compose <this run only> down (named volumes retained)",
+      "cwd": ".",
+      "durationMs": 2751,
+      "exitCode": 0,
+      "status": "passed"
+    }
+  ],
+  "targetVerifiedBeforeProvisioning": false,
+  "suiteEvidenceAvailable": false,
+  "namedVolumesRemoved": false,
+  "http": "http://127.0.0.1:58891/api",
+  "provisioningScope": "only the newly allocated empty isolated project; production suite owns its registered test accounts/resources",
+  "failure": {
+    "stage": "start",
+    "code": "CI_STAGE_FAILED"
+  },
+  "cleanup": {
+    "attempted": true,
+    "success": true
+  },
+  "exitCode": 1
+}
