@@ -91,3 +91,21 @@
 .auth-entry .auth-card:has(.role-picker) .form-fields { gap: 14px; }
 .auth-entry .auth-card:has(.role-picker) .switch-copy { padding-top: 10px; }
 .auth-entry .entry-form-panel:has(.role-picker) .entry-footnote { margin-top: 18px; }
+
+@media (max-width: 760px) {
+  .auth-page.auth-entry { padding: 16px; }
+  .auth-entry .entry-layout { grid-template-columns: minmax(0, 1fr); min-height: 0; border-radius: 18px; }
+  .auth-entry .entry-story { padding: 20px; border-right: 0; border-bottom: 1px solid #dce7f6; }
+  .auth-entry .entry-story-copy { margin-top: 20px; }
+  .auth-entry .entry-story-copy h2 { font-size: 28px; }
+  .auth-entry .entry-story-copy > p:last-child { max-width: 44ch; margin-top: 12px; font-size: 13px; }
+  .auth-entry .entry-illustration, .auth-entry .entry-story-caption { display: none; }
+  .auth-entry .entry-form-panel { padding: 28px 24px; }
+  .auth-entry .entry-heading h1 { font-size: 26px; }
+  .auth-entry .entry-footnote { margin-top: 20px; }
+  .auth-entry .form-options { flex-wrap: wrap; gap: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-entry .input-wrap input { transition: none; }
+}
