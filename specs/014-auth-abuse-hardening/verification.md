@@ -66,3 +66,9 @@ Historical008T023 preserved;008T026/010T016/012T012 remain open. Current control
 are per-process and Nginx users share IP budget; no public-load/penetration-test
 or production-readiness claim. Legacy app remains temporarily unreferenced by
 tests/runtime; retirement belongs to architecture feature.
+
+## Actual review, hosted CI and convergence
+
+PR [6](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/pull/6), base portfolio/00-audit-speckit. Implementation5eddc22 and documentation124bf74 pushed normally. Actual [run42656092914](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42656092914) at124bf74a2a6577401f834e66ab060dcf737be3f2: Frontend, Backend and HTTP/database integration all SUCCESS. Includes separate seeded stack; real providers remain disabled. T007 closed from this evidence; later documentation-only SHA has its own run.
+
+Read-only final analyze:6FR/3SC covered by7tasks; no unmapped/critical/high issues. Converge reviewed6FR/3SC/6AC, plan and five constitution principles: no new unbuilt task beyond recorded operational limitations; task bytes unchanged during converge, no duplicate blocker. Checklist markers unchanged. No merge/main write. Security branch review metadata updated in its separate ignored Git worktree while architecture validation ran; no code stacking.
