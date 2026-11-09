@@ -18,7 +18,7 @@
 
 ## Phase 5: Verify and review
 
-- [ ] T005 P1 Validate links/diff, record verification.md and create audit commit/PR (FR-004,SC-001/002; reviewable audit; verify actual Git/PR result; depends:T004).
+- [x] T005 P1 Validate links/diff, record verification.md and create audit commit/PR (FR-004,SC-001/002; reviewable audit; verify actual Git/PR result; depends:T004).
 
 ## Dependencies and implementation strategy
 
