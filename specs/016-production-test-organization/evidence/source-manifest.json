@@ -1,0 +1,42 @@
+[
+  {
+    "file": "frontend/src/__tests__/account.test.js",
+    "sha256": "23c62e8314c2351204eb73f99641abe8cfd317fd3aaf334b60677d022b3d74a7"
+  },
+  {
+    "file": "frontend/src/__tests__/admin.test.js",
+    "sha256": "9054f414ce00053b235395af085daa3b5ff17ac5db0f96d1d5436bb7c4252786"
+  },
+  {
+    "file": "frontend/src/__tests__/assignments.test.js",
+    "sha256": "3a3c46b6c0f0bf9fa6782def266b039e2c06f0c836ae0a05c46f1675fe5ed6e0"
+  },
+  {
+    "file": "frontend/src/__tests__/authEntry.test.js",
+    "sha256": "7f7a70b8ba0808bcbd9a15169ea6413f56178ea7dce9baf0ebefb6f288bb5eae"
+  },
+  {
+    "file": "frontend/src/__tests__/dashboard.test.js",
+    "sha256": "830630e724d926f531dfc9aa0fe87743764c2af6f4e7e88552e13997297e8e5b"
+  },
+  {
+    "file": "frontend/src/__tests__/documentStudy.test.js",
+    "sha256": "e053999053d1a17f75e495ebe84ea4a61d53eb63dbfa7d4c37703718733cfdb3"
+  },
+  {
+    "file": "frontend/src/__tests__/fixtures.js",
+    "sha256": "eebf18324299f274b436782167511ab950b99449302a585475bea27138f473d3"
+  },
+  {
+    "file": "frontend/src/__tests__/quiz.test.js",
+    "sha256": "728474907a9e27f2eae8b86419c557e751ffcd85a98c86546b7df72721ddefad"
+  },
+  {
+    "file": "frontend/src/__tests__/session.test.js",
+    "sha256": "ee755a6e6aade7bac2b2520657e1523966dfbced28e6c1947e4d28d6699ec25b"
+  },
+  {
+    "file": "frontend/src/__tests__/workspace.test.js",
+    "sha256": "6107c1a00b0a226acf4159f2358745004cf601a2e75d336171fc836f52f8a934"
+  }
+]
