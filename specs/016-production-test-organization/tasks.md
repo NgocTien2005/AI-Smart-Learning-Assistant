@@ -18,7 +18,7 @@
 
 ## Phase 5: Review
 
-- [ ] T005 P1 Record verification.md, small commits, push/PR and actual hosted SHA (SC-001/002; deliverable reviewable isolated branch; verify Git/CI and no weakened gate; depends:T004).
+- [x] T005 P1 Record verification.md, small commits, push/PR and actual hosted SHA (SC-001/002; deliverable reviewable isolated branch; verify Git/CI and no weakened gate; depends:T004).
 
 ## Dependencies and strategy
 
