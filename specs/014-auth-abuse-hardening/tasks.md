@@ -20,7 +20,7 @@
 ## Phase 5: Verification and review
 
 - [x] T006 P1 Write docs/security.md and verification.md with threat model, cookie tradeoffs, limits and scoped command outcomes (FR-006,SC-001/002/003; deliverable truthful handoff; verify Prisma/isolated HTTP+actualDB and diff; depends:T005).
-- [ ] T007 P1 Commit scoped changes, push branch and create PR; record exact hosted result in verification.md (SC-003; deliverable review; verify SHA/jobs, not inferred; depends:T006).
+- [x] T007 P1 Commit scoped changes, push branch and create PR; record exact hosted result in verification.md (SC-003; deliverable review; verify SHA/jobs, not inferred; depends:T006).
 
 ## Dependencies and implementation strategy
 
