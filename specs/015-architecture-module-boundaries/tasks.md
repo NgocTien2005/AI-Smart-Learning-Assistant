@@ -19,7 +19,7 @@
 ## Phase 5: Verify/review
 
 - [x] T005 P1 Record commands/traceability/browser/scoped cleanup and module guide in verification.md (FR-005,SC-001/002/003; deliverable verified boundaries; verify actual suites/DB/Chrome and diff; depends:T003/T004).
-- [ ] T006 P1 Create small feature commits, push and PR against portfolio/00-audit-speckit; record hosted result in verification.md (SC-003; deliverable reviewable branch; verify exact SHA/PR; depends:T005).
+- [x] T006 P1 Create small feature commits, push and PR against portfolio/00-audit-speckit; record hosted result in verification.md (SC-003; deliverable reviewable branch; verify exact SHA/PR; depends:T005).
 
 ## Dependencies and implementation strategy
 
