@@ -64,3 +64,9 @@ Zero real provider/email requests; old008T023 evidence unchanged;
 include014 security fixes; combined validation must name included commits.
 
 Prisma validate, cwd backend, serialized after npm ci with synthetic URL/empty dotenv path: exit0. git diff --check0. No schema delta.
+
+## Actual review/hosted CI and convergence
+
+Commits86f96c9 (server),bd2bdf8 (frontend),45a31b1 (evidence) pushed separately. PR [7](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/pull/7), base portfolio/00-audit-speckit. Actual [run42658427628](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42658427628) at45a31b165e20fdc6cdd2f5c4a117689a8c54e26c passed Frontend, Backend, HTTP/database integration. T006 closed from actual results; later evidence-only commit has a separate run.
+
+Final read-only analyze5FR/3SC covered by6tasks, no critical/high/unmapped issue. Converge checked5FR/3SC/4AC, named boundaries and five constitution principles: no new gap, tasks byte-identical during converge; legacy retirement is an explicit compatibility dependency on014, not silently claimed complete. Checklist markers unchanged, no duplicate provider/cleanup task. No merge/main/deploy.
