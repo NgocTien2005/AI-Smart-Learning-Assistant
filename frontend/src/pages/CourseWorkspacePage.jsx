@@ -1,3 +1,4 @@
+import { useCourseRoster } from '../hooks/useCourseRoster.js'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import AssignmentsPanel from '../components/AssignmentsPanel.jsx'
@@ -42,9 +43,6 @@ function CourseWorkspacePage() {
   const [createReset, setCreateReset] = useState(0)
   const [descriptionExpanded, setDescriptionExpanded] = useState(false)
   const [editingLesson, setEditingLesson] = useState(null)
-  const [students, setStudents] = useState([])
-  const [studentsLoading, setStudentsLoading] = useState(false)
-  const [studentsError, setStudentsError] = useState('')
   const [previewLesson, setPreviewLesson] = useState(null)
   const [uploadStates, setUploadStates] = useState({})
   const guard = useRef(0)
@@ -54,6 +52,7 @@ function CourseWorkspacePage() {
   const selectedIdRef = useRef(selectedLessonId)
   const quizFlushRef = useRef(null)
   const [studentReload, setStudentReload] = useState(0)
+  const { students, studentsLoading, studentsError } = useCourseRoster(courseId, section === 'students' && isInstructor, studentReload)
   const workspaceClass = 'workspace-main course-workspace' + (section === 'lessons' ? ' course-workspace--lessons' : '')
 
   useEffect(() => { selectedIdRef.current = selectedLessonId }, [selectedLessonId])
@@ -125,26 +124,6 @@ function CourseWorkspacePage() {
     next.delete('panel')
     return next
   })
-
-  useEffect(() => {
-    if (section !== 'students' || !isInstructor) return undefined
-    const controller = new AbortController()
-    let active = true
-    queueMicrotask(async () => {
-      if (!active) return
-      setStudentsLoading(true)
-      setStudentsError('')
-      try {
-        const data = await apiRequest(`/api/courses/${courseId}/students`, { signal: controller.signal })
-        if (active) setStudents(data.students)
-      } catch (error) {
-        if (active && error.name !== 'AbortError') setStudentsError(error.message)
-      } finally {
-        if (active) setStudentsLoading(false)
-      }
-    })
-    return () => { active = false; controller.abort() }
-  }, [section, courseId, isInstructor, studentReload])
 
   const setPending = (key, value) => setOperationPending((current) => ({ ...current, [key]: value }))
   const updateCourseState = (updater) => setCourse((current) => current ? updater(current) : current)
