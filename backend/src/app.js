@@ -6,14 +6,19 @@ import { authenticate } from './middleware/authenticate.js'
 import { prisma } from './lib/prisma.js'
 import { createToken, publicUser } from './utils/auth.js'
 import { createGoogleAuthRouter } from './routes/googleAuth.js'
-import authRouter from './routes/auth.js'
+import { createAuthRouter } from './routes/auth.js'
+import { isEmailConfigured, sendPasswordResetEmail } from './services/email.js'
 import adminRouter from './routes/admin.js'
 import coursesRouter from './routes/courses.js'
 import healthRouter from './routes/health.js'
 import { createDemoCloudRouter } from './routes/demoCloudAssistant.js'
+import { requestBoundary } from './middleware/requestBoundary.js'
+import { securityHeaders, logSafeError } from './middleware/securityHeaders.js'
 
 export const createApp = () => {
   const app = express()
+  app.disable('x-powered-by')
+  app.use(securityHeaders)
 
   app.use(cors({
     origin(origin, callback) {
@@ -25,9 +30,10 @@ export const createApp = () => {
     },
   }))
   app.use(express.json({ limit: '1mb' }))
+  app.use(requestBoundary)
   app.use('/api/health', healthRouter)
   app.use('/api/auth/google', createGoogleAuthRouter({ prisma, authenticate, createToken, publicUser, clientId: googleClientId, secureCookie: appOrigin.startsWith('https://') }))
-  app.use('/api/auth', authRouter)
+  app.use('/api/auth', createAuthRouter({ prisma, authenticate, createToken, publicUser, isEmailConfigured, sendPasswordResetEmail }))
   app.use('/api/admin', adminRouter)
   app.use('/api/courses/lessons', createDemoCloudRouter({ prisma, authenticate }))
   app.use('/api/courses', coursesRouter)
@@ -35,6 +41,9 @@ export const createApp = () => {
     response.status(404).json({ error: 'Không tìm thấy endpoint' })
   })
   app.use((error, _request, response, _next) => {
+    if (error.type === 'entity.too.large') {
+      return response.status(413).json({ error: 'Nội dung yêu cầu vượt quá giới hạn 1 MiB' })
+    }
     if (error instanceof multer.MulterError) {
       if (error.code === 'LIMIT_FILE_SIZE') {
         return response.status(413).json({ code: 'UPLOAD_TOO_LARGE', error: 'Tài liệu không được vượt quá 10 MiB' })
@@ -54,7 +63,7 @@ export const createApp = () => {
       return response.status(400).json({ code: 'UNSUPPORTED_TYPE', error: 'Chỉ hỗ trợ PDF, TXT, Markdown hoặc CSV.' })
     }
 
-    console.error('Unhandled request error:', error)
+    logSafeError('Unhandled request error', error)
     return response.status(500).json({ error: 'Đã xảy ra lỗi máy chủ' })
   })
 

@@ -11,6 +11,7 @@ import { answerFromDocument } from '../utils/studyAssistant.js'
 import quizAttemptsRouter from './quizAttempts.js'
 import { lessonTextAfterContentEdit, resolveLessonSource, createExtractiveSummary } from '../utils/lessonText.js'
 import { processDocument } from '../services/documentProcessing.js'
+import { createJoinLimit } from '../middleware/rateLimit.js'
 
 const router = Router()
 const maxDocumentSize = 10 * 1024 * 1024
@@ -146,7 +147,7 @@ router.post('/', authorizeRole('INSTRUCTOR'), async (request, response) => {
   return response.status(201).json({ course })
 })
 
-router.post('/join', authorizeRole('STUDENT'), async (request, response) => {
+router.post('/join', authorizeRole('STUDENT'), createJoinLimit(), async (request, response) => {
   const joinCode = typeof request.body.joinCode === 'string' ? request.body.joinCode.trim().toUpperCase() : ''
   if (!/^[A-F0-9]{8}$/.test(joinCode)) {
     return response.status(400).json({ error: 'Mã tham gia phải gồm 8 ký tự' })
