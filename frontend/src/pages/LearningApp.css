@@ -401,6 +401,15 @@ button.course-stat-card:hover { transform: translateY(-2px); border-color: #a9c5
 .state-card > span:not(.state-spinner) { color: var(--lumina-muted); }
 .state-error { border-color: #e7b8bc; background: #fffafa; }
 .state-spinner { width: 20px; height: 20px; border: 2px solid #dbe1ed; border-top-color: var(--lumina-primary); border-radius: 50%; animation: lumina-spin .8s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .state-spinner { animation: none; }
+  .dashboard-main .course-card,
+  .dashboard-main .course-card-progress-track > span,
+  .course-progress-track > span,
+  .workspace-tabs a,
+  button.course-stat-card { transition: none; }
+}
 @keyframes lumina-spin { to { transform: rotate(360deg); } }
 .confirm-dialog { width: min(520px, calc(100vw - 36px)); padding: 25px; border: 1px solid var(--lumina-border); border-radius: 16px; color: var(--lumina-ink); box-shadow: 0 24px 80px #11223b38; }
 .confirm-dialog::backdrop { background: #101a2c80; }
@@ -439,3 +448,13 @@ button.course-stat-card:hover { transform: translateY(-2px); border-color: #a9c5
 .practice-result nav { display: flex; flex-wrap: wrap; gap: 12px; margin: 12px 0; }
 .practice-result blockquote { margin: 12px 0; padding: 12px; border-left: 3px solid var(--lumina-primary); background: #f5f6fb; }
 @media (max-width: 760px) { .lesson-browser { grid-template-columns: 1fr; } .pdf-preview-frame { min-height: 70vh; } .confirm-actions { flex-wrap: wrap; } .admin-user-fields { grid-template-columns: 1fr; } }
+
+@media (max-width: 640px) {
+  .learning-header { flex-direction: column; align-items: stretch; gap: 8px; padding: 12px 16px; }
+  .learning-header .learning-brand { align-self: flex-start; white-space: nowrap; }
+  .learning-header .learning-brand > span { flex: 0 0 36px; }
+  .learning-header nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; }
+  .learning-header nav a, .learning-header nav button { display: flex; align-items: center; min-height: 44px; }
+  .learning-header nav button { justify-self: end; }
+  .learning-header .nav-profile-name { max-width: 100%; }
+}
