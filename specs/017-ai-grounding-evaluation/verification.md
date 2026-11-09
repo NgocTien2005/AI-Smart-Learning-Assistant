@@ -59,3 +59,9 @@ Exact quote validation does not establish semantic entailment. Small offline
 cases are not comprehensive AI quality or real Gemini evidence.012T012 remains
 open for four real actions/human source review;010T016/008T026 remain in their
 features;008T023 historical mailbox evidence preserved. Budget0/no private egress.
+
+## Actual review/hosted CI and convergence
+
+Commits5b6e3ef (fixes/evaluation) and47f2a5a (docs/evidence) pushed separately; PR [9](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/pull/9), base portfolio/00-audit-speckit. Actual [run42660492344](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42660492344) at47f2a5a9ee3a44bde9f298a6ff36dea7558281b1 passed Frontend, Backend and HTTP/database integration, including isolated seed checks with providers disabled. T006 closed from actual hosted evidence; this does not close012T012.
+
+Final read-only analyze5FR/3SC covered by6tasks, no critical/high/unmapped issue. Converge checked5FR/3SC/5AC, plan and five constitution principles: no new unbuilt gap; task bytes unchanged during converge and no duplicate original provider/cleanup task. Checklist markers unchanged. No merge/main/deploy.
