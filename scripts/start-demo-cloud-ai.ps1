@@ -19,7 +19,9 @@ try {
     $env:GEMINI_API_KEY = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($pointer)
     if ([string]::IsNullOrWhiteSpace($env:GEMINI_API_KEY)) { throw 'Empty key; setup stopped.' }
     $env:GEMINI_FREE_ONLY_CONFIRMED = 'true'
-    docker compose -f compose.yaml -f compose.dev.yaml up -d --build --no-deps --wait --wait-timeout 120 backend *> $null
+    # Docker build progress on stderr is not an error. The Node bridge drains
+    # native streams privately and returns Docker's real exit code on PS5.1.
+    node scripts/configure-demo-cloud.mjs
     $result = $LASTEXITCODE
     Write-Output ('Backend configuration command exit code: ' + $result)
     if ($result -ne 0) { throw 'Backend did not become ready. No model request sent.' }

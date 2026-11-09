@@ -6,6 +6,21 @@ import path from 'node:path'
 import { runCommand, safeCommandRecord, exportHttpEvidence } from '../common.mjs'
 import { runPackage } from '../check-package.mjs'
 import { validateProject, validatePort, assertFreshProject, runLifecycle, freePort, dockerEndpoint, resetEvidence } from '../integration.mjs'
+import { configureDemoBackend } from '../../configure-demo-cloud.mjs'
+
+test('private Gemini launcher isolates native streams and propagates actual Docker failure', () => {
+  let recorded
+  assert.equal(configureDemoBackend({run:(command,args,options)=>{recorded={command,args,options};return{status:0}}}),0)
+  assert.equal(recorded.command,'docker')
+  assert.equal(recorded.options.stdio,'ignore')
+  assert.equal(recorded.options.shell,false)
+  assert.ok(recorded.args.includes('--no-deps'))
+  assert.ok(recorded.args.includes('--wait'))
+  assert.equal(recorded.args.some(arg=>/key|password|secret/i.test(arg)),false)
+  assert.equal(configureDemoBackend({run:()=>({status:7})}),7)
+  assert.equal(configureDemoBackend({run:()=>({status:null,signal:'SIGTERM'})}),1)
+  assert.equal(configureDemoBackend({run:()=>{throw new Error('not exposed')}}),1)
+})
 
 test('package keeps full-suite failure even when later checks pass; never persists raw output', async () => {
   const calls=[];let saved

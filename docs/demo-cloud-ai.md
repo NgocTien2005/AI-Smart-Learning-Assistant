@@ -25,6 +25,13 @@ sau lệnh. Không đọc/in Docker environment. Launcher không gọi model ho�
 Backend cần giữ key trong runtime để hoạt động; không coi đây là secret manager
 cho production. Chỉ báo readiness/kết quả, không gửi key.
 
+Windows PowerShell5.1: launcher dùng `scripts/configure-demo-cloud.mjs` để tách
+stdout/stderr của Docker khỏi error stream PowerShell và giữ đúng exit code.
+Thông báo `Image ... Building` trên stderr không tự chứng minh build lỗi. Nếu
+đã gặp `NativeCommandError` ở bản launcher cũ, backend có thể đã nhận cấu hình;
+kiểm tra readiness boolean trước khi nhập lại key hoặc recreate. Exit code khác0
+vẫn là thất bại; không bỏ qua kiểm tra healthy hoặc gọi model để giả thành công.
+
 Có thể cấu hình riêng `GEMINI_API_KEY` và `GEMINI_FREE_ONLY_CONFIRMED=true` trong
 môi trường operator rồi chạy cả `compose.yaml` và `compose.dev.yaml`. Chỉ chạy
 Compose mặc định sẽ không truyền key/marker cloud. Recreate mà không nhập lại key
