@@ -19,7 +19,7 @@
 
 ## Phase 5: Review
 
-- [ ] T006 P1 Commit scoped changes, push/PR and record exact hosted result in verification.md (SC-002/003; deliverable review; verify actual SHA/jobs; depends:T005).
+- [x] T006 P1 Commit scoped changes, push/PR and record exact hosted result in verification.md (SC-002/003; deliverable review; verify actual SHA/jobs; depends:T005).
 
 ## Dependencies and strategy
 
