@@ -1,0 +1,46 @@
+[
+  {
+    "file": "backend/src/app.js",
+    "sha256": "5435c604f9e5120691cf4c34750fc5dfa1e10458b880c328b2b20083a6d1c4c3"
+  },
+  {
+    "file": "backend/src/routes/auth.js",
+    "sha256": "746220a1c97389519a7df41db5ebf14824cd3e31bdd7d671f27624afc648971e"
+  },
+  {
+    "file": "backend/src/routes/courses.js",
+    "sha256": "12c365b23a5c6c7b1d323ade2765cc64ecddb8ac313160996384fa2bed434946"
+  },
+  {
+    "file": "backend/src/middleware/authenticate.js",
+    "sha256": "9a982ecb05b6cd3d115d6fd39b503fed284ffbba622275aba0bbe94958c0f038"
+  },
+  {
+    "file": "backend/src/middleware/authenticateFactory.js",
+    "sha256": "f78ab09c8ec0223ec1bef79be4a09597f1040df06a2dc2968204ab161d251f11"
+  },
+  {
+    "file": "backend/src/middleware/rateLimit.js",
+    "sha256": "d44cfe26ad90df9d9d05909af3046bbba56cedf5b7629ef7f5248c2a56e75f43"
+  },
+  {
+    "file": "backend/src/middleware/requestBoundary.js",
+    "sha256": "e308eedbfcc56fd28fc30647ad02e903eba152f791b772fc30a68e1e8b491670"
+  },
+  {
+    "file": "backend/src/middleware/securityHeaders.js",
+    "sha256": "a335fead5a8b43cfffe46d1ea199115adf96473cd1118ac634628ca67ad09077"
+  },
+  {
+    "file": "backend/test/auth.test.js",
+    "sha256": "c9d8e227e88b66d2de999ef987d05a8063917ec646b5a3a516311a7f071d7c75"
+  },
+  {
+    "file": "backend/test/rateLimit.test.js",
+    "sha256": "2b2557f6f9b7b87d33615a470bc72071cfc3903b1023744cee726d73b701d0f3"
+  },
+  {
+    "file": "backend/test/requestBoundary.test.js",
+    "sha256": "f0924f1633e337be396f0b16c6516708e1e4d0f31e840f16bf499c0c80e2f881"
+  }
+]
