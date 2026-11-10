@@ -6,8 +6,8 @@ const stopWords = new Set([
 const normalize = (value) => value
   .normalize('NFD')
   .replace(/[\u0300-\u036f]/g, '')
-  .replace(/đ/g, 'd')
   .toLowerCase()
+  .replace(/đ/g, 'd')
   .replace(/[^a-z0-9\s]/g, ' ')
 
 const keywords = (question) => [...new Set(normalize(question)
@@ -23,8 +23,8 @@ export const answerFromDocument = (question, documentText) => {
 
   const ranked = passages
     .map((passage, index) => {
-      const normalizedPassage = normalize(passage)
-      const score = terms.reduce((total, term) => total + (normalizedPassage.includes(term) ? 1 : 0), 0)
+      const passageTerms = new Set(normalize(passage).split(/\s+/))
+      const score = terms.reduce((total, term) => total + (passageTerms.has(term) ? 1 : 0), 0)
       return { passage, score, index }
     })
     .filter(({ score }) => score > 0)

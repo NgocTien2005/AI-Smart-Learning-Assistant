@@ -1,0 +1,592 @@
+{
+  "project": "lumina-acceptance-ci-1794243514572-03829b04",
+  "baseUrl": "http://127.0.0.1:59200/api",
+  "database": "lumina_acceptance",
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/api/auth/register",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses",
+      "status": 201
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/register",
+      "status": 201
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/google/challenge",
+      "status": 503
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/google/link",
+      "status": 401
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/google/link",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/google/link",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/register",
+      "status": 400
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/register",
+      "status": 201
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/users",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/admin/users/4",
+      "status": 403
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/admin/users/3",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/admin/users/3",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 401
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/admin/users/3",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/admin/users/1",
+      "status": 409
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/1",
+      "status": 403
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/join",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/1/students",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/1/lessons",
+      "status": 201
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/courses/lessons/1",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/1/lessons",
+      "status": 201
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/courses/lessons/2/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/2/document",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/courses/lessons/2/document",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/1/lessons",
+      "status": 413
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/courses/lessons/2/document",
+      "status": 413
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/courses/lessons/2/document",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/2/document",
+      "status": 404
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/1/lessons",
+      "status": 201
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/courses/lessons/3/document",
+      "status": 400
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/courses/lessons/3/document",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/courses/lessons/3",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/lessons/3/chat",
+      "status": 201
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/courses/lessons/3/document",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/courses/lessons/3",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/lessons/3/chat",
+      "status": 201
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/courses/lessons/3/document",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/lessons/3/chat",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/1",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/api/courses/lessons/1/progress",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/api/courses/lessons/1/progress",
+      "status": 403
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/1/students",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/1",
+      "status": 200
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/courses/lessons/1/progress",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/api/courses/lessons/1/progress",
+      "status": 200
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/courses/1/enrollment",
+      "status": 204
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/join",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/1/assignments",
+      "status": 201
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/courses/assignments/1",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/1",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/api/courses/assignments/1/submission",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/api/courses/assignments/1/submission",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/courses/assignments/1/submissions/2",
+      "status": 409
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/courses/assignments/1/submissions/2",
+      "status": 200
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/courses/assignments/1",
+      "status": 409
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/1",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/api/courses/assignments/1/submission",
+      "status": 409
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/lessons/1/chat",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/1/chat",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/lessons/1/quizzes",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/1",
+      "status": 200
+    },
+    {
+      "method": "PUT",
+      "path": "/api/courses/quiz-attempts/1/draft",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/1",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/quiz-attempts/1/submit",
+      "status": 404
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/quiz-attempts/1/submit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/1/quizzes",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/1",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/courses/quiz-attempts/1/submit",
+      "status": 409
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/courses/1",
+      "status": 403
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/courses/1/enrollment",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/1",
+      "status": 403
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/quiz-attempts/1",
+      "status": 403
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/reset-password",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 401
+    },
+    {
+      "method": "GET",
+      "path": "/api/courses/lessons/1/document",
+      "status": 401
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 401
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/reset-password",
+      "status": 400
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/change-password",
+      "status": 400
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/change-password",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 401
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/reset-password",
+      "status": 400
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/courses/1",
+      "status": 204
+    }
+  ],
+  "resources": [
+    {
+      "kind": "user",
+      "id": 1
+    },
+    {
+      "kind": "user",
+      "id": 1
+    },
+    {
+      "kind": "user",
+      "id": 1
+    },
+    {
+      "kind": "course",
+      "id": 1
+    },
+    {
+      "kind": "user",
+      "id": 2
+    },
+    {
+      "kind": "user",
+      "id": 3
+    },
+    {
+      "kind": "user",
+      "id": 4
+    },
+    {
+      "kind": "user",
+      "id": 3
+    },
+    {
+      "kind": "user",
+      "id": 3
+    },
+    {
+      "kind": "user",
+      "id": 3
+    },
+    {
+      "kind": "course",
+      "id": 1
+    },
+    {
+      "kind": "lesson",
+      "id": 1
+    },
+    {
+      "kind": "lesson",
+      "id": 1
+    },
+    {
+      "kind": "lesson",
+      "id": 2
+    },
+    {
+      "kind": "lesson",
+      "id": 2
+    },
+    {
+      "kind": "lesson",
+      "id": 2
+    },
+    {
+      "kind": "lesson",
+      "id": 3
+    },
+    {
+      "kind": "lesson",
+      "id": 3
+    },
+    {
+      "kind": "lesson",
+      "id": 3
+    },
+    {
+      "kind": "lesson",
+      "id": 3
+    },
+    {
+      "kind": "lesson",
+      "id": 3
+    },
+    {
+      "kind": "lesson",
+      "id": 3
+    },
+    {
+      "kind": "course",
+      "id": 1
+    },
+    {
+      "kind": "course",
+      "id": 1
+    },
+    {
+      "kind": "course",
+      "id": 1
+    },
+    {
+      "kind": "assignment",
+      "id": 1
+    },
+    {
+      "kind": "assignment",
+      "id": 1
+    },
+    {
+      "kind": "course",
+      "id": 1
+    },
+    {
+      "kind": "submission",
+      "id": 1
+    },
+    {
+      "kind": "submission",
+      "id": 1
+    },
+    {
+      "kind": "course",
+      "id": 1
+    },
+    {
+      "kind": "user",
+      "id": 2
+    },
+    {
+      "kind": "user",
+      "id": 2
+    }
+  ],
+  "remainingOwnedUsers": 0
+}
