@@ -37,7 +37,7 @@ their dependency mapping is in [integration-review.md](integration-review.md).
 | D [017](../specs/017-ai-grounding-evaluation/spec.md) | T001–T006 verified | feat/ai-quality-improvements |5b6e3ef fix/evaluation;47f2a5a evidence;c13333c closure | [9](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/pull/9), review pending |
 | C [018](../specs/018-responsive-accessibility-review/spec.md) | T001–T005 verified | refactor/frontend-ux |c89137f auth;33d7c17 role layouts;35bda2b evidence;8a1495d closure | [10](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/pull/10), review pending |
 | G [019](../specs/019-deployment-operation-foundations/spec.md) | T001–T005 verified | chore/deployment-foundations |d61c7c6 proxy;2354639 recovery;4c2f23a guide/evidence;31e90ae CI guards;65148ad closure | [11](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/pull/11), review pending |
-| F [020](../specs/020-portfolio-readiness/spec.md) | T001–T004 verified;T005 delivery closure follows | docs/portfolio-readiness | Documentation commits listed in feature verification after publication | Documentation-only PR targets portfolio/integration-review |
+| F [020](../specs/020-portfolio-readiness/spec.md) | T001-T005 verified | docs/portfolio-readiness | cf065eb overview/architecture;afd34cf interview/demo;de229b1 report/evidence | [12](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/pull/12), docs-only; base integration-review; review pending |
 
 The agent issued no merge command. External merges of5/6 were observed and
 preserved. Local main was not used for implementation or rewritten. The
@@ -48,12 +48,12 @@ compatibility testing; no combined feature PR into main was created.
 
 | Scope | Tested revision / run | Observed outcome |
 | --- | --- | --- |
-| Security |124bf74 / [42656092914](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42656092914) | All3 hosted jobs success |
-| Architecture |45a31b1 / [42658427628](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42658427628) | All3 hosted jobs success |
-| Test organization |c8fc379 / [42659423813](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42659423813) | All3 hosted jobs success |
-| AI grounding |47f2a5a / [42660492344](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42660492344) | All3 hosted jobs success; no actual model call |
-| Responsive UI |35bda2b / [42665994019](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42665994019) | All3 hosted jobs success |
-| Operations |31e90ae / [42769334520](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42769334520) | All3 hosted jobs success, including real synthetic recovery |
+| Security |fc219b3 / [42658072147](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42658072147) | All3 hosted jobs success |
+| Architecture |67610b2 / [42659199318](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42659199318) | All3 hosted jobs success |
+| Test organization |fef1fea / [42660197641](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42660197641) | All3 hosted jobs success |
+| AI grounding |c13333c / [42663857173](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42663857173) | All3 hosted jobs success; no actual model call |
+| Responsive UI |8a1495d / [42769021900](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42769021900) | All3 hosted jobs success |
+| Operations |65148ad / [42769941342](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42769941342) | All3 hosted jobs success, including real synthetic recovery |
 | Combined local |276d03f source, later metadata40dbf67/460b0ab | Frontend npm ci/test/lint/build; backend npm ci/test/quiz/25CIguards; Prisma validate;90HTTP/DB/recovery and247seedHTTP, all exit0 |
 | Combined hosted |460b0ab / [42770069065](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42770069065) | All3 hosted jobs success on the integrated code |
 | Combined real browser | Same combined code, fresh seed stack |52role views plus16auth views at390/768/1280×800/1440×900; no document overflow; captures inspected |
@@ -63,8 +63,7 @@ evaluation has21 original synthetic cases and refuses provider networking. Real
 browser observations demonstrate rendered role/view/viewport behavior; actual
 assignment grading, quiz lifecycle/concurrency and protected upload/download also
 have component/production HTTP evidence. No browser or mock result is presented
-as actual provider success. Exact docs-only HEAD CI is recorded separately after
-publication; a previous code SHA is not relabeled as a later run.
+as actual provider success. Documentation push de229b1 passed all3jobs in run42771024786. Rows above use direct push events, not PR merge-ref checkout assumptions; full source SHAs, event and job outcomes are in feature020 evidence/hosted-runs.json. Earlier feature reports also include PR-event runs whose headSha identifies the PR source, while checkout may use a merge ref. A previous code SHA is not relabeled as a later docs-only revision.
 
 Failures were retained and corrected: missing runtime/Docker at preflight, one
 new operations dynamic-import cycle, targeted layout overflows, an extraction
@@ -138,3 +137,7 @@ convergence task is created in the portfolio features. The next recommended
 step is human review of the separate implementation PRs, then optional real
 Google/Gemini acceptance with private configuration. Public deployment is a
 separate authorized task, not an automatic consequence of passing CI.
+
+## Final portfolio delivery
+
+All44tasks across013-020 are verified within their bounded scope. Feature020 documentation commits cf065eb/afd34cf/de229b1 are on docs/portfolio-readiness; PR12 targets the explicit integration branch. [Documentation hosted run42771024786](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42771024786) passed frontend/backend/HTTP-database jobs atde229b1. Later evidence-only closure commits remain separately identifiable; no unobserved HEAD success is implied. Final read-only analyze found no uncovered requirement; converge found no new actionable task and did not rewrite existing tasks. Original three blockers and public-release limits remain open.

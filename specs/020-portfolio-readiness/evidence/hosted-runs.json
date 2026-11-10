@@ -1,0 +1,178 @@
+[
+  {
+    "branch": "security/auth-hardening",
+    "runId": 42658072147,
+    "conclusion": "success",
+    "event": "push",
+    "headSha": "fc219b317f52b98dd33ee6fe160e2306b4ff5d01",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "name": "Backend"
+      },
+      {
+        "conclusion": "success",
+        "name": "HTTP and database integration"
+      },
+      {
+        "conclusion": "success",
+        "name": "Frontend"
+      }
+    ],
+    "status": "completed"
+  },
+  {
+    "branch": "refactor/architecture-cleanup",
+    "runId": 42659199318,
+    "conclusion": "success",
+    "event": "push",
+    "headSha": "67610b298331f15dae181695fda9f4200c757376",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "name": "Frontend"
+      },
+      {
+        "conclusion": "success",
+        "name": "HTTP and database integration"
+      },
+      {
+        "conclusion": "success",
+        "name": "Backend"
+      }
+    ],
+    "status": "completed"
+  },
+  {
+    "branch": "test/quality-ci",
+    "runId": 42660197641,
+    "conclusion": "success",
+    "event": "push",
+    "headSha": "fef1fea6ee3fcc159ba9eb2c56cf41861bc0d13d",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "name": "HTTP and database integration"
+      },
+      {
+        "conclusion": "success",
+        "name": "Backend"
+      },
+      {
+        "conclusion": "success",
+        "name": "Frontend"
+      }
+    ],
+    "status": "completed"
+  },
+  {
+    "branch": "feat/ai-quality-improvements",
+    "runId": 42663857173,
+    "conclusion": "success",
+    "event": "push",
+    "headSha": "c13333c584754f48fc241e7549dd6a821cc75c3b",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "name": "Backend"
+      },
+      {
+        "conclusion": "success",
+        "name": "HTTP and database integration"
+      },
+      {
+        "conclusion": "success",
+        "name": "Frontend"
+      }
+    ],
+    "status": "completed"
+  },
+  {
+    "branch": "refactor/frontend-ux",
+    "runId": 42769021900,
+    "conclusion": "success",
+    "event": "push",
+    "headSha": "8a1495d3ff10b04c6c4466d20743b6b81e6b2814",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "name": "Backend"
+      },
+      {
+        "conclusion": "success",
+        "name": "HTTP and database integration"
+      },
+      {
+        "conclusion": "success",
+        "name": "Frontend"
+      }
+    ],
+    "status": "completed"
+  },
+  {
+    "branch": "chore/deployment-foundations",
+    "runId": 42769941342,
+    "conclusion": "success",
+    "event": "push",
+    "headSha": "65148ad39558c4824175db5e4329952d2b4b84e2",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "name": "Backend"
+      },
+      {
+        "conclusion": "success",
+        "name": "HTTP and database integration"
+      },
+      {
+        "conclusion": "success",
+        "name": "Frontend"
+      }
+    ],
+    "status": "completed"
+  },
+  {
+    "branch": "portfolio/integration-review",
+    "runId": 42770069065,
+    "conclusion": "success",
+    "event": "push",
+    "headSha": "460b0abce279fc527ac8417ffed131ac649dd4aa",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "name": "Backend"
+      },
+      {
+        "conclusion": "success",
+        "name": "HTTP and database integration"
+      },
+      {
+        "conclusion": "success",
+        "name": "Frontend"
+      }
+    ],
+    "status": "completed"
+  },
+  {
+    "branch": "docs/portfolio-readiness",
+    "runId": 42771024786,
+    "conclusion": "success",
+    "event": "push",
+    "headSha": "de229b1a7b45c054637ab41239c55299ffd6e31b",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "name": "HTTP and database integration"
+      },
+      {
+        "conclusion": "success",
+        "name": "Frontend"
+      },
+      {
+        "conclusion": "success",
+        "name": "Backend"
+      }
+    ],
+    "status": "completed"
+  }
+]

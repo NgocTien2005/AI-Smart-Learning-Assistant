@@ -11,6 +11,6 @@
 - [x] T004 P1 [US2] Write docs/interview-guide.md and docs/demo-script.md; deps:T002; deliverable three-role synthetic walkthrough and tradeoffs; AC FR002/SC002; verify existing browser/HTTP evidence and private credential/provider conditions.
 
 ## US3 ? report/delivery
-- [ ] T005 P1 [US3] Write docs/portfolio-improvement-report.md plus verification.md, traceability/evidence, small commits and docs PR; deps:T003/T004; deliverable before/after/task/branch/commit/PR/result/retention matrix; AC FR003/SC003; verify links/diff, source/exact hosted outcomes, final read-only analyze and append-only converge.
+- [x] T005 P1 [US3] Write docs/portfolio-improvement-report.md plus verification.md, traceability/evidence, small commits and docs PR; deps:T003/T004; deliverable before/after/task/branch/commit/PR/result/retention matrix; AC FR003/SC003; verify links/diff, source/exact hosted outcomes, final read-only analyze and append-only converge.
 
 Dependencies:T001?T002?{T003,T004}?T005. Writing may be independent after baseline verification but execute serially. No new worker required. Original feature tasks/provider blockers remain owned by their features.

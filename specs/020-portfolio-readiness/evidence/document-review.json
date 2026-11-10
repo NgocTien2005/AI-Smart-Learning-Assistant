@@ -1,8 +1,9 @@
 {
-  "command": "node <portfolio relative-link and placeholder review>",
+  "command": "node <portfolio relative-link and placeholder/source review>",
   "cwd": ".",
   "files": 8,
   "relativeLinks": 69,
   "failures": [],
+  "originalReadmeGuidancePreserved": true,
   "exitCode": 0
 }

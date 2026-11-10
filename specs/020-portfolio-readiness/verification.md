@@ -24,3 +24,11 @@ Relative-link/placeholder review exit0 (count in document-review.json); source r
 Readonly analyze before implementation:3FR/5tasks,100%coverage,zero critical/ambiguity/duplication; final analysis after artifacts checked again with no-persist, no modifications made during analysis. Convergence closure recorded only after publication; do not infer completion from checklist markers.
 
 13 exact portfolio invocation projects/26namedvolumes retained; no containers/network remain for them. evidence/local-retained-resources.json is readonly inventory. Two operations restore databases and synthetic fixtures/files retained; no live backup/archive uploaded. Earlier feature012 inventory separate. No local8081 changes, production DB modifications, volume deletion, old cleanup bypass, private provider request or email sent. Original008T023 stays closed;008T026/010T016/012T012 and public-release gates remain open in original features. No PR merge, forcepush or deployment.
+
+## Publication evidence
+
+Commits cf065eb (overview/architecture), afd34cf (interview/demo), de229b1 (report/spec/evidence) pushed. PR12 https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/pull/12 targets portfolio/integration-review; no main omnibus implementation PR. Actual push run42771024786 atde229b1a7b45c054637ab41239c55299ffd6e31b passed all3jobs. evidence/hosted-runs.json additionally records actual direct-push outcomes for every implementation branch latest reviewed head. PR-event run.headSha elsewhere identifies source head, not necessarily the PR merge-ref checked out; direct-push results remove that ambiguity. All5tasks verified, original provider/cleanup blockers unchanged.
+
+## Final analyze/converge report
+
+After publication/artifact updates, final analyze ran read-only with SPECIFY_FEATURE_NO_PERSIST=1:3FR/5unique verified tasks/100%coverage,zero critical/ambiguity/duplication or constitution findings. Separate convergence compared current docs/code/evidence to spec/plan/tasks: no new actionable gap; tasks SHA256 identical before/after, no append or rewrite. Requirements4/4 and portfolio3/3 markers unchanged. Converged within feature020 scope, not a claim that original provider/cleanup/production gates are closed.
