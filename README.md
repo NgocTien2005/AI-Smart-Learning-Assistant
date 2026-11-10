@@ -1,5 +1,40 @@
-# AI-Smart-Learning-Assistant
-AI-Powered LMS là nền tảng quản lý học tập trực tuyến giúp giảng viên quản lý khóa học, bài giảng, bài tập và kết quả học tập. Sinh viên có thể học, làm bài và theo dõi tiến độ. Hệ thống có trợ lý tra cứu tài liệu cục bộ, tóm tắt trích xuất và bài ôn dựa trên mẫu câu hỗ trợ; không dùng dịch vụ AI bên ngoài cho nội dung tài liệu.
+# Lumina LMS ? AI Smart Learning Assistant
+
+A Vietnamese learning-management application with instructor-owned courses,
+student learning workflows and administrator account management. Built as a
+Fullstack Developer Intern portfolio project with explicit authorization,
+production-code regressions and isolated HTTP/database verification.
+
+Default study tools are local document lookup, extractive summaries and
+pattern-based quizzes. Optional Gemini is restricted to original synthetic demo
+sources and finite actions; it is not enabled for private documents. PDF support
+uses text-layer extraction, without OCR. Real Google/Gemini acceptance and public
+production readiness remain separate open conditions.
+
+## Portfolio navigation
+
+- [Overview and main features](docs/portfolio-overview.md)
+- [Architecture, ERD, authentication and role design](docs/architecture.md)
+- [Engineering decisions and interview guide](docs/interview-guide.md)
+- [Instructor ? Student ? Admin demo](docs/demo-script.md)
+- [Before/after report, tasks, commits, PRs and exact CI evidence](docs/portfolio-improvement-report.md)
+- [Operations and recovery](docs/operations.md), [known production limits](docs/production-readiness.md)
+
+Stack: React19 / React Router7 / Vite8; Express5 / Prisma7 / PostgreSQL17;
+Node24 in Docker/CI, Nginx reverse proxy. Two independent npm packages, no root
+workspace. See package lockfiles for exact resolved versions.
+
+The API runtime is backend/server.js ? backend/src/app.js. Authentication checks
+the current active user/authVersion; course resources additionally require
+ownership or enrollment. ADMIN account management does not bypass course access.
+JWT Bearer browser storage is retained with its documented XSS tradeoff; this
+project does not silently claim HttpOnly cookie sessions.
+
+Portfolio improvements remain separate reviewable feature PRs. The named
+[temporary integration reference](docs/integration-review.md) combines verified
+changes for compatibility testing; it is not an automatic main merge or deploy.
+Use the report to distinguish local tests, exact hosted CI and real-provider
+acceptance. No deployed URL, benchmark or production certification is claimed.
 
 ## Trạng thái bàn giao MVP
 
