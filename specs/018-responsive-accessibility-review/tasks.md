@@ -18,7 +18,7 @@
 
 ## Phase 5: Verify/review
 
-- [ ] T005 P1 Record full frontend/isolated Chrome/cleanup, commit/push/PR and hosted SHA in verification.md (SC-001/002; deliverable truthful review; verify all commands and exact source; depends:T003/T004).
+- [x] T005 P1 Record full frontend/isolated Chrome/cleanup, commit/push/PR and hosted SHA in verification.md (SC-001/002; deliverable truthful review; verify all commands and exact source; depends:T003/T004).
 
 ## Dependencies and strategy
 
