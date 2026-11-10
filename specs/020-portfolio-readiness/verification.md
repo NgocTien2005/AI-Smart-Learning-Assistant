@@ -1,4 +1,4 @@
-# Portfolio verification ? 2026-11-10
+# Portfolio verification - 2026-11-10
 
 Feature020, docs/portfolio-readiness; parent temporary integration branch460b0ab. Documentation-only feature; all implementation remains in independent feature commits/PRs. Official resolver selected020, no branch-name guessing, template scripts allocated number/setup-plan/setup-tasks. Constitution reviewed; no extension hooks present. Requirements checklist4/4 and separate portfolio quality review3/3, markers frozen during implement.
 

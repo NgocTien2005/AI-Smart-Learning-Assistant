@@ -8,13 +8,13 @@ Recruiters need an accurate, navigable account of what Lumina implements, why de
 Goals: source-matched architecture/ERD/auth/role description, reproducible three-role demonstration, exact verification and feature/commit/PR traceability. Non-goals: new product behavior, screenshots/benchmarks/deployed URLs not observed, deployment, automatic merge, new provider calls, secret collection or reopening historical accepted email work.
 
 ## User Scenarios & Testing
-### US1 ? Understand the project (P1)
+### US1 - Understand the project (P1)
 As a reviewer I can follow README links to actual architecture, data model, authorization, test strategy and engineering decisions.
 Acceptance: documents identify runtime entrypoints and all persisted domain relations; distinguish four study capabilities and real-provider gates; links resolve and setup commands match packages/Compose.
-### US2 ? Demonstrate and discuss it (P1)
-As a candidate I can follow Instructor?Student?Admin with synthetic data and explain tradeoffs and limits honestly.
+### US2 - Demonstrate and discuss it (P1)
+As a candidate I can follow Instructor -> Student -> Admin with synthetic data and explain tradeoffs and limits honestly.
 Acceptance: local private credential provisioning, role boundaries, assignments/quizzes/documents and optional cloud/provider conditions are explicit; no credentials, invented successful external responses or public deployment claim.
-### US3 ? Review completed work (P1)
+### US3 - Review completed work (P1)
 As a maintainer I can identify each feature's tasks, branch, commits, PR, tests, resource retention and remaining blocker.
 Acceptance: before/after report distinguishes confirmed fixes from recommendations, exact hosted commits from local evidence and integration-branch compatibility from independent passes.
 
@@ -29,7 +29,7 @@ Documentation only on this feature branch; integration branch preserves separate
 ## Edge cases and assumptions
 Missing provider configuration is a documented blocked acceptance, not fake success. CI outcome must identify exact SHA; later docs commits do not retroactively change tested revision. Broken local links and stale entrypoints fail document review. Existing private demo runtime is not recreated merely to show the candidate branch.
 
-## Clarification review ? 2026-11-10
+## Clarification review - 2026-11-10
 No critical ambiguity: user explicitly requested these documents and separate feature review. Unmerged dependencies are combined only on a named temporary integration branch; documentation PR targets it, not main. Public deployment, real provider and original cleanup gates remain deferred.
 
 ## Success Criteria
