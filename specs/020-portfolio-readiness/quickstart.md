@@ -1,0 +1,2 @@
+# Review guide
+Open README ? portfolio-overview ? architecture ? interview-guide ? demo-script ? portfolio-improvement-report. Follow setup in README and existing guarded demo-seed guide; credentials remain local. Review combined-branch test evidence and original feature PRs before merging any dependency. Real Google/Gemini and public deployment are separate gates. Run relative-link/placeholder checks and git diff --check from repository root; no provider request or application data mutation is needed to validate documentation.

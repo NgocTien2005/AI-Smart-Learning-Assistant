@@ -1,0 +1,8 @@
+{
+  "command": "node <portfolio relative-link and placeholder review>",
+  "cwd": ".",
+  "files": 8,
+  "relativeLinks": 69,
+  "failures": [],
+  "exitCode": 0
+}
