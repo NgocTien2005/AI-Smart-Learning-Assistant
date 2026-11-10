@@ -1,4 +1,4 @@
-# Research ? 2026-11-10
+# Research - 2026-11-10
 
 Decision: allowlist access status/duration/bytes and suppress native request errors; error severity alone cannot guarantee privacy. Alternative query-only redaction leaves path/referrer/error leaks. See https://nginx.org/en/docs/http/ngx_http_log_module.html and https://nginx.org/en/docs/ngx_core_module.html#error_log . Research agent independently confirmed these risks.
 
