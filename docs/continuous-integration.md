@@ -121,3 +121,26 @@ kết quả. Generic 200, SMTP accepted, mock và DB fixture không chứng minh
 delivery. SMTP thật không chạy tự động trên PR. Thiếu điều kiện thì T023 mở
 và CI vẫn chạy. T026 cùng các profile cleanup bị policy chặn giữ nguyên;
 không thử xóa bằng cách khác.
+## Feature-oriented coverage and evidence
+
+Frontend component regression files now separate auth entry, sessions, dashboards,
+course workspace, assignments, quiz lifecycle, document study, account settings
+and administration. `frontend/src/__tests__/fixtures.js` shares synthetic helpers
+and per-file cleanup; existing Google/cloud component files stay distinct.
+The package's existing `vitest run src/__tests__` discovers all of them. No
+assertion, parameterized variant, required command or workflow permission is
+removed by the split. Vitest's default [file isolation](https://vitest.dev/config/isolate.html)
+is retained; do not use `--no-isolate` as a shortcut for failing shared state.
+
+| Gate | What it establishes | Limit |
+| --- | --- | --- |
+| Frontend npm test/lint/build | Real rendered components, navigation/late-response/draft behavior, static checks and build | Fetch fixtures do not prove DB/provider delivery |
+| Backend npm test and quiz filter | Utilities and mounted production router tests, snapshot/version/concurrency and access rules | Old revisions' auth.test.js used legacy backend/app.js; production auth replacement is separate feature014 |
+| Isolated integration | Actual production HTTP+database, roles/ownership, documents, progress, submission/grading and quiz workflows | Only the verified fresh target; health alone is liveness |
+| Separate seed integration | Dry-run/collision/create-only/rerun guards, multi-owner dataset,247HTTP operations and disabled-cloud/source rejection | No SMTP/Google/Gemini request or mailbox/model acceptance |
+| CI safety regressions | Target mismatch refusal, scoped cleanup, failure propagation, safe artifact export, cancellation | Not a public deployment security certification |
+
+Exact source hashes/test-statement inventory and results for the split belong to
+[feature016](../specs/016-production-test-organization/verification.md). Hosted
+results must match the exact pushed SHA; a previous green badge does not certify
+new code. No provider credentials or browser profiles should enter CI artifacts.
