@@ -13,6 +13,6 @@
 - [x] T004 [P2] [US3] Write docs/operations.md and link docs/production-readiness.md; deps T001; deliverable release/backup/rollback/monitoring guide; AC FR004/SC003; verify commands, links, no public-readiness claim.
 
 ## Cross-cutting delivery
-- [ ] T005 [P1] Record verification.md/evidence/traceability, small commits and feature PR; deps T002?004; deliverable local command/cwd/exit and exact hosted CI evidence; AC all declared checks pass and retained resources/open production gates explicit; verify diff, read-only analyze and append-only converge.
+- [x] T005 [P1] Record verification.md/evidence/traceability, small commits and feature PR; deps T002?004; deliverable local command/cwd/exit and exact hosted CI evidence; AC all declared checks pass and retained resources/open production gates explicit; verify diff, read-only analyze and append-only converge.
 
 Dependencies: T001?T002?T003?T005; T004 can follow T001 independently. Sequential implementation; no additional worker needed. MVP is US1, then recovery and guide. Checklist review is separate from implementation; tasks close only with evidence.
