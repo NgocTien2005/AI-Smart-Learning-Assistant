@@ -1,0 +1,18 @@
+[
+  {
+    "file": "frontend/src/pages/AuthEntry.css",
+    "sha256": "0b94914b24435cabdf47e297911eb0d9fb7ebc2acb199a158439b8a77b16dbc8"
+  },
+  {
+    "file": "frontend/src/pages/LearningApp.css",
+    "sha256": "c3b1d1da1863ebf12508e0d99fb25357887e795da599242a0551130249b48153"
+  },
+  {
+    "file": "frontend/src/components/AssignmentsPanel.css",
+    "sha256": "c5d490ad36578e36e158bfb1ec651d35c0fbeac5f863a5a667b9dd4bf33f29f1"
+  },
+  {
+    "file": "frontend/src/App.css",
+    "sha256": "ef2b32e29a49f2c078c316e0ec9007d7600357df3c6d821c6fc67b03d54be772"
+  }
+]

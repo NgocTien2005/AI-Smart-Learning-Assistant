@@ -44,3 +44,15 @@
 .assignment-workspace :is(button, input, select, textarea, [tabindex]):focus-visible { outline: 3px solid #77a8ef; outline-offset: 3px; }
 .assignment-workspace .state-card, .assignment-workspace .status-message { overflow-wrap: anywhere; }
 .assignment-workspace .status-message .ui-button { margin-top: 8px; }
+
+@media (max-width: 640px) {
+  .assignment-workspace .aw-layout,
+  .assignment-workspace .aw-submission-layout,
+  .assignment-workspace .aw-grade-fields,
+  .assignment-workspace .aw-form-row { grid-template-columns: minmax(0, 1fr); }
+  .assignment-workspace .aw-list,
+  .assignment-workspace .aw-submission-list { max-height: none; }
+  .assignment-workspace .aw-heading,
+  .assignment-workspace .aw-detail-heading,
+  .assignment-workspace .aw-editor-heading { flex-wrap: wrap; }
+}

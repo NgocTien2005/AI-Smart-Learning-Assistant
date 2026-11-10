@@ -1,0 +1,691 @@
+{
+  "time": "2026-11-09T17:31:33.377Z",
+  "revision": "2891c1126a2ec4bc91b57a35cc3fe5d3004a21dd",
+  "sourceType": "local working tree; see source manifest",
+  "node": "v25.2.0",
+  "platform": "win32",
+  "project": "lumina-acceptance-ci-demo-1794245493318-40cc3b",
+  "job": "seed-integration",
+  "commands": [
+    {
+      "command": "docker context show",
+      "cwd": ".",
+      "durationMs": 100,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker context inspect <endpoint only>",
+      "cwd": ".",
+      "durationMs": 97,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 112,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 109,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 112,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 106,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 106,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 109,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker compose <fresh seed project> up --build --wait",
+      "cwd": ".",
+      "durationMs": 22554,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified seed backend> prisma migrate status",
+      "cwd": ".",
+      "durationMs": 2713,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker compose <this seed run only> down (volumes retained)",
+      "cwd": ".",
+      "durationMs": 3158,
+      "exitCode": 0,
+      "status": "passed"
+    }
+  ],
+  "emailsSent": 0,
+  "providerRequests": 0,
+  "namedVolumesRemoved": false,
+  "targetVerifiedBeforeProvisioning": true,
+  "database": "lumina_acceptance",
+  "api": "http://127.0.0.1:51902/api",
+  "sentinelId": 1,
+  "counts": {
+    "users": 18,
+    "admin": 1,
+    "instructors": 4,
+    "activeStudents": 12,
+    "disabledStudents": 1,
+    "courses": 8,
+    "lessons": 48,
+    "assignments": 24,
+    "documents": 26
+  },
+  "modifiedSourceDenied": true,
+  "httpOperations": 247,
+  "coverage": {
+    "submitted": 8,
+    "draft": 1,
+    "unstarted": 40,
+    "graded": 8,
+    "pending": 8,
+    "notSubmitted": 8,
+    "documents": 26
+  },
+  "dryRunNoWrites": true,
+  "collisionDenied": true,
+  "rerunNoDuplicates": true,
+  "preexistingSentinelPreserved": true,
+  "browser": [
+    {
+      "role": "admin",
+      "viewport": "390x844",
+      "view": "home",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "admin",
+      "viewport": "390x844",
+      "view": "account",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "admin",
+      "viewport": "768x1024",
+      "view": "home",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "admin",
+      "viewport": "768x1024",
+      "view": "account",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "admin",
+      "viewport": "1280x800",
+      "view": "home",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "admin",
+      "viewport": "1280x800",
+      "view": "account",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "admin",
+      "viewport": "1440x900",
+      "view": "home",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "admin",
+      "viewport": "1440x900",
+      "view": "account",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "390x844",
+      "view": "home",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "390x844",
+      "view": "account",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "390x844",
+      "view": "lessons",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "390x844",
+      "view": "cloud",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "390x844",
+      "view": "assignments",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "390x844",
+      "view": "students",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "768x1024",
+      "view": "home",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "768x1024",
+      "view": "account",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "768x1024",
+      "view": "lessons",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "768x1024",
+      "view": "cloud",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "768x1024",
+      "view": "assignments",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "768x1024",
+      "view": "students",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1280x800",
+      "view": "home",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1280x800",
+      "view": "account",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1280x800",
+      "view": "lessons",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1280x800",
+      "view": "cloud",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1280x800",
+      "view": "assignments",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1280x800",
+      "view": "students",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1440x900",
+      "view": "home",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1440x900",
+      "view": "account",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1440x900",
+      "view": "lessons",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1440x900",
+      "view": "cloud",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1440x900",
+      "view": "assignments",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "instructor1",
+      "viewport": "1440x900",
+      "view": "students",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "390x844",
+      "view": "home",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "390x844",
+      "view": "account",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "390x844",
+      "view": "lessons",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "390x844",
+      "view": "cloud",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "390x844",
+      "view": "assignments",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "768x1024",
+      "view": "home",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "768x1024",
+      "view": "account",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "768x1024",
+      "view": "lessons",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "768x1024",
+      "view": "cloud",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "768x1024",
+      "view": "assignments",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "1280x800",
+      "view": "home",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "1280x800",
+      "view": "account",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "1280x800",
+      "view": "lessons",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "1280x800",
+      "view": "cloud",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "1280x800",
+      "view": "assignments",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "1440x900",
+      "view": "home",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "1440x900",
+      "view": "account",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "1440x900",
+      "view": "lessons",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "1440x900",
+      "view": "cloud",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    },
+    {
+      "role": "student1",
+      "viewport": "1440x900",
+      "view": "assignments",
+      "observed": true,
+      "overflow": false,
+      "offenders": []
+    }
+  ],
+  "authProbe": {
+    "command": "node <public auth layout probe>",
+    "cwd": ".",
+    "exitCode": 0
+  },
+  "authObservations": [
+    {
+      "mode": "login",
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "inputWidth": 293,
+      "columns": "341px"
+    },
+    {
+      "mode": "register",
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "inputWidth": 293,
+      "columns": "341px"
+    },
+    {
+      "mode": "forgot",
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "inputWidth": 308,
+      "columns": "356px"
+    },
+    {
+      "mode": "reset-missing",
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "inputWidth": null,
+      "columns": "341px"
+    },
+    {
+      "mode": "login",
+      "width": 768,
+      "height": 1024,
+      "overflow": false,
+      "inputWidth": 244.15625,
+      "columns": "325.844px 360.156px"
+    },
+    {
+      "mode": "register",
+      "width": 768,
+      "height": 1024,
+      "overflow": false,
+      "inputWidth": 244.15625,
+      "columns": "325.844px 360.156px"
+    },
+    {
+      "mode": "forgot",
+      "width": 768,
+      "height": 1024,
+      "overflow": false,
+      "inputWidth": 244.15625,
+      "columns": "325.844px 360.156px"
+    },
+    {
+      "mode": "reset-missing",
+      "width": 768,
+      "height": 1024,
+      "overflow": false,
+      "inputWidth": null,
+      "columns": "325.844px 360.156px"
+    },
+    {
+      "mode": "login",
+      "width": 1280,
+      "height": 800,
+      "overflow": false,
+      "inputWidth": 410,
+      "columns": "531.047px 586.938px"
+    },
+    {
+      "mode": "register",
+      "width": 1280,
+      "height": 800,
+      "overflow": false,
+      "inputWidth": 410,
+      "columns": "531.047px 586.938px"
+    },
+    {
+      "mode": "forgot",
+      "width": 1280,
+      "height": 800,
+      "overflow": false,
+      "inputWidth": 410,
+      "columns": "531.047px 586.938px"
+    },
+    {
+      "mode": "reset-missing",
+      "width": 1280,
+      "height": 800,
+      "overflow": false,
+      "inputWidth": null,
+      "columns": "531.047px 586.938px"
+    },
+    {
+      "mode": "login",
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "inputWidth": 410,
+      "columns": "531.047px 586.938px"
+    },
+    {
+      "mode": "register",
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "inputWidth": 410,
+      "columns": "531.047px 586.938px"
+    },
+    {
+      "mode": "forgot",
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "inputWidth": 410,
+      "columns": "531.047px 586.938px"
+    },
+    {
+      "mode": "reset-missing",
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "inputWidth": null,
+      "columns": "531.047px 586.938px"
+    },
+    {
+      "capability": "computed-css-motion-probe",
+      "reduced": "none",
+      "normal": "lumina-spin"
+    }
+  ],
+  "remainingUsers": "0",
+  "retainedSyntheticDocuments": 26,
+  "retainedVolumes": [
+    "lumina-acceptance-ci-demo-1794245493318-40cc3b_postgres_data",
+    "lumina-acceptance-ci-demo-1794245493318-40cc3b_uploads_data"
+  ],
+  "failure": null,
+  "cleanup": {
+    "attempted": true,
+    "success": true
+  },
+  "exitCode": 0
+}
