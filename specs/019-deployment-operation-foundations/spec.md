@@ -9,15 +9,15 @@ Operators need bounded diagnostics without retaining reset URLs, and a reproduci
 
 ## User Scenarios & Testing
 
-### US1 ? Private diagnostics (P1)
+### US1 - Private diagnostics (P1)
 As an operator I can inspect response outcomes without collecting URLs or identity.
 Acceptance: successful and failing frontend/API responses have declared headers; synthetic secret markers in path/query/header/body/referrer do not appear in proxy output. Preserve API proxying and document downloads.
 
-### US2 ? Safe recovery rehearsal (P1)
+### US2 - Safe recovery rehearsal (P1)
 As a maintainer I can restore synthetic fixtures in a fresh owned acceptance stack.
 Acceptance: verify HTTP and actual backend database before provisioning; dump and restore into a new database, compare fixture content and upload digests. Missing/mismatched targets fail before mutations. Failures are nonzero. Only own containers/network are removed; volumes/restore fixture remain reported.
 
-### US3 ? Honest release guidance (P2)
+### US3 - Honest release guidance (P2)
 As an operator I can distinguish local evidence from public-release conditions.
 Acceptance: guide covers TLS/origins/proxy, least privilege, secrets, consistent DB/uploads backup, monitoring, migrations, rollback and optional-provider limitations.
 
@@ -34,7 +34,7 @@ No runtime dependency, schema, migration or API change. No private backup or pro
 ### Edge cases
 Unknown routes, upstream errors and invalid methods cannot introduce request-bearing logs. Restore destination must be newly created; missing/mismatched targets and restore failures must stop. Never accept an archive from outside the current synthetic invocation.
 
-## Clarification review ? 2026-11-10
+## Clarification review - 2026-11-10
 No critical ambiguity requires questioning: deployment/destructive operations are excluded. Recovery creates a new DB inside an invocation-owned stack and retains it. Suppress native request-bearing Nginx errors, retaining sanitized access statuses/duration; emergency diagnostics need a separate controlled procedure. Production RPO/RTO/retention/topology remain operator decisions.
 
 ## Success Criteria

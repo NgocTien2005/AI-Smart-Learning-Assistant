@@ -1,4 +1,4 @@
-# Lumina LMS ? AI Smart Learning Assistant
+# Lumina LMS - AI Smart Learning Assistant
 
 A Vietnamese learning-management application with instructor-owned courses,
 student learning workflows and administrator account management. Built as a
@@ -16,7 +16,7 @@ production readiness remain separate open conditions.
 - [Overview and main features](docs/portfolio-overview.md)
 - [Architecture, ERD, authentication and role design](docs/architecture.md)
 - [Engineering decisions and interview guide](docs/interview-guide.md)
-- [Instructor ? Student ? Admin demo](docs/demo-script.md)
+- [Instructor / Student / Admin demo](docs/demo-script.md)
 - [Before/after report, tasks, commits, PRs and exact CI evidence](docs/portfolio-improvement-report.md)
 - [Operations and recovery](docs/operations.md), [known production limits](docs/production-readiness.md)
 
