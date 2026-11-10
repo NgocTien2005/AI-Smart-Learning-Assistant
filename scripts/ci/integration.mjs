@@ -122,6 +122,15 @@ export async function runIntegration() {
       summary.httpOperations = exported.requests.length
       summary.recordedResources = exported.resources.length
       if (target.query('SELECT COUNT(*) FROM "User";') !== '0') throw new Error('Owned test data remains in new project')
+      // Revalidate the backend's actual DB connection immediately before recovery.
+      target = createIntegrationTarget(env)
+      const { verifyOperations } = await import('./operations-check.mjs')
+      summary.operations = await verifyOperations(target, async args => {
+        const result = await runCommand('docker', args, { env, timeoutMs: 90000, signal: controller.signal })
+        summary.commands.push(safeCommandRecord(`docker ${args[0]} <verified operations fixture; arguments suppressed>`, '.', result))
+        if (result.exitCode !== 0) throw new Error('Required operations command failed; raw output suppressed')
+        return (args[0] === 'logs' ? result.stdout + result.stderr : result.stdout).trim()
+      })
     },
     cleanup: async () => {
       const ids = (await docker(['ps', '-aq', '--filter', `label=com.docker.compose.project=${project}`], { cleanup: true })).split(/\r?\n/).filter(Boolean)
