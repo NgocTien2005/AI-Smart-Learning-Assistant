@@ -1,0 +1,8 @@
+{
+  "frontend/nginx.conf": "7a6a09e5131099331768a5aab6721dd9acc72f97351a99906b2fd675fb8c2395",
+  "compose.yaml": "19dbf96666ad5e29b1c4c6eeae0768702787a1bb6f15d0dc10bceb36a738e656",
+  "compose.acceptance.yaml": "8ea6d7cf19e895c0d46af4e3eba65cb4cdc5e2baf6dab84bbc2ac5b59f3b0b94",
+  "scripts/ci/integration.mjs": "93e6b9a00cc67ce50d5772a1c20689ab0af22d0f04aca42241b53cf24fa21f2c",
+  "scripts/ci/operations-check.mjs": "d185f53e844c65a46871cb774ed85bbe1dcedbac6b4301514c5da1300087a07f",
+  "scripts/ci/test/operations.test.mjs": "f648f03359307c4625041866ef1730524e4bce7c2861f3f2eca48a3e6ddfb2d0"
+}

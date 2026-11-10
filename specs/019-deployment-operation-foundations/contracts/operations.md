@@ -1,0 +1,3 @@
+# Operations verification contract
+
+node scripts/ci/integration.mjs remains the required fresh-stack entry point. After HTTP/database checks, operations-check.mjs receives an immediately reverified target. It rejects a missing/non-CI project, reserved port, unknown DB or missing container identity before executing commands. No arbitrary dump/target arguments. Success adds operations booleans/counts and retained restoreDatabase name to the safe integration summary. Any failure yields nonzero and scoped cleanup still runs. Raw logs/archive/fixture content never enter evidence. Existing API response bodies are unchanged; proxy headers are additive.

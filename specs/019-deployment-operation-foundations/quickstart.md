@@ -1,0 +1,3 @@
+# Validation
+
+Prerequisites: local Linux Docker engine and Node24+, existing package lockfiles. From repository root run node --test scripts/ci/test/*.test.mjs, then node scripts/ci/integration.mjs. The latter builds a fresh unique project, runs npm run test:integration, verifies proxy/privacy/rotation and synthetic recovery, then downs only its own containers/network without -v. Inspect ci-results/integration/summary.json only; do not publish raw logs or dump files. No SMTP/Google/Gemini configuration needed. Expected success: exit0, 90 HTTP checks, operations comparisons true, retained restore DB and two volumes reported. Existing development8080/local8081 remain untouched.

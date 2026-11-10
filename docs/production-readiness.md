@@ -1,5 +1,10 @@
 # Production readiness — Lumina LMS
 
+Feature019 adds a [safe operations/recovery guide](operations.md), bounded
+new-container logging and proxy privacy/header defaults. Its synthetic drill
+evidence is recorded separately in specs/019-deployment-operation-foundations;
+the historical table below is not retroactive production certification.
+
 Review ngày **2026-11-07**, theo cấu hình versioned tại `ef3cbf1`, không đọc
 `.env`, secret store hoặc Docker environment. Đây là checklist chuẩn bị bàn
 giao, **không phải chứng nhận production-ready hoặc kế hoạch deploy đã duyệt**.
