@@ -1,0 +1,12 @@
+{
+  "reference": "829b815",
+  "baseMain": "eeccc5b",
+  "audit": "66c2727",
+  "candidateMerge": "ebbce42",
+  "command": "git diff --name-only origin/portfolio/integration-review -- <runtime, tests, CI, compose, schema, package and lockfiles>",
+  "cwd": ".",
+  "exitCode": 0,
+  "differentFiles": [],
+  "applicationAndInfrastructureSourceIdentical": true,
+  "noEnvironmentRead": true
+}

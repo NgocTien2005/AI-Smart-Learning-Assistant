@@ -1,0 +1,111 @@
+{
+  "fixtureVersion": 1,
+  "evidence": "offline local/contract evaluation; not real Gemini",
+  "networkRequests": 0,
+  "databaseRequests": 0,
+  "cases": [
+    {
+      "id": "lookup-vietnamese",
+      "capability": "local-retrieval",
+      "passed": true
+    },
+    {
+      "id": "lookup-uppercase-d",
+      "capability": "local-retrieval",
+      "passed": false
+    },
+    {
+      "id": "lookup-substring-refused",
+      "capability": "local-retrieval",
+      "passed": false
+    },
+    {
+      "id": "lookup-no-context",
+      "capability": "local-retrieval",
+      "passed": true
+    },
+    {
+      "id": "lookup-missing-topic",
+      "capability": "local-retrieval",
+      "passed": true
+    },
+    {
+      "id": "summary-source-only",
+      "capability": "extractive-summary",
+      "passed": true
+    },
+    {
+      "id": "summary-empty",
+      "capability": "extractive-summary",
+      "passed": true
+    },
+    {
+      "id": "quiz-supported",
+      "capability": "template-quiz",
+      "passed": true
+    },
+    {
+      "id": "quiz-insufficient",
+      "capability": "template-quiz",
+      "passed": true
+    },
+    {
+      "id": "cloud-valid-summary",
+      "capability": "cloud-contract",
+      "passed": true
+    },
+    {
+      "id": "cloud-unknown-citation",
+      "capability": "cloud-contract",
+      "passed": true
+    },
+    {
+      "id": "cloud-invented-quote",
+      "capability": "cloud-contract",
+      "passed": true
+    },
+    {
+      "id": "cloud-no-citations",
+      "capability": "cloud-contract",
+      "passed": true
+    },
+    {
+      "id": "cloud-insufficient-honest",
+      "capability": "cloud-contract",
+      "passed": true
+    },
+    {
+      "id": "cloud-insufficient-unacknowledged",
+      "capability": "cloud-contract",
+      "passed": true
+    },
+    {
+      "id": "cloud-valid-quiz",
+      "capability": "cloud-contract",
+      "passed": true
+    },
+    {
+      "id": "cloud-quiz-space-duplicates",
+      "capability": "cloud-contract",
+      "passed": false
+    },
+    {
+      "id": "cloud-quiz-unicode-duplicates",
+      "capability": "cloud-contract",
+      "passed": false
+    },
+    {
+      "id": "cloud-quiz-repeated-question",
+      "capability": "cloud-contract",
+      "passed": false
+    },
+    {
+      "id": "cloud-modified-instruction-source",
+      "capability": "cloud-source-proof",
+      "passed": true
+    }
+  ],
+  "passed": 15,
+  "total": 20,
+  "exitCode": 1
+}

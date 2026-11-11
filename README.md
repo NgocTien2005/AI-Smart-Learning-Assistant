@@ -1,80 +1,108 @@
-# AI-Smart-Learning-Assistant
-AI-Powered LMS là nền tảng quản lý học tập trực tuyến giúp giảng viên quản lý khóa học, bài giảng, bài tập và kết quả học tập. Sinh viên có thể học, làm bài và theo dõi tiến độ. Hệ thống có trợ lý tra cứu tài liệu cục bộ, tóm tắt trích xuất và bài ôn dựa trên mẫu câu hỗ trợ; không dùng dịch vụ AI bên ngoài cho nội dung tài liệu.
+# Lumina LMS — AI Smart Learning Assistant
 
-## Trạng thái bàn giao MVP
+[![Lumina CI](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/workflows/ci.yml)
 
-[Báo cáo bàn giao](docs/mvp-handoff.md) đối chiếu các feature 001–009 và loại
-bằng chứng đã có. Ngày 2026-11-07: 001–007 đạt 175/175 task, 009 đạt 18/18 với
-hosted CI đã pass; 008 đạt 25/26 sau khi người dùng xác nhận luồng email/reset
-thật. Task T026 cleanup profile vẫn bị policy chặn. Chưa tuyên bố nghiệm thu
-toàn bộ hoặc sẵn sàng production.
-Xem [checklist production readiness](docs/production-readiness.md) trước khi
-chuẩn bị triển khai công khai; CI không thực hiện deploy hoặc gửi email thật.
+Nền tảng quản lý học tập bằng tiếng Việt cho **giảng viên, sinh viên và quản trị
+viên**. Lumina kết nối khóa học, tài liệu, bài tập, chấm điểm và tiến độ trong
+một ứng dụng fullstack; đồng thời cung cấp công cụ học từ nguồn tài liệu có quyền
+truy cập. Dự án hướng tới một portfolio dễ chạy thử, đọc hiểu và kiểm chứng.
 
-Theo yêu cầu bổ sung ngày 2026-11-07, [feature010](specs/010-add-google-sign-in/verification.md)
-thêm Google cho tài khoản đã liên kết, kèm sửa kết nối Vite5173. Các kiểm tra
-local đã đạt; nghiệm thu Google thật còn chờ Client ID/cấu hình riêng (T016).
-[Hosted CI cho mã Google](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42391440389) đã pass cả frontend/backend/HTTP-database.
-Trạng thái này không đóng T026 của008 hoặc chứng nhận production-ready.
+> Các luồng LMS đã có kiểm thử local và CI. Google/Gemini là tích hợp tùy chọn,
+> còn cần nghiệm thu provider thật. Dự án chưa được chứng nhận production-ready.
 
-## Cấu trúc repository
+## Tính năng
 
-- `frontend/src/app`: application shell và route composition.
-- `frontend/src/pages`: các màn hình React và style theo trang.
-- `backend/src/config`: cấu hình runtime và biến môi trường.
-- `backend/src/routes`: các route HTTP theo nhóm tính năng.
-- `backend/src/middleware`: middleware dùng chung như authentication.
-- `backend/src/lib`: kết nối Prisma/database.
-- `backend/src/utils`: hàm dùng chung cho authentication và public response.
-- `backend/prisma`: schema và lịch sử migration.
+| Vai trò | Luồng chính |
+| --- | --- |
+| **INSTRUCTOR** | Quản lý khóa học/bài học sở hữu, tài liệu, mã tham gia, danh sách học viên, bài tập, bài nộp và chấm điểm |
+| **STUDENT** | Tham gia khóa học, đọc/tải tài liệu, theo dõi tiến độ, nộp bài, xem nhận xét và tiếp tục bài ôn trắc nghiệm |
+| **ADMIN** | Tìm kiếm, cập nhật vai trò/thông tin, khóa/mở tài khoản; không tự bypass quyền nội dung khóa học |
 
-`frontend/src/assets` chỉ chứa asset được ứng dụng sử dụng. Prisma client trong `backend/generated/prisma` là mã sinh tự động, không chỉnh sửa thủ công.
+- Đăng ký/đăng nhập bằng email + mật khẩu, khôi phục phiên qua `/api/auth/me`,
+  đổi mật khẩu và quên/đặt lại mật khẩu qua SMTP khi được cấu hình.
+- Google tùy chọn chỉ đăng nhập **tài khoản đã chủ động liên kết**; không tự tạo
+  tài khoản hoặc gộp user chỉ vì trùng email.
+- PDF/TXT/Markdown/CSV có kiểm tra upload và tải qua API được bảo vệ. PDF chỉ
+  trích xuất **lớp văn bản**, không có OCR.
+- Quiz lưu snapshot câu hỏi, draft và version; server kiểm quyền/chấm điểm.
+  Điều hướng trong app xử lý lưu/bỏ draft; browser unload không bảo đảm lưu mạng.
+- UI có loading/error/empty states, bảo vệ response đến trễ và hỗ trợ bố cục hẹp,
+  đồng thời giữ giao diện desktop theo vai trò.
 
-## Continuous integration
+## AI: có gì và giới hạn gì?
 
-[Lumina CI](.github/workflows/ci.yml) kiểm tra frontend, backend và HTTP/database
-trên stack Docker riêng khi pull request, push hoặc chạy tay. Dùng Node 24,
-`npm ci` và lockfiles hiện có; CI cơ bản không cần production/Gmail credentials.
-Xem [hướng dẫn CI](docs/continuous-integration.md) để chạy lại, đọc evidence an
-toàn và phân biệt local checks với hosted run. Trạng thái từng lần chạy được
-ghi trong [verification 009](specs/009-setup-quality-ci/verification.md);
-nghiệm thu email thật vẫn thuộc feature 008.
+| Công cụ | Cách hoạt động | Giới hạn |
+| --- | --- | --- |
+| Tra cứu tài liệu | Tìm đoạn nguồn bằng token cục bộ | Không phải chatbot LLM hiểu mọi tài liệu |
+| Tóm tắt trích xuất | Chọn câu từ nguồn | Không diễn giải bằng AI sinh nội dung |
+| Quiz ôn tập | Generator nhận dạng mẫu câu định nghĩa | Có thể tạo ít câu hoặc thiếu nguồn phù hợp |
+| Gemini cloud demo | Gọi model qua backend, tùy chọn và mặc định tắt | Chỉ nguồn demo tổng hợp nguyên bản/câu hỏi hữu hạn; chưa nghiệm thu chất lượng model thật |
+
+Không tự gửi tài liệu riêng, lịch sử chat hoặc nội dung người dùng ra provider.
+Gemini cần project Free **không bật billing**, key nhập riêng, xác nhận phạm vi
+dữ liệu và giới hạn app. App không thể tự bảo đảm billing của project Google.
+Xem [cấu hình cloud](docs/demo-cloud-ai.md) và [bộ đánh giá AI](docs/ai-evaluation.md).
+
+## Công nghệ và kiến trúc
+
+| Lớp | Công nghệ |
+| --- | --- |
+| Frontend | React19, React Router7, Vite8 |
+| Backend | Node.js24+, Express5, Prisma7, PostgreSQL17 |
+| Tài liệu/email | PDF.js, Multer, Nodemailer/Gmail SMTP |
+| Tests | Node test runner, Vitest, jsdom, React Testing Library |
+| Vận hành | Docker Compose, Nginx, GitHub Actions |
+
+```mermaid
+flowchart LR
+  UI[React / SessionContext] --> Proxy[Nginx hoặc Vite proxy]
+  Proxy --> API[Express production API]
+  API --> Guards[Auth / role / owner-enrollment]
+  Guards --> DB[(Prisma / PostgreSQL)]
+  Guards --> Files[Protected uploads / local study tools]
+  Guards --> Optional[SMTP / Google / synthetic Gemini demo]
+```
+
+Runtime backend là `backend/server.js` → `backend/src/app.js`.
+`backend/app.js` là legacy không được server/current auth tests import.
+JWT Bearer được lưu theo lựa chọn nhớ đăng nhập; middleware kiểm user hiện tại,
+active và `authVersion`. Reset thành công thu hồi phiên cũ. Cookie HttpOnly chưa
+được thay vào kiến trúc hiện tại; tradeoff XSS/CSRF được ghi trong
+[thiết kế bảo mật](docs/security.md).
+
+[Kiến trúc, ERD và luồng authentication](docs/architecture.md) ·
+[Ranh giới module](docs/module-boundaries.md)
 
 ## Chạy bằng Docker
 
-Yêu cầu Docker Desktop đang chạy. Tạo cấu hình local:
+Yêu cầu: Docker Desktop chạy Linux containers; Git. Node24+ cần cho các lệnh
+development/test trên host. Hai thư mục frontend/backend là hai package độc lập.
 
 ```powershell
+git clone https://github.com/NgocTien2005/AI-Smart-Learning-Assistant.git
+cd AI-Smart-Learning-Assistant
 Copy-Item .env.docker.example .env
 ```
 
-Đổi `POSTGRES_PASSWORD` và `JWT_SECRET` trong `.env`. Để gửi email quên mật khẩu qua Gmail, bật xác minh 2 bước cho tài khoản Google, tạo App Password rồi cấu hình:
-
-```dotenv
-SMTP_USER=your-gmail-address@gmail.com
-SMTP_APP_PASSWORD=your-16-character-google-app-password
-APP_ORIGIN=http://localhost:8080
-```
-
-Không dùng mật khẩu đăng nhập Gmail thông thường và không commit file `.env`. Sau đó chạy:
+Sửa `.env` **cục bộ** để đặt `POSTGRES_PASSWORD` và `JWT_SECRET` mạnh. Không commit
+file này hoặc gửi secret vào chat. Sau đó:
 
 ```powershell
 docker compose up -d --build
 docker compose ps
+Invoke-RestMethod http://localhost:8080/api/health
 ```
 
-Mở `http://localhost:8080`. Backend không public cổng riêng; Nginx chuyển tiếp `/api` tới backend. Backend tự chạy `prisma migrate deploy` khi container khởi động.
+Mở **http://localhost:8080**. PostgreSQL/backend chỉ ở network nội bộ; Nginx proxy
+`/api`. Backend tự chạy `prisma migrate deploy` lúc khởi động. Health endpoint là
+liveness; không thay cho kiểm chứng đọc/ghi database.
 
-```powershell
-docker compose logs -f
-docker compose down
-```
+Để dừng: `docker compose down`. **Không dùng `down -v`** nếu cần giữ dữ liệu.
+Không reset database hoặc sửa migration đã dùng.
 
-`docker compose down` giữ dữ liệu PostgreSQL. Chỉ dùng `docker compose down -v` khi chủ động muốn xóa volume database.
+### Frontend development tại localhost:5173
 
-### Phát triển tại localhost:5173
-
-Vite gọi `/api` cùng origin và proxy sang Docker8080. Backend Docker chỉ mở cổng nội bộ3000; frontend host không gọi trực tiếp cổng đó. Chạy từ thư mục gốc:
+Chạy Docker với dev override để cho phép origin5173:
 
 ```powershell
 docker compose -f compose.yaml -f compose.dev.yaml up -d --build
@@ -83,80 +111,126 @@ npm ci
 npm run dev
 ```
 
-Override dev chỉ cho phép origin `http://localhost:5173,http://localhost:8080`; Compose mặc định giữ cấu hình production theo `APP_ORIGIN`. Có thể đặt `DEV_CORS_ORIGIN` riêng cho port/domain local khác. Nếu backend chạy độc lập trên host3000, đặt `$env:DEV_API_PROXY_TARGET='http://localhost:3000'` trước khi chạy Vite. `VITE_API_URL` vẫn dùng được khi cần cấu hình base URL rõ ràng. Port5173 bận sẽ báo lỗi thay vì tự chuyển port. Không dùng wildcard CORS hoặc public database để sửa lỗi kết nối.
+Vite mặc định proxy `/api` đến `http://127.0.0.1:8080`. Nếu chạy backend riêng trên
+host, đặt `$env:DEV_API_PROXY_TARGET='http://localhost:3000'` trước khi chạy Vite.
+API client dùng cùng origin hoặc `VITE_API_URL` khi có override chủ động.
 
-Tài liệu upload được lưu trong Docker volume `uploads_data` và chỉ tải xuống qua endpoint có authentication. Định dạng hỗ trợ là PDF, TXT, Markdown và CSV, tối đa 10 MiB. Nội dung text được dùng cho trợ lý tài liệu cục bộ; dữ liệu không được gửi sang dịch vụ AI bên ngoài.
+**Lưu ý runtime đã cấu hình riêng:** recreate backend bằng Compose thường có thể
+làm mất key Gemini chỉ được nhập vào container qua launcher. Dùng hướng dẫn
+provider riêng khi cần; không đọc/in Docker environment để lấy lại key.
 
-### Trích xuất tài liệu và tóm tắt
+## Dữ liệu demo và tài khoản
 
-PDF có lớp văn bản được xử lý cục bộ bằng Mozilla PDF.js; giới hạn hiện tại là 250 trang và 100.000 ký tự đầu ra. PDF scan, được mã hóa hoặc không có chữ vẫn có thể xem/tải nếu tệp hợp lệ, nhưng không cung cấp nguồn văn bản. Không có OCR. MIME có thể thiếu hoặc là `application/octet-stream`; phần mở rộng và nội dung được kiểm tra.
+Dataset tổng hợp có **18 user**, gồm1ADMIN,4INSTRUCTOR,12STUDENT hoạt động và
+1STUDENT đã khóa; **8 khóa học,48 bài học,26 tài liệu và24 bài tập**, cùng enrollment,
+tiến độ, bài nộp/chấm điểm và quiz ở nhiều trạng thái.
 
-Văn bản đã trích được lưu riêng khỏi nội dung nhập tay, cùng hash, trạng thái, revision và cờ cắt ngắn. Assistant, tóm tắt và quiz mới cùng ưu tiên văn bản tài liệu đã trích; nếu chưa có, dùng nội dung bài học do giảng viên nhập. Migration không tự xử lý tài liệu lịch sử. Giảng viên sở hữu khóa học có thể yêu cầu xử lý lại bằng `POST /api/courses/lessons/:lessonId/document/process`. Thay/gỡ tài liệu làm mới nguồn; snapshot quiz và kết quả đã nộp không đổi.
-
-`GET /api/courses/lessons/:lessonId/summary` trả các câu được chọn từ nguồn dưới nhãn “Tóm tắt trích xuất”, kèm trang khi parser cung cấp được. Đây không phải giải thích AI; nội dung ngắn có thể không có điểm tóm tắt. Không gửi văn bản đến dịch vụ ngoài. PDF.js Node API được dùng theo ví dụ chính thức của Mozilla: https://github.com/mozilla/pdf.js/blob/master/examples/node/getinfo.mjs.
-
-## Chức năng LMS hiện có
-
-- Đăng nhập và kiểm tra phiên cho `ADMIN`, `INSTRUCTOR`, `STUDENT`; đăng ký công khai chỉ cho `INSTRUCTOR` và `STUDENT`. Quên mật khẩu dùng Gmail SMTP khi được cấu hình; phản hồi chung không xác nhận email tồn tại hoặc đã được chuyển đến hộp thư. Đặt lại mật khẩu giữ validation hiện có và thu hồi phiên cũ.
-- Giảng viên tạo, sửa, xóa khóa học; hệ thống sinh mã tham gia 8 ký tự.
-- Học viên tham gia bằng mã và chỉ truy cập khóa học đã tham gia.
-- Giảng viên thêm/xóa bài học, nhập nội dung hoặc upload tài liệu.
-- Người có quyền trong khóa học tải tài liệu, hỏi đáp theo nội dung text và xem lịch sử hỏi đáp.
-- Học viên đánh dấu hoặc bỏ hoàn thành từng bài học; dashboard hiển thị tiến độ khóa học và giảng viên xem tiến độ từng học viên.
-- Học viên tạo bài ôn trắc nghiệm cục bộ từ các mẫu câu định nghĩa được hỗ trợ, lưu nháp tự động, tiếp tục bài chưa nộp và xem lại kết quả chi tiết. Generator không dùng AI bên ngoài và bỏ qua dạng câu không nhận diện được; số câu tạo thực tế có thể thấp hơn yêu cầu.
-- Giảng viên giao bài có hạn nộp và điểm tối đa; học viên nộp/cập nhật bài trước hạn, giảng viên chấm điểm và gửi nhận xét.
-- Quản trị viên tìm tài khoản, sửa họ tên, đổi vai trò giảng viên/học viên và khóa/mở quyền truy cập.
-- Authorization được kiểm tra riêng cho từng thao tác khóa học và bài học.
-
-### Bài ôn tập có thể tiếp tục
-
-- Số câu được yêu cầu từ 3 đến 10; API trả số câu thực tế và trả `422` khi không tìm thấy đủ khái niệm phù hợp. Generator hiện chỉ nhận diện câu định nghĩa có khái niệm đứng trước các mẫu `giúp`, `cho phép`, `lưu trữ`, `chứa`, `mô tả`, `biểu diễn`, `bao gồm`, `gồm` hoặc `là`. Đây là tạo câu hỏi theo mẫu cục bộ, không phải AI hiểu ngôn ngữ tổng quát.
-- `GET /api/courses/lessons/:lessonId/quizzes` liệt kê lịch sử; `POST` cùng đường dẫn tạo attempt.
-- `GET /api/courses/quiz-attempts/:attemptId` mở bản nháp hoặc kết quả; `PUT .../:attemptId/draft` lưu lựa chọn với `version`; `POST .../:attemptId/submit` chấm điểm và khóa attempt. Các thao tác đều cần quyền hiện tại với lesson/course.
-- Câu hỏi đã tạo lưu snapshot nguồn bất biến. Answer key chỉ được trả sau khi nộp. Attempt cũ vẫn giữ được; attempt đã nộp trước khi lưu lựa chọn sẽ hiện thông báo lịch sử không có đáp án đã chọn.
-- Migration `20261009150000_persist_quiz_attempt_lifecycle` bổ sung JSONB cho nháp/lựa chọn và bộ đếm version, không xóa hoặc sửa attempt cũ.
-
-Các kiểm tra chính:
-
-```powershell
-cd backend
-npm test
-npm run test:integration
-npx prisma validate
-
-cd ../frontend
-npm run lint
-npm run build
-```
-
-`npm run test:integration` yêu cầu stack kiểm thử tách biệt, healthy. Đặt rõ `TEST_COMPOSE_PROJECT=lumina-acceptance-*` và `TEST_API_URL=http://127.0.0.1:PORT/api`. Script xác minh project/container, cổng HTTP, network, volume và database trước khi tạo/dọn dữ liệu; không dùng Compose mặc định của repository. Xem [hướng dẫn kiểm thử tách biệt](docs/acceptance-testing.md).
-
-Đăng nhập email/mật khẩu tiếp tục hoạt động cho ba vai trò. Google tùy chọn chỉ dùng cho tài khoản Lumina đã có và đã chủ động liên kết trong Tài khoản; không tạo user mới hoặc tự gộp theo email. Xem [cấu hình Google riêng](docs/google-sign-in.md). Khi chưa có Client ID, nút báo chưa sẵn sàng; nghiệm thu Google thật vẫn cần cấu hình và kiểm chứng riêng. Microsoft chưa triển khai.
-
-## Dữ liệu trải nghiệm giao diện
-
-Dataset demo mới bao phủ ba vai trò: 18 tài khoản tổng hợp, 8 khóa học, 48 bài tiếng Việt, 26 tài liệu có thể đọc, 24 bài tập cùng tiến độ/bài nộp/quiz ở nhiều trạng thái. Chỉ thêm vào development đã xác minh; không ghi đè dữ liệu cũ.
+Seed chỉ chạy trên target development/demo đã xác minh. Có dry-run, ownership
+ledger và cơ chế chạy lại không tạo trùng; không tự seed khi server khởi động.
 
 ```powershell
 node backend/scripts/seed-demo.mjs --project ai-smart-learning-assistant --api http://localhost:8080/api --dry-run
 powershell -NoProfile -File scripts/start-demo-seed.ps1
 ```
 
-Launcher hiển thị mật khẩu ngẫu nhiên riêng từng tài khoản trong console riêng duy nhất lúc tạo; không lưu credentials vào source/evidence. Chạy lại báo `unchanged`, không cập nhật hoặc đổi mật khẩu. Xem [hướng dẫn seed, target guard và cleanup](docs/demo-data.md). Các tài khoản demo cũ nếu có được giữ nguyên; không dùng tài khoản mẫu cho triển khai công khai.
+Dev override phải được bật trước. Launcher cấp thông tin đăng nhập qua console
+riêng khi **tạo mới**; không có mật khẩu dùng chung hard-code trong source và seed
+rerun không reset tài khoản. Email demo dùng `.invalid`, không dùng để nhận thư.
+ADMIN không được tạo từ public registration. Xem [hướng dẫn dataset](docs/demo-data.md)
+và [demo Instructor → Student → Admin](docs/demo-script.md).
 
-Tài khoản quản trị môi trường triển khai không thể đăng ký từ giao diện. Hãy đặt `ADMIN_BOOTSTRAP_NAME`, `ADMIN_BOOTSTRAP_EMAIL` và `ADMIN_BOOTSTRAP_PASSWORD` trong `.env`, khởi động lại backend rồi chạy `docker compose exec backend npm run admin:create`. Sau khi tạo xong, xóa ba biến này khỏi `.env` và khởi động lại backend. Mật khẩu bootstrap cần từ 12 đến 72 ký tự; lệnh chỉ tạo tài khoản mới và không sửa tài khoản đã tồn tại.
+## Cấu hình tích hợp tùy chọn
 
+- **Quên mật khẩu qua Gmail:** cấu hình `SMTP_USER`, `SMTP_APP_PASSWORD` và
+  `APP_ORIGIN` trong môi trường riêng. Dùng App Password, không dùng mật khẩu
+  Gmail thường. Email/reset URL không được ghi vào evidence. HTTP200/SMTP accepted
+  không chứng minh thư đã tới hộp thư.
+- **Google:** [Client ID, authorized origins và liên kết tài khoản](docs/google-sign-in.md).
+  Nghiệm thu Google thật vẫn còn mở; không yêu cầu Client Secret trong chat.
+- **Gemini:** [launcher và phạm vi Free demo](docs/demo-cloud-ai.md).
+  Key chỉ ở backend; không đặt vào biến `VITE_*`, source, ảnh hoặc chat.
 
-## Frontend workflows
+## Kiểm thử và CI
 
-The React UI supports ADMIN, INSTRUCTOR, and STUDENT sessions. It provides role-aware dashboards, course workspace sections stored in the URL, lesson reading, authenticated document preview/download, progress, assignments and grading, local source lookup, and resumable practice quizzes. Session identity is checked through `/api/auth/me`; network and server failures remain recoverable.
+Frontend, từ `frontend/`:
 
-PDF preview displays the uploaded document; the backend extracts its text layer for local lookup, extractive summaries and practice questions. Scanned PDFs without text are not OCR-processed. Quiz generation uses supported local definition patterns and may return fewer questions when the source has too few suitable candidates. Drafts use server versions to resolve concurrent tabs.
+```powershell
+npm ci
+npm test
+npm run lint
+npm run build
+```
 
-Run frontend checks from `frontend/`: `npm test`, `npm run lint`, and `npm run build`.
+Backend, từ `backend/`:
 
-Local PDF text-layer extraction and extractive summaries are implemented. Google identity sign-in is optional for explicitly linked existing accounts; real-provider acceptance remains separate. OCR, learning recommendations, notifications and global analytics remain outside the current supported APIs and scope.
+```powershell
+npm ci
+npm test
+npm test -- --test-name-pattern=quiz
+npx prisma validate
+```
 
-## AI cloud cho demo
+HTTP/database integration, từ **repository root**:
 
-Panel **AI cloud demo** gọi Gemini cho hỏi theo nguồn, giải thích, tóm tắt và câu ôn tập riêng. Mặc định tắt; chỉ nguồn demo tổng hợp nguyên bản và câu hỏi mẫu được gửi sau thao tác rõ ràng. Không gửi bài/tài liệu thật, history hoặc câu hỏi riêng tư. Cần API key server nhập riêng và project Free chưa bật billing; không tự chuyển trả phí hoặc dùng local/mock để giả thành công. Xem [cấu hình, giới hạn và nghiệm thu Gemini](docs/demo-cloud-ai.md). Test/CI không chứng minh model thật đã chạy; nghiệm thu thật cần cấu hình và kết quả riêng.
+```powershell
+node scripts/ci/integration.mjs
+node scripts/ci/seed-integration.mjs
+```
+
+Các runner tạo project/network/volumes/port/secrets thử riêng, kiểm cả HTTP và
+database backend thực sự kết nối, rồi dọn đúng containers/network của lượt thử.
+Volumes được giữ lại; không trỏ test tới stack đang dùng hoặc local8081. Không
+chỉ đổi `TEST_API_URL` rồi chạy harness trên database không xác định.
+
+[GitHub Actions](.github/workflows/ci.yml) chạy **frontend, backend và HTTP/database**
+khi push, pull request hoặc chạy tay, dùng Node24, lockfiles và quyền tối thiểu.
+Integration còn kiểm seed create-only và phục hồi DB/tệp tổng hợp. CI cơ bản
+không cần SMTP, Google credentials hoặc Gemini key. Xem [hướng dẫn/evidence CI](docs/continuous-integration.md).
+
+## Cấu trúc repository
+
+```text
+frontend/src/
+  app/          Router, session và application shell
+  pages/        Auth, dashboard, course, account, admin
+  components/   LMS panels, UI và route guards
+  hooks/        Lifecycle/state được dùng lại
+  services/     API client và helper thuần
+backend/
+  server.js     Production entrypoint
+  src/routes/   Auth, admin, courses, lessons, assignments, quiz
+  src/services/ Email, tài liệu và cloud demo
+  src/middleware/ Authentication, authorization, validation, rate limiting
+  prisma/       Schema và migration history
+  scripts/      Seed và integration harness
+scripts/ci/     Package checks, isolated integration/recovery
+specs/          Spec Kit specs, plans, tasks và verification
+docs/           Kiến trúc, demo, quyết định kỹ thuật và vận hành
+```
+
+## Quyết định kỹ thuật và giới hạn còn lại
+
+- Authorization được kiểm trên server theo role **và từng tài nguyên**; không
+  chỉ ẩn nút ở frontend. Password reset/quiz concurrency có kiểm thử riêng.
+- Rate limit, Google challenge và quota cloud hiện theo process; multi-replica
+  và topology proxy cần thiết kế thêm. Không bật `trust proxy` tùy tiện.
+- Google thật còn feature010/T016; chất lượng Gemini thật còn012/T012.
+  Email recovery008/T023 đã có nghiệm thu lịch sử; cleanup008/T026 vẫn bị policy
+  chặn và không được xóa bằng cách khác.
+- Chưa có OCR, recommendations, notifications hoặc analytics toàn hệ thống.
+- Public deployment còn cần domain/TLS, secrets/quyền DB, backup nhất quán,
+  monitoring, kiểm tra tải/advisories và release/rollback trên môi trường thật.
+  Synthetic recovery drill không chứng nhận RPO/RTO production.
+
+## Tài liệu cho người review
+
+[Tổng quan portfolio](docs/portfolio-overview.md) ·
+[Hướng dẫn phỏng vấn](docs/interview-guide.md) ·
+[Báo cáo cải thiện và bằng chứng](docs/portfolio-improvement-report.md) ·
+[Quy trình Spec Kit](docs/development-workflow.md) ·
+[Vận hành/backup/rollback](docs/operations.md) ·
+[Production readiness](docs/production-readiness.md)
+
+Không có deployed URL, benchmark hoặc kết quả provider thật được dựng lên để
+minh họa. Trạng thái một hosted run phải đối chiếu đúng commit; badge CI không
+thay cho nghiệm thu toàn bộ ứng dụng.

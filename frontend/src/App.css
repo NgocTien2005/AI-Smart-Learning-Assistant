@@ -78,6 +78,10 @@
 .switch-copy a { color: #0058be; font-size: 14px; font-weight: 600; text-decoration: none; }
 .session-loading { display: flex; align-items: center; gap: 12px; color: #424754; }
 .spinner { width: 20px; height: 20px; border: 2px solid #c2c6d6; border-top-color: #0058be; border-radius: 50%; animation: spin .8s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; }
+}
 .signed-in-card { align-items: center; text-align: center; }
 .signed-in-card h2 { margin: 0; color: #121c2a; font: 600 28px/36px Lexend, sans-serif; }
 .signed-in-card p { margin: 0; color: #727785; }

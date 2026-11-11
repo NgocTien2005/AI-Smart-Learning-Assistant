@@ -1,0 +1,63 @@
+{
+  "time": "2026-11-09T16:44:01.613Z",
+  "revision": "2891c1126a2ec4bc91b57a35cc3fe5d3004a21dd",
+  "sourceType": "local working tree; see source manifest",
+  "node": "v25.2.0",
+  "platform": "win32",
+  "job": "integration",
+  "project": "lumina-acceptance-ci-1794242641573-c0820f0e",
+  "commands": [
+    {
+      "command": "docker compose <explicit fresh project/file/empty env> up --build --wait --wait-timeout 180",
+      "cwd": ".",
+      "durationMs": 13809,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified isolated backend> prisma migrate status",
+      "cwd": ".",
+      "durationMs": 1456,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "npm run test:integration",
+      "cwd": "backend",
+      "durationMs": 5447,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker compose <this run only> down (named volumes retained)",
+      "cwd": ".",
+      "durationMs": 2289,
+      "exitCode": 0,
+      "status": "passed"
+    }
+  ],
+  "targetVerifiedBeforeProvisioning": true,
+  "suiteEvidenceAvailable": true,
+  "namedVolumesRemoved": false,
+  "http": "http://127.0.0.1:57421/api",
+  "provisioningScope": "only the newly allocated empty isolated project; production suite owns its registered test accounts/resources",
+  "database": "lumina_acceptance",
+  "containers": {
+    "db": "0410a15922e649759e3e797e7c10e4dabc93d0c137634e5e9434b566adfcfb90",
+    "backend": "2c4113453b18ae9f41522f8345827db07afdfd22b50d3b3055f30c8635fce27c",
+    "frontend": "462819a4459bc2ac8964584f16d0bbf7aba5f36052de3fb949ac883664382067"
+  },
+  "retainedVolumes": [
+    "lumina-acceptance-ci-1794242641573-c0820f0e_postgres_data",
+    "lumina-acceptance-ci-1794242641573-c0820f0e_uploads_data"
+  ],
+  "remainingOwnedUsers": 0,
+  "httpOperations": 90,
+  "recordedResources": 33,
+  "failure": null,
+  "cleanup": {
+    "attempted": true,
+    "success": true
+  },
+  "exitCode": 0
+}

@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "scope": "original synthetic offline fixtures; not real model output",
+  "cases": [
+    {"id":"lookup-vietnamese", "capability":"local-retrieval", "source":"Biến lưu trữ giá trị để chương trình sử dụng lại.", "question":"biến lưu trữ gì", "found":true},
+    {"id":"lookup-uppercase-d", "capability":"local-retrieval", "source":"Định nghĩa mô tả ý nghĩa của thuật ngữ trong một ngữ cảnh cụ thể.", "question":"định", "found":true},
+    {"id":"lookup-substring-refused", "capability":"local-retrieval", "source":"Program mô tả một chuỗi thao tác thực hiện nhiệm vụ xác định.", "question":"RAM", "found":false},
+    {"id":"lookup-no-context", "capability":"local-retrieval", "source":"", "question":"cơ sở dữ liệu", "found":false},
+    {"id":"lookup-missing-topic", "capability":"local-retrieval", "source":"Biến lưu trữ giá trị để chương trình sử dụng lại.", "question":"thiên văn", "found":false},
+    {"id":"summary-source-only", "capability":"extractive-summary", "source":"Biến lưu trữ giá trị để chương trình sử dụng lại. Hàm là nhóm lệnh có tên để tái sử dụng một nhiệm vụ.", "minimum":1},
+    {"id":"summary-empty", "capability":"extractive-summary", "source":"", "minimum":0},
+    {"id":"quiz-supported", "capability":"template-quiz", "source":"Thuật toán là dãy bước hữu hạn để giải một bài toán xác định. Biến lưu trữ giá trị để chương trình có thể sử dụng lại. Hàm là nhóm lệnh có tên để tái sử dụng một nhiệm vụ. Vòng lặp giúp thực hiện lại thao tác khi điều kiện còn đúng.", "supported":true},
+    {"id":"quiz-insufficient", "capability":"template-quiz", "source":"Hãy đọc ví dụ và kiểm tra kết quả bằng tay trước khi viết mã.", "supported":false},
+    {"id":"cloud-valid-summary", "capability":"cloud-contract", "mutation":"valid", "accepted":true},
+    {"id":"cloud-unknown-citation", "capability":"cloud-contract", "mutation":"unknown-source", "accepted":false},
+    {"id":"cloud-invented-quote", "capability":"cloud-contract", "mutation":"invented-quote", "accepted":false},
+    {"id":"cloud-no-citations", "capability":"cloud-contract", "mutation":"no-citations", "accepted":false},
+    {"id":"cloud-insufficient-honest", "capability":"cloud-contract", "mutation":"insufficient", "accepted":true},
+    {"id":"cloud-insufficient-unacknowledged", "capability":"cloud-contract", "mutation":"insufficient-invalid", "accepted":false},
+    {"id":"cloud-valid-quiz", "capability":"cloud-contract", "mutation":"quiz-valid", "accepted":true},
+    {"id":"cloud-quiz-case-sensitive", "capability":"cloud-contract", "mutation":"quiz-case-sensitive", "accepted":true},
+    {"id":"cloud-quiz-space-duplicates", "capability":"cloud-contract", "mutation":"quiz-space", "accepted":false},
+    {"id":"cloud-quiz-unicode-duplicates", "capability":"cloud-contract", "mutation":"quiz-unicode", "accepted":false},
+    {"id":"cloud-quiz-repeated-question", "capability":"cloud-contract", "mutation":"quiz-repeat", "accepted":false},
+    {"id":"cloud-modified-instruction-source", "capability":"cloud-source-proof", "accepted":false}
+  ]
+}

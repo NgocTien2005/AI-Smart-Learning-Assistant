@@ -1,51 +1,13 @@
+import { blankAssignment, editorDraft, validateAssignment, assignmentPayload } from '../services/assignmentForm.js'
+import StudentEditor from './assignments/StudentEditor.jsx'
 import { useEffect, useRef, useState } from 'react'
 import { apiRequest } from '../services/api.js'
-import { assignmentDate, assignmentId, assignmentStateLabel, defaultSubmission, filterAssignments, hasGrade, localAssignmentDate, orderAssignments, overdueAssignment, studentAssignmentState, submissionsOf } from '../services/assignmentView.js'
+import { assignmentDate, assignmentId, assignmentStateLabel, defaultSubmission, filterAssignments, hasGrade, orderAssignments, overdueAssignment, studentAssignmentState, submissionsOf } from '../services/assignmentView.js'
 import AssignmentEditor from './AssignmentEditor.jsx'
 import ConfirmDialog from './ui/ConfirmDialog.jsx'
 import Button from './ui/Button.jsx'
 import { EmptyState, ErrorState, FieldError, LoadingState, StatusMessage } from './ui/Feedback.jsx'
 import './AssignmentsPanel.css'
-
-const blankAssignment = () => ({ title: '', description: '', dueAt: '', points: 100 })
-const editorDraft = (assignment) => ({ title: assignment.title, description: assignment.description || '', points: assignment.points, dueAt: localAssignmentDate(assignment.dueAt) })
-const validateAssignment = (draft) => {
-  const errors = {}
-  if (draft.title.trim().length < 3 || draft.title.trim().length > 160) errors.title = 'Tiêu đề phải từ 3 đến 160 ký tự.'
-  if (!draft.description.trim() || draft.description.trim().length > 20000) errors.description = 'Yêu cầu là bắt buộc và tối đa 20.000 ký tự.'
-  if (!Number.isInteger(Number(draft.points)) || Number(draft.points) < 1 || Number(draft.points) > 1000) errors.points = 'Điểm tối đa phải là số nguyên từ 1 đến 1000.'
-  if (draft.dueAt && !Number.isFinite(new Date(draft.dueAt).getTime())) errors.dueAt = 'Hạn nộp không hợp lệ.'
-  return errors
-}
-const assignmentPayload = (draft) => ({ title: draft.title.trim(), description: draft.description.trim(), points: Number(draft.points), dueAt: draft.dueAt ? new Date(draft.dueAt).toISOString() : null })
-
-function StudentEditor({ assignment, submission, draft, error, pending, open, onOpenChange, onChange, onSubmit }) {
-  const trigger = useRef(null)
-  const field = useRef(null)
-  const form = useRef(null)
-  const hadFocus = useRef(false)
-  const wasOpen = useRef(false)
-  useEffect(() => {
-    const track = (event) => { hadFocus.current = Boolean(form.current?.contains(event.target)) }
-    document.addEventListener('focusin', track)
-    return () => document.removeEventListener('focusin', track)
-  }, [])
-  useEffect(() => {
-    if (open && !wasOpen.current) field.current?.focus()
-    if (!open && wasOpen.current && hadFocus.current && document.activeElement === document.body) trigger.current?.focus()
-    wasOpen.current = open
-  }, [open])
-  const close = () => { trigger.current?.focus(); onOpenChange(false) }
-  return <div className="aw-student-editor">
-    <Button ref={trigger} variant="secondary" aria-expanded={open} aria-controls={'aw-answer-' + assignment.id} disabled={pending} onClick={() => onOpenChange(!open)}>{submission ? 'Sửa bài làm' : 'Viết bài làm'}</Button>
-    {open && <form ref={form} id={'aw-answer-' + assignment.id} aria-label="Bài làm của bạn" aria-busy={pending} noValidate onSubmit={(event) => { event.preventDefault(); onSubmit() }} onKeyDown={(event) => { if (event.key === 'Escape' && !pending) { event.preventDefault(); close() } }}>
-      <label htmlFor={'aw-answer-field-' + assignment.id}>{submission ? 'Bài làm cập nhật' : 'Bài làm'}<textarea id={'aw-answer-field-' + assignment.id} ref={field} value={draft ?? submission?.content ?? ''} rows="6" maxLength="20000" disabled={pending} onChange={(event) => onChange(event.target.value)} aria-invalid={Boolean(error)} aria-describedby={error ? 'aw-answer-error-' + assignment.id : undefined} /></label>
-      <FieldError id={'aw-answer-error-' + assignment.id}>{error}</FieldError>
-      <p className="aw-muted">Bản nháp được giữ khi đổi bài trong phần này; rời phần bài tập hoặc tải lại trang sẽ kết thúc bản nháp chưa nộp.</p>
-      <div className="aw-actions"><Button type="submit" disabled={pending}>{pending ? 'Đang nộp…' : submission ? 'Cập nhật bài nộp' : 'Nộp bài'}</Button><Button variant="secondary" disabled={pending} onClick={close}>Thu gọn bài làm</Button></div>
-    </form>}
-  </div>
-}
 
 function AssignmentWorkspace({ course, isInstructor, onAssignmentsChange, selectedAssignmentId = null, selectedSubmissionId = null, onSelectAssignment, onSelectSubmission }) {
   const assignments = Array.isArray(course.assignments) ? course.assignments : []

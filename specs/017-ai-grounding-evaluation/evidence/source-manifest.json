@@ -1,0 +1,22 @@
+[
+  {
+    "file": "backend/src/utils/studyAssistant.js",
+    "sha256": "c16cb1230ac56e87dfd67d4583bea966dd2be6b7023b4e83610af1f0359e15b5"
+  },
+  {
+    "file": "backend/src/services/demoCloudAssistant.js",
+    "sha256": "795eef3b393391db3b722a4466cf9c90b6560ed0a35fdac99a6098369053e451"
+  },
+  {
+    "file": "backend/scripts/evaluate-study.mjs",
+    "sha256": "c913a6f62e890dd67a6d40174eeacd14fa3489fd6316bc0ce91b07addf113bd8"
+  },
+  {
+    "file": "backend/test/studyEvaluation.test.js",
+    "sha256": "ec1930e8f54386f28b6c02ada7b36ea41812b548d16d73bc5daef5cfb66143e3"
+  },
+  {
+    "file": "backend/test/fixtures/study-evaluation.json",
+    "sha256": "4b899ff16b265ca8f1117d0baa144f846c01427e2939f1114ca454bd4dd26dfd"
+  }
+]

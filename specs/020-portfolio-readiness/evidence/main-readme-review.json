@@ -1,0 +1,7 @@
+{
+  "command": "node <README relative-link/source review>",
+  "cwd": ".",
+  "relativeLinks": 17,
+  "failures": [],
+  "exitCode": 0
+}
