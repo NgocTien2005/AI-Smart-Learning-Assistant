@@ -81,3 +81,7 @@ eventual removal. Do not cherry-pick unrelated auth code into this branch.
 Base audit2891c11; no security014 code dependency. Changes later combined only in
 a documented temporary integration branch, leaving main unchanged. Existing
 provider/cleanup acceptance gates remain in original features.
+
+## Compatibility follow-up - 2026-11-11
+
+Original specification and acceptance history above are preserved. External merges moved the PR base to92e0585, which now includes014/016/017/018. The no-unrelated-auth-cherry-pick constraint still holds: the follow-up branches directly from this already verified base and reapplies only architecture015 code. Current security guards and production auth tests must be retained. Original PR7 is conflicting; replacement refactor/architecture-base-compatibility delivery is tracked by T007, without force-push, PR/main merge or new feature identifier. No new API/schema/layout/dependency or provider behavior.

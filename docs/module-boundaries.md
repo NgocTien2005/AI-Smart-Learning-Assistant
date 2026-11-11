@@ -36,3 +36,7 @@ Do not infer production coverage from legacy tests on older revisions.
 See [feature015 verification](../specs/015-architecture-module-boundaries/verification.md)
 for method/path equality, frontend/backend checks, real HTTP/database matrix and
 Chrome desktop observations. This is a module guide, not a new service framework.
+
+## Verified-base follow-up - 2026-11-11
+
+The replacement architecture branch starts from already-merged base92e0585 and preserves current production auth tests, join-code rate limiting, AI utilities and responsive styles. Only original architecture code commits were reapplied; the courses import overlap retains createJoinLimit alongside the extracted routers/helpers. The legacy root app remains unmounted and no longer imported by current auth tests. Its removal is not part of this compatibility-only follow-up. Feature015 T007 records current-base/local/hosted evidence; original PR7/branch remain intact for historical comparison.

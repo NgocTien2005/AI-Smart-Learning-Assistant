@@ -21,7 +21,7 @@ Mọi thay đổi phải giúp dự án tiến gần hơn tới một hệ thố
 │       └── services/         API client and request helpers
 └── backend/                  Express 5 + Prisma 7 + PostgreSQL
     ├── server.js             Runtime entry point; imports src/app.js
-    ├── app.js                Legacy auth-only test harness used by test/auth.test.js
+    ├── app.js                Unused legacy auth harness; tests use production auth router
     ├── src/
     │   ├── app.js            Middleware and route mounting
     │   ├── routes/           Auth, admin, course and health APIs

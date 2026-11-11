@@ -45,3 +45,7 @@ cleanup retains volumes and never touches local8081/private dev configuration.
 ## Complexity Tracking
 
 No new public contract/data model; no migrations. Extract, don't redesign.
+
+## Current-base compatibility follow-up - 2026-11-11
+
+T007 uses verified origin/portfolio/00-audit-speckit92e0585. Reapply original code commits86f96c9 andbd2bdf8, resolving only overlapping imports by retaining createJoinLimit and the extracted child-router helpers. Preserve current016 test organization,017 utilities and018 styles already in base. The old legacy-test reference decision is historical:014 tests now use the production router; keep the unmounted legacy file for this compatibility-only follow-up, documenting its actual references. No retirement or auth rewrite is included. Full package checks and fresh HTTP/database verify the reconstructed branch. Reuse earlier actual Chrome evidence only if all frontend source files exactly match the already browser-verified combined branch; otherwise run relevant browser cases. Add fresh sanitized command/cwd/exit, source comparison and current PR/base/hosted evidence under015/evidence.

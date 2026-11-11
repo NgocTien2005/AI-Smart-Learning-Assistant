@@ -1,0 +1,13 @@
+{
+  "time": "2026-11-11T15:15:19.892Z",
+  "base": "92e058518ffffd09de64a660c0e75407cc73d640",
+  "reference": "829b815",
+  "command": "git diff --name-only origin/portfolio/integration-review -- backend/src frontend/src backend/test",
+  "cwd": ".",
+  "exitCode": 0,
+  "differentSourceFiles": [],
+  "frontendSourceIdentical": true,
+  "backendSourceAndTestsIdentical": true,
+  "browserEvidenceReused": "feature020 combined real Chrome52 role views/16 auth views, and feature015 original browser acceptance; source equality verified",
+  "noNewLayoutChange": true
+}
