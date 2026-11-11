@@ -4,7 +4,7 @@
 **Base**: verified origin/main d407a1c; independent chore/deployment-foundations.
 
 ## Technical context and constitution
-Node24, Express5/Prisma7/PostgreSQL17, React19/Vite8, Nginx1.27. UI ? Nginx /api ? production src/app.js ? guards ? Prisma remains unchanged. No dependency/schema/migration/API change. Constitution review before/after design passes: preserve data/contracts, explicit isolated target, no private egress, real evidence. extensions.yml absent; no workflow hooks registered.
+Node24, Express5/Prisma7/PostgreSQL17, React19/Vite8, Nginx1.27. UI - Nginx /api - production src/app.js - guards - Prisma remains unchanged. No dependency/schema/migration/API change. Constitution review before/after design passes: preserve data/contracts, explicit isolated target, no private egress, real evidence. extensions.yml absent; no workflow hooks registered.
 
 ## Design and affected files
 1. frontend/nginx.conf: allowlisted JSON access records (status/duration/bytes only), error_log /dev/null at HTTP scope to suppress request-bearing native errors, server_tokens off; add_header always nosniff/no-referrer/SAMEORIGIN/device restrictions. Hide duplicate upstream nosniff/referrer. No untested CSP/COOP/HSTS.

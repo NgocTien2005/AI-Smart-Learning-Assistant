@@ -1,0 +1,46 @@
+[
+  {
+    "file": "backend/src/routes/courses.js",
+    "sha256": "0570940c669c91070384186257e2a256c495fa1d96f5f996b78b90c4f815059f"
+  },
+  {
+    "file": "backend/src/routes/assignments.js",
+    "sha256": "317f7fc18453bd5af6a586a0a1b72befd44804f1ad7a5187c03f93e16609e864"
+  },
+  {
+    "file": "backend/src/routes/lessons.js",
+    "sha256": "4d8ce75e01e0ec5ef1c383f82aa15ce93d6d531173b60bcc4760003015f42824"
+  },
+  {
+    "file": "backend/src/services/courseDocuments.js",
+    "sha256": "7d2f714702214d9c1509fe7024c2fafd57748eabcb7631b0cb40501653eea214"
+  },
+  {
+    "file": "backend/src/services/courseProgress.js",
+    "sha256": "9d782ae5201348f007727df6884dd3f2fc52e61d27e1d6d2c6528f3645bb3eda"
+  },
+  {
+    "file": "backend/src/utils/courseAccess.js",
+    "sha256": "296591bb8f5179503ca39c43865e1c1dad5916b6f044b371b8b1beabe8810400"
+  },
+  {
+    "file": "frontend/src/pages/CourseWorkspacePage.jsx",
+    "sha256": "b36cf7cc29a4ac2f65f73c73099507c09392c0db427b5d9df701507d979743d2"
+  },
+  {
+    "file": "frontend/src/components/AssignmentsPanel.jsx",
+    "sha256": "13aed6b58fcfa15a03f646cdb937821defc7a65445ee0fc5af2a48c9d021ff2d"
+  },
+  {
+    "file": "frontend/src/components/assignments/StudentEditor.jsx",
+    "sha256": "5c7d3c9574533ea84960984ec27c6def5bb0521ad395fa2fd249b9304d2b155a"
+  },
+  {
+    "file": "frontend/src/hooks/useCourseRoster.js",
+    "sha256": "a30b6948cadceaba22c34144b29e2b87ebbcf2736084712fb03b387692e92749"
+  },
+  {
+    "file": "frontend/src/services/assignmentForm.js",
+    "sha256": "08f4bca9caf3cb78cfb960d552459d30abbe9cccb71eb77fc258cff979d306d5"
+  }
+]

@@ -1,0 +1,135 @@
+{
+  "command": "node auth-layout-probe.mjs",
+  "cwd": "repository root",
+  "exitCode": 0,
+  "observations": [
+    {
+      "mode": "login",
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "inputWidth": 37.828125,
+      "columns": "139.172px 153.828px"
+    },
+    {
+      "mode": "register",
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "inputWidth": 37.828125,
+      "columns": "139.172px 153.828px"
+    },
+    {
+      "mode": "forgot",
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "inputWidth": 37.828125,
+      "columns": "139.172px 153.828px"
+    },
+    {
+      "mode": "reset-missing",
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "inputWidth": null,
+      "columns": "139.172px 153.828px"
+    },
+    {
+      "mode": "login",
+      "width": 768,
+      "height": 1024,
+      "overflow": false,
+      "inputWidth": 244.15625,
+      "columns": "325.844px 360.156px"
+    },
+    {
+      "mode": "register",
+      "width": 768,
+      "height": 1024,
+      "overflow": false,
+      "inputWidth": 244.15625,
+      "columns": "325.844px 360.156px"
+    },
+    {
+      "mode": "forgot",
+      "width": 768,
+      "height": 1024,
+      "overflow": false,
+      "inputWidth": 244.15625,
+      "columns": "325.844px 360.156px"
+    },
+    {
+      "mode": "reset-missing",
+      "width": 768,
+      "height": 1024,
+      "overflow": false,
+      "inputWidth": null,
+      "columns": "325.844px 360.156px"
+    },
+    {
+      "mode": "login",
+      "width": 1280,
+      "height": 800,
+      "overflow": false,
+      "inputWidth": 410,
+      "columns": "531.047px 586.938px"
+    },
+    {
+      "mode": "register",
+      "width": 1280,
+      "height": 800,
+      "overflow": false,
+      "inputWidth": 410,
+      "columns": "531.047px 586.938px"
+    },
+    {
+      "mode": "forgot",
+      "width": 1280,
+      "height": 800,
+      "overflow": false,
+      "inputWidth": 410,
+      "columns": "531.047px 586.938px"
+    },
+    {
+      "mode": "reset-missing",
+      "width": 1280,
+      "height": 800,
+      "overflow": false,
+      "inputWidth": null,
+      "columns": "531.047px 586.938px"
+    },
+    {
+      "mode": "login",
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "inputWidth": 410,
+      "columns": "531.047px 586.938px"
+    },
+    {
+      "mode": "register",
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "inputWidth": 410,
+      "columns": "531.047px 586.938px"
+    },
+    {
+      "mode": "forgot",
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "inputWidth": 410,
+      "columns": "531.047px 586.938px"
+    },
+    {
+      "mode": "reset-missing",
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "inputWidth": null,
+      "columns": "531.047px 586.938px"
+    }
+  ]
+}

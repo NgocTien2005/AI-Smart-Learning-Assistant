@@ -11,6 +11,7 @@ const fail=(code,status=502)=>Object.assign(new Error(code),{code,status})
 const plain=value=>value&&typeof value==='object'&&!Array.isArray(value)
 const exact=(value,keys)=>plain(value)&&Object.keys(value).length===keys.length&&keys.every(k=>Object.hasOwn(value,k))
 const norm=text=>text.replace(/\s+/g,' ').trim()
+const displayKey=text=>norm(text.normalize('NFC'))
 export function validateCloudRequest(body) {
   if(!exact(body,['mode','questionId'])||!modes.has(body.mode)||!Object.hasOwn(questions,body.questionId))throw fail('CLOUD_INVALID_REQUEST',400)
   return {mode:body.mode,questionId:body.questionId}
@@ -56,7 +57,8 @@ export function validateCloudOutput(value,mode,sources) {
     if(!value.citations.length)throw fail('CLOUD_INVALID_OUTPUT')
     if(mode==='quiz') {
       if(value.questions.length!==3)throw fail('CLOUD_INVALID_OUTPUT')
-      for(const q of value.questions)if(!exact(q,['question','options','correctIndex','explanation','sourceId','quote'])||typeof q.question!=='string'||q.question.length<10||q.question.length>500||!Array.isArray(q.options)||q.options.length!==4||new Set(q.options).size!==4||q.options.some(o=>typeof o!=='string'||!o.trim()||o.length>300)||!Number.isInteger(q.correctIndex)||q.correctIndex<0||q.correctIndex>3||typeof q.explanation!=='string'||q.explanation.length<10||q.explanation.length>1000||!citationValid({sourceId:q.sourceId,quote:q.quote},sources))throw fail('CLOUD_INVALID_OUTPUT')
+      for(const q of value.questions)if(!exact(q,['question','options','correctIndex','explanation','sourceId','quote'])||typeof q.question!=='string'||q.question.length<10||q.question.length>500||!Array.isArray(q.options)||q.options.length!==4||q.options.some(o=>typeof o!=='string'||!o.trim()||o.length>300)||new Set(q.options.map(displayKey)).size!==4||!Number.isInteger(q.correctIndex)||q.correctIndex<0||q.correctIndex>3||typeof q.explanation!=='string'||q.explanation.length<10||q.explanation.length>1000||!citationValid({sourceId:q.sourceId,quote:q.quote},sources))throw fail('CLOUD_INVALID_OUTPUT')
+      if(new Set(value.questions.map(q=>displayKey(q.question))).size!==value.questions.length)throw fail('CLOUD_INVALID_OUTPUT')
     } else if(value.questions.length)throw fail('CLOUD_INVALID_OUTPUT')
   }
   return value
