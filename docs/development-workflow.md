@@ -14,6 +14,12 @@ hoặc thiếu `.specify/` tại mốc đó để mô tả repository hiện t�
 
 ## Kết quả khảo sát và giới hạn bằng chứng
 
+Cập nhật 2026-11-11 cho base đã có feature014/016: `backend/test/auth.test.js`
+hiện kiểm tra production auth router/current-user factory; `backend/app.js` vẫn
+là file legacy không được server hoặc test đó import. Frontend regression đã
+tách thành [các module theo workflow](../frontend/src/__tests__/). Các nhận định
+legacy trong bảng khảo sát 2026-10-28 dưới đây là lịch sử, không mô tả test hiện tại.
+
 | Phần đã đọc | Implementation và ý nghĩa khi phát triển |
 | --- | --- |
 | [Frontend package](../frontend/package.json), [backend package](../backend/package.json) | Hai package độc lập; React 19/Vite 8, Express 5/Prisma 7; không có npm workspace gốc. Test frontend kết hợp Node tests và Vitest/jsdom/React Testing Library; backend dùng Node test runner. |
@@ -25,7 +31,7 @@ hoặc thiếu `.specify/` tại mốc đó để mô tả repository hiện t�
 | [Runtime entry](../backend/server.js), [production app](../backend/src/app.js), [routes](../backend/src/routes/) | Mount dưới `/api`; courses mount router quiz. [Legacy app](../backend/app.js) là harness khác, không phải server production. |
 | [Authentication](../backend/src/middleware/authenticate.js), [role middleware](../backend/src/middleware/authorizeRole.js), [courses](../backend/src/routes/courses.js), [quiz](../backend/src/routes/quizAttempts.js), [admin](../backend/src/routes/admin.js), [auth](../backend/src/routes/auth.js) | Token được đối chiếu user hiện tại, active/authVersion; role và quyền owner/enrollment là các kiểm tra riêng. ADMIN không có bypass nội dung mặc định trong predicate course. |
 | [Schema](../backend/prisma/schema.prisma), [migrations](../backend/prisma/migrations/), [Prisma config](../backend/prisma.config.ts), [client adapter](../backend/src/lib/prisma.js) | Quan hệ cascade, progress/submission uniqueness, quiz JSON snapshot/draft/version và document metadata phải được xem cùng consumer. Không chỉnh generated client. |
-| [Backend tests](../backend/test/), [frontend tests](../frontend/src/__tests__/frontend.test.js), [service tests](../frontend/src/services/) | Auth regression import legacy app; quiz regression dùng production router với Prisma injection, không qua toàn bộ middleware thật. Test render có mock API, không chứng minh DB hoạt động. |
+| [Backend tests](../backend/test/), [frontend tests](../frontend/src/__tests__/), [service tests](../frontend/src/services/) | Auth regression import legacy app; quiz regression dùng production router với Prisma injection, không qua toàn bộ middleware thật. Test render có mock API, không chứng minh DB hoạt động. |
 | [Compose](../compose.yaml), [backend image](../backend/Dockerfile), [frontend image](../frontend/Dockerfile), [Nginx](../frontend/nginx.conf), [integration script](../backend/scripts/integration-check.mjs) | DB/backend ở network nội bộ, frontend public; backend startup chạy migrate deploy. Integration gọi HTTP, tạo tài khoản/dữ liệu và dọn qua Docker DB; có tác động dữ liệu kiểm thử. |
 
 Lần tạo skill này chỉ khảo sát tĩnh và kiểm tra tooling. Không mở UI, chạy app,
