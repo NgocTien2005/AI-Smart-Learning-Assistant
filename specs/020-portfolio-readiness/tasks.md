@@ -14,3 +14,7 @@
 - [x] T005 P1 [US3] Write docs/portfolio-improvement-report.md plus verification.md, traceability/evidence, small commits and docs PR; deps:T003/T004; deliverable before/after/task/branch/commit/PR/result/retention matrix; AC FR003/SC003; verify links/diff, source/exact hosted outcomes, final read-only analyze and append-only converge.
 
 Dependencies:T001 -> T002 -> {T003,T004} -> T005. Writing may be independent after baseline verification but execute serially. No new worker required. Original feature tasks/provider blockers remain owned by their features.
+
+## Phase 6: Main documentation consolidation
+
+- [ ] T006 P1 [US1/US3] Rewrite README.md and prepare the user-authorized main consolidation candidate per FR-001/FR-003: retain all feature histories/newest evidence, verify application source equality, relative links and exact candidate hosted CI; record source/command/cwd/exit and consolidation PR in verification.md/docs/main-consolidation.md. Dependencies:T001-T005 verified; affected README.md, historical status/report notes and020artifacts only; deliverable verified merge candidate with accurate setup/AI/provider limits. Actual authorized merge and resulting main CI are operational outcomes recorded in the PR body, not fabricated before execution.

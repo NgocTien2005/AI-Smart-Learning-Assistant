@@ -13,3 +13,7 @@ Combined baseline: full frontend npm ci/test/lint/build; backend npm ci/test/qui
 
 ## Risks
 Pending human review/realGoogle/Gemini/cleanup/TLS/monitoring remain explicit. Retained volumes are inventoried, never deleted. Legacy backend/app.js stays labeled as unmounted legacy until a separately reviewed retirement; real auth tests use production factory from014. Source/version references may differ across independent feature branches; integration report identifies exact selected commits.
+
+## Main consolidation follow-up - 2026-11-11
+
+Candidate integration/main-portfolio starts from origin/main eeccc5b. User-authorized PR13 merge updates audit base66c2727. Merge verified integration829b815 and audit66c2727, resolving only add/add documentation copies toward newer evidence; application code must remain identical to the verified integrated source. Rewrite README with current setup/roles/AI limits/testing and links, without changing runtime/config/schema/dependencies. Candidate exact-SHA hosted CI and source equivalence precede the authorized main PR merge; verify main hosted CI afterwards and record the operational outcome in the PR body. No deploy or development-container recreation.

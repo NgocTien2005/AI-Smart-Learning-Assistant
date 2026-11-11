@@ -22,3 +22,7 @@ The dependent docs/portfolio-readiness branch targets portfolio/integration-revi
 ## Combined local acceptance
 
 At source276d03f, isolated project lumina-acceptance-ci-1794292705527-bea45e21 passed90HTTP/database operations plus proxy headers/logprivacy/rotation, new DB restoration and upload digest comparison. Separate project lumina-acceptance-ci-demo-1794292732868-817a63 passed247HTTP operations, guarded seed/dryrun/collision/rerun and actual Chrome role matrix with52views plus16auth views across390/768/1280?800/1440?900. Both returned0 and scoped cleanup succeeded; users0, named volumes retained. No SMTP/Google/Gemini request. Exact reports are carried by dependent feature020 evidence. This code tree now forms the verified local reference base; hosted status follows after publication.
+
+## Owner-authorized main consolidation - 2026-11-11
+
+The owner has now explicitly requested merging all completed code into main and rewriting README. This supersedes the earlier no-merge boundary for this operation. PR13 merged into audit66c2727; historical conflicting PR7 is superseded and its branch preserved. Candidate integration/main-portfolio combines origin/main eeccc5b, integration829b815 and audit66c2727. Runtime/tests/CI/schema/Compose/package-lock sources remain byte-identical to the verified integrated source; conflicts were newer documentation copies only. See [main consolidation](main-consolidation.md) for evidence and the operational merge record. No force-push, deploy, private provider call or data/volume deletion.

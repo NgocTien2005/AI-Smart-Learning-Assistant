@@ -36,3 +36,7 @@ No critical ambiguity: user explicitly requested these documents and separate fe
 - **SC-001**: All relative links in newly written portfolio documents resolve and technical claims map to source/evidence.
 - **SC-002**: The walkthrough covers all three roles without disclosing private credentials or claiming an unobserved provider/deployment result.
 - **SC-003**: Every improvement group has a reviewable traceability row; combined compatibility checks either pass with evidence or are explicitly left incomplete.
+
+## Authorized main consolidation - 2026-11-11
+
+User now explicitly requests merging all completed code into main and rewriting README. This supersedes the prior no-merge limitation for this operation only; deployment, force-push, secret/provider and destructive-data limits remain. Consolidate the verified integration/audit branches on a dedicated candidate, preserve original feature histories and newest evidence, rewrite README against actual source and open provider gates, verify source equivalence and candidate CI before merging. Main execution/result is recorded in the consolidation PR after merge.

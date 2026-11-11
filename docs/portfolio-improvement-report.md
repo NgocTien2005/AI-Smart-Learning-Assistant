@@ -141,3 +141,7 @@ separate authorized task, not an automatic consequence of passing CI.
 ## Final portfolio delivery
 
 All44tasks across013-020 are verified within their bounded scope. Feature020 documentation commits cf065eb/afd34cf/de229b1 are on docs/portfolio-readiness; PR12 targets the explicit integration branch. [Documentation hosted run42771024786](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/42771024786) passed frontend/backend/HTTP-database jobs atde229b1. Later evidence-only closure commits remain separately identifiable; no unobserved HEAD success is implied. Final read-only analyze found no uncovered requirement; converge found no new actionable task and did not rewrite existing tasks. Original three blockers and public-release limits remain open.
+
+## Owner-authorized main consolidation - 2026-11-11
+
+PR13 supersedes original conflicting PR7 and was merged into audit base66c2727 under the new explicit authorization. Architecture015 T007 adds current-base verified delivery; documentation020 T006 tracks the rewritten README and main merge candidate. The earlier task/PR matrix is a dated snapshot, not the current open-PR list. All completed application, CI/operations and documentation changes are consolidated on integration/main-portfolio for main delivery. The exact operational merge/main CI outcomes are recorded in the consolidation PR linked from [main-consolidation.md](main-consolidation.md). Real Google/Gemini,008T026 and public deployment gates remain unchanged.
