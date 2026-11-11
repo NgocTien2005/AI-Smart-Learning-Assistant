@@ -1,0 +1,11 @@
+{
+  "time": "2026-11-11T15:19:12.379Z",
+  "project": "lumina-acceptance-ci-1794410151593-e7bff4a4",
+  "containers": [],
+  "networks": [],
+  "volumes": [
+    "lumina-acceptance-ci-1794410151593-e7bff4a4_postgres_data",
+    "lumina-acceptance-ci-1794410151593-e7bff4a4_uploads_data"
+  ],
+  "namedVolumesRemoved": false
+}
