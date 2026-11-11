@@ -1,0 +1,39 @@
+{
+  "time": "2026-11-11T15:15:08.936Z",
+  "revision": "f24c4fb3b2bd73c431b2f2106aad6fd1ff8bb9b9",
+  "sourceType": "local working tree; see source manifest",
+  "node": "v25.2.0",
+  "platform": "win32",
+  "job": "frontend",
+  "commands": [
+    {
+      "command": "npm ci",
+      "cwd": "frontend",
+      "durationMs": 13810,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "npm test",
+      "cwd": "frontend",
+      "durationMs": 21180,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "npm run lint",
+      "cwd": "frontend",
+      "durationMs": 5598,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "npm run build",
+      "cwd": "frontend",
+      "durationMs": 1091,
+      "exitCode": 0,
+      "status": "passed"
+    }
+  ],
+  "exitCode": 0
+}
