@@ -32,3 +32,13 @@ Commits cf065eb (overview/architecture), afd34cf (interview/demo), de229b1 (repo
 ## Final analyze/converge report
 
 After publication/artifact updates, final analyze ran read-only with SPECIFY_FEATURE_NO_PERSIST=1:3FR/5unique verified tasks/100%coverage,zero critical/ambiguity/duplication or constitution findings. Separate convergence compared current docs/code/evidence to spec/plan/tasks: no new actionable gap; tasks SHA256 identical before/after, no append or rewrite. Requirements4/4 and portfolio3/3 markers unchanged. Converged within feature020 scope, not a claim that original provider/cleanup/production gates are closed.
+
+## Authorized main candidate - 2026-11-11
+
+Owner explicitly authorizes merging completed code into main and rewriting README. Candidate integration/main-portfolio includes main eeccc5b, integration829b815 and audit66c2727 (merged13); original7 closed superseded, branches retained. A provenance merge of original architecture67610b2 retains its history too: the only runtime overlap is createJoinLimit import, kept exactly from current verified source. All original architecture modules were already present via13; full runtime/CI/Compose/schema/package/lockfile comparison remains identical to integration829b815. No unrelated change is discarded.
+
+README rewritten in Vietnamese against actual packages/scripts/architecture/provider limits;17relative README links and32relative links across the4changed entry/report documents pass. git diff --check passes. Exact direct push6eb6433bee1f1fbc445a6befbbdbd637e90ebe26 passed all3hosted jobs in run43050865517, including fresh HTTP/database/recovery and separate seed checks. No local full-suite/browser repetition for identical application code. Closure/provenance metadata will receive its own final candidate CI before the authorized merge. T006 candidate deliverable verified; actual main merge/main hosted run are operational outcomes recorded in PR14: https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/pull/14 .
+
+No running development stack recreate, environment/credential read, provider request, local8081 change, volume/profile/branch deletion, force-push or deployment. Original008T026/010T016/012T012 and production gates remain open;008T023 history preserved. Checklist markers frozen; source comparison evidence and hosted metadata are allowlisted.
+
+Final candidate read-only analyze:3FR/6unique verified tasks/100%coverage, no critical issue. Convergence: no new actionable gap, tasks byte-identical during assessment, no appended duplicate task. Runtime/infrastructure diff versus verified integrated reference empty after provenance resolution; checklist markers unchanged. Operational main merge and its CI follow in PR14 under explicit owner authorization.

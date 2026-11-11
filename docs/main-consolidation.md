@@ -38,7 +38,7 @@ against actual files/scripts. Historical reports remain dated snapshots.
 
 The consolidation PR records the exact candidate SHA/run, merge execution and
 resulting main SHA/run after those actions occur. This document does not
-fabricate future results. Its PR link is added before publication closure.
+fabricate future results. [PR14](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/pull/14) is the operational record; exact candidate6eb6433 passed all3jobs in [run43050865517](https://github.com/NgocTien2005/AI-Smart-Learning-Assistant/actions/runs/43050865517). The final metadata/provenance commit is checked separately before merge.
 
 ## Boundaries preserved
 
@@ -48,3 +48,7 @@ policy-blocked browser profile is deleted. Main consolidation itself creates no
 test dataset; hosted isolated runs retain their normal scoped cleanup rules.
 Google010/T016, Gemini012/T012, cleanup008/T026 and production gates remain open;
 email008/T023 historical acceptance remains closed.
+
+## Original architecture history preserved
+
+The original architecture branch67610b2 is also incorporated through a normal provenance merge. Its existing refactor is already included through replacement13; the import overlap retains current createJoinLimit, and newer015/module documentation is retained. Full runtime/source equality is verified again rather than using a strategy that blindly discards changes. No original branch is deleted.
