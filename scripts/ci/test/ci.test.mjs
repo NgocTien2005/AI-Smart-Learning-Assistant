@@ -136,7 +136,7 @@ test('HTTP evidence rejects unknown endpoints and arbitrary failure strings', ()
 
 test('production evidence accepts the mounted API prefix and actual submission/grading routes', () => {
   const target = { project: valid.project, baseUrl: valid.baseUrl, database: valid.database }
-  for (const pathname of ['/api/auth/login', '/api/courses/assignments/1/submission', '/api/courses/assignments/1/submissions/2']) {
+  for (const pathname of ['/api/auth/login', '/api/courses/assignments/1/submission', '/api/courses/assignments/1/submissions/2', '/api/courses/lessons/1/gemini-chat']) {
     assert.equal(exportHttpEvidence({ ...valid, requests: [{ method: 'POST', path: pathname, status: 200 }] }, target).requests[0].path, pathname)
   }
 })

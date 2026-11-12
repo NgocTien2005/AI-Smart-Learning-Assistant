@@ -12,6 +12,8 @@ import adminRouter from './routes/admin.js'
 import coursesRouter from './routes/courses.js'
 import healthRouter from './routes/health.js'
 import { createDemoCloudRouter } from './routes/demoCloudAssistant.js'
+import { createLessonChatRouter } from './routes/lessonChat.js'
+import { createCloudBudget, createCloudService } from './services/demoCloudAssistant.js'
 import { requestBoundary } from './middleware/requestBoundary.js'
 import { securityHeaders, logSafeError } from './middleware/securityHeaders.js'
 
@@ -35,7 +37,10 @@ export const createApp = () => {
   app.use('/api/auth/google', createGoogleAuthRouter({ prisma, authenticate, createToken, publicUser, clientId: googleClientId, secureCookie: appOrigin.startsWith('https://') }))
   app.use('/api/auth', createAuthRouter({ prisma, authenticate, createToken, publicUser, isEmailConfigured, sendPasswordResetEmail }))
   app.use('/api/admin', adminRouter)
-  app.use('/api/courses/lessons', createDemoCloudRouter({ prisma, authenticate }))
+  const budget = createCloudBudget()
+  const providerOptions = { key: process.env.GEMINI_API_KEY || '', freeOnly: process.env.GEMINI_FREE_ONLY_CONFIRMED === 'true', budget }
+  app.use('/api/courses/lessons', createDemoCloudRouter({ prisma, authenticate, service: createCloudService({ ...providerOptions, enabled: process.env.LUMINA_DEMO_ALLOWED === 'true' }) }))
+  app.use('/api/courses/lessons', createLessonChatRouter({ prisma, authenticate, service: createCloudService({ ...providerOptions, enabled: process.env.GEMINI_CHAT_ALLOWED === 'true', chat: true }) }))
   app.use('/api/courses', coursesRouter)
   app.use((_request, response) => {
     response.status(404).json({ error: 'Không tìm thấy endpoint' })

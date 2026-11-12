@@ -1,6 +1,6 @@
 # Lesson chat HTTP contract
 
-Authenticated `GET|POST /api/courses/lessons/:lessonId/chat`.
+Authenticated `GET|POST /api/courses/lessons/:lessonId/gemini-chat`.
 
 GET: `{enabled, provider:'Gemini', model, source:{type,revision,title,characters,truncated}|null}`; no provider request, no source text beyond authorized lesson metadata. POST body exactly `{question,history,sourceType,sourceRevision,consent:true}` (bounds in data-model). No provider/model/URL/tool overrides. Success200 validated provider reply plus lessonId/sourceRevision/sourceType; questions always[].
 

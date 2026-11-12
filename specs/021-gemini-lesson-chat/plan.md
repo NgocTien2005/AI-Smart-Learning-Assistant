@@ -4,7 +4,7 @@
 
 ## Summary
 
-Add a separate authenticated `/chat` contract and React conversation panel in the existing lesson workspace. Reuse the pinned Gemini transport and exact citation validator with a free-text adapter and shared process budget. Keep the finite `/cloud-assistant` contract and demo proof unchanged. No schema, dependency, lockfile, billing or authentication architecture changes.
+Add a separate authenticated `/gemini-chat` contract and React conversation panel in the existing lesson workspace. Reuse the pinned Gemini transport and exact citation validator with a free-text adapter and shared process budget. Keep the finite `/cloud-assistant` contract and demo proof unchanged. No schema, dependency, lockfile, billing or authentication architecture changes.
 
 ## Technical Context
 
