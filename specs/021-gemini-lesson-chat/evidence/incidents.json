@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-12",
+  "incidents": [
+    {
+      "command": "node --test test/lessonChat.test.js",
+      "cwd": "backend",
+      "exitCode": 1,
+      "cause": "Expected test-first missing production module before implementation",
+      "resolution": "Production source/router implemented; 11 chat/demo tests pass"
+    },
+    {
+      "command": "npm test -- --run src/__tests__/GeminiChatPanel.test.jsx",
+      "cwd": "frontend",
+      "exitCode": 1,
+      "cause": "Expected test-first missing component; existing 226 component cases passed",
+      "resolution": "Component implemented; test harness corrected to existing Vitest cleanup/plain assertion conventions"
+    },
+    {
+      "command": "npm ci",
+      "cwd": "frontend",
+      "exitCode": 4294963248,
+      "cause": "Windows EPERM on loaded Rolldown native module held by verified repository Vite process",
+      "resolution": "Stopped only matching repository Vite process; npm ci/test/lint/build passed; restarted Vite5173"
+    },
+    {
+      "command": "node scripts/ci/integration.mjs",
+      "cwd": ".",
+      "exitCode": 1,
+      "project": "lumina-acceptance-ci-1794466543830-920b4376",
+      "cause": "HTTP/database test command passed but sanitizer correctly refused new endpoint absent from exact public path allowlist",
+      "resolution": "Added only numeric lesson gemini-chat path and allowlist regression; fresh isolated rerun passed",
+      "cleanupSucceeded": true,
+      "namedVolumesRetained": [
+        "lumina-acceptance-ci-1794466543830-920b4376_postgres_data",
+        "lumina-acceptance-ci-1794466543830-920b4376_uploads_data"
+      ]
+    },
+    {
+      "command": "fresh Chrome CDP browser probe",
+      "cwd": ".",
+      "exitCode": 1,
+      "cause": "Some native Tab dispatches never reached document keydown listener; no application preventDefault observed",
+      "resolution": "Preserved limitation explicitly in final browser evidence. Actual buttons, source/consent/input and both viewport layouts exercised. Native Tab observed for instructor, inconclusive for student; component Ctrl+Enter/Tab/Enter regression passes. No application keyboard workaround or weakened production guard. Enabled-flow native keyboard acceptance remains open."
+    }
+  ],
+  "security": {
+    "providerCalls": 0,
+    "smtpSends": 0,
+    "local8081Touched": false,
+    "namedVolumesDeleted": false,
+    "historicalBlockedProfilesRetried": false
+  }
+}

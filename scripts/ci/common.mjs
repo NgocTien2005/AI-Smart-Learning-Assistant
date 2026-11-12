@@ -82,7 +82,7 @@ export async function prepareJob(job) {
 export function exportHttpEvidence(raw, target) {
   if (!raw || raw.project !== target.project || raw.baseUrl !== target.baseUrl || raw.database !== target.database || raw.remainingOwnedUsers !== 0 || !Array.isArray(raw.requests) || !raw.requests.length || !Array.isArray(raw.resources)) throw new Error('Missing, mismatched or incomplete integration evidence')
   const requests = raw.requests.map(entry => {
-    const approvedPath = /^\/api\/(?:auth\/(?:register|login|me|forgot-password|reset-password|change-password|google\/(?:challenge|login|link))|admin\/users(?:\/\d+)?|courses(?:\/join|\/\d+(?:\/(?:students|lessons|assignments|enrollment))?|\/lessons\/\d+(?:\/(?:document(?:\/process)?|progress|chat|summary|quizzes))?|\/assignments\/\d+(?:\/submission|\/submissions(?:\/\d+)?)?|\/quiz-attempts\/\d+(?:\/(?:draft|submit))?)?)$/
+    const approvedPath = /^\/api\/(?:auth\/(?:register|login|me|forgot-password|reset-password|change-password|google\/(?:challenge|login|link))|admin\/users(?:\/\d+)?|courses(?:\/join|\/\d+(?:\/(?:students|lessons|assignments|enrollment))?|\/lessons\/\d+(?:\/(?:document(?:\/process)?|progress|chat|gemini-chat|summary|quizzes))?|\/assignments\/\d+(?:\/submission|\/submissions(?:\/\d+)?)?|\/quiz-attempts\/\d+(?:\/(?:draft|submit))?)?)$/
     if (!['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(entry.method) || typeof entry.path !== 'string' || !approvedPath.test(entry.path)) throw new Error('Unsafe HTTP evidence shape')
     const safe = { method: entry.method, path: entry.path }
     if (Number.isInteger(entry.status) && entry.status >= 100 && entry.status < 600) safe.status = entry.status

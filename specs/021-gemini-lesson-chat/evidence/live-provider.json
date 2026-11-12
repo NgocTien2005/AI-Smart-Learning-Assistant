@@ -1,0 +1,39 @@
+{
+  "date": "2026-11-12",
+  "runtimeReadinessAfterPrivateSetup": {"keyPresent": true, "freeConfirmed": true, "chatAllowed": true},
+  "freeBillingEnforcement": "Operator confirmation only; no billing API inspected or paid service enabled",
+  "actualUI": {
+    "command": "fresh Chrome selected synthetic lesson -> source selection -> acknowledgment -> free question -> submit",
+    "cwd": ".",
+    "exitCode": 1,
+    "role": "STUDENT",
+    "viewport": [1280, 800],
+    "generationAttempts": 1,
+    "answered": false,
+    "safeError": "Chưa thể kết nối Gemini hoặc model chưa khả dụng. Không có câu trả lời thay thế.",
+    "automaticRetries": 0,
+    "secondConversationQuestionSent": false
+  },
+  "metadataDiagnostic": {
+    "command": "verified backend GET fixed model metadata; only numeric status/availability published",
+    "cwd": ".",
+    "exitCode": 0,
+    "httpStatus": 200,
+    "modelAvailable": true,
+    "contentGeneration": false
+  },
+  "syntheticTransportDiagnostic": {
+    "command": "verified backend existing adapter with native fetch wrapper; new original-synthetic diagnostic question; status-only reporting",
+    "cwd": ".",
+    "exitCode": 0,
+    "generationAttempts": 1,
+    "providerHttpStatus": 503,
+    "validated": false,
+    "safeCode": "CLOUD_PROVIDER_UNAVAILABLE",
+    "automaticRetries": 0
+  },
+  "assessment": "Model metadata is reachable with current runtime configuration, but the pinned Interactions generation endpoint returned503 during separate controlled diagnosis. This supports an upstream availability blocker; it is not proof of a global provider outage or successful generation.",
+  "totals": {"generationAttempts": 2, "metadataRequests": 1, "validatedModelReplies": 0, "smtpSends": 0},
+  "privacy": "Only original synthetic seed text, free synthetic questions and empty history were sent. No real/private document, account identity, token, reset URL or key is included in evidence. Fresh profile cleanup followed invocation-owned OS-temp prefix guard; no historical profile touched.",
+  "remaining": "T007 remains open for two successful actual UI questions with valid grounded replies. Wait for provider recovery; operator may explicitly configure another documented Free model in a separately reviewed change, no automatic fallback. T006 enabled/native student keyboard acceptance also remains open."
+}

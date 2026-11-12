@@ -363,6 +363,18 @@ END $$;`)
   }, student.token))
   if (resubmitGraded.status !== 409) throw new Error(`Graded assignment update returned ${resubmitGraded.status}, expected 409`)
 
+  // Gemini is disabled in isolated CI: exercise real auth/DB/source boundaries
+  // without contacting Google. The existing local /chat contract stays intact.
+  const geminiPath = `/courses/lessons/${createdLesson.lesson.id}/gemini-chat`
+  const geminiCapability = await request(geminiPath, { headers: { Authorization: `Bearer ${student.token}` } })
+  if (geminiCapability.enabled !== false || geminiCapability.source?.type !== 'LESSON_CONTENT' || 'text' in geminiCapability.source) throw new Error('Unexpected Gemini readiness/source disclosure')
+  const ownerGemini = await request(geminiPath, { headers: { Authorization: `Bearer ${instructorToken}` } })
+  if (ownerGemini.source.revision !== geminiCapability.source.revision) throw new Error('Gemini source revision mismatch')
+  const geminiBody = { question: 'Giải thích theo bài học?', history: [], sourceType: geminiCapability.source.type, sourceRevision: geminiCapability.source.revision, consent: true }
+  for (const [body, token, status] of [[geminiBody, null, 401], [geminiBody, adminToken, 403], [{ ...geminiBody, consent: false }, student.token, 400], [{ ...geminiBody, sourceRevision: geminiBody.sourceRevision + 1 }, student.token, 409], [geminiBody, student.token, 503]]) {
+    const response = await fetch(`${baseUrl}${geminiPath}`, jsonOptions('POST', body, token))
+    if (response.status !== status) throw new Error(`Gemini boundary returned ${response.status}, expected ${status}`)
+  }
   const chat = await request(`/courses/lessons/${createdLesson.lesson.id}/chat`, jsonOptions('POST', {
     question: 'Machine Learning học từ đâu?',
   }, student.token))
@@ -418,6 +430,8 @@ END $$;`)
   await request(`/courses/${courseId}/enrollment`, { method: 'DELETE', headers: { Authorization: `Bearer ${student.token}` } })
   const afterLeaving = await fetch(`${baseUrl}/courses/${courseId}`, { headers: { Authorization: `Bearer ${student.token}` } })
   if (afterLeaving.status !== 403) throw new Error(`Course access after leaving returned ${afterLeaving.status}, expected 403`)
+  const geminiAfterLeaving = await fetch(`${baseUrl}${geminiPath}`, { headers: { Authorization: `Bearer ${student.token}` } })
+  if (geminiAfterLeaving.status !== 403) throw new Error('Gemini allowed content access after leaving')
   const quizAfterLeaving = await fetch(`${baseUrl}/courses/quiz-attempts/${quiz.attemptId}`, { headers: { Authorization: `Bearer ${student.token}` } })
   if (quizAfterLeaving.status !== 403) throw new Error(`Quiz access after leaving returned ${quizAfterLeaving.status}, expected 403`)
 
