@@ -1,0 +1,43 @@
+{
+  "before": {
+    "key": false,
+    "free": false,
+    "smtp": true,
+    "chat": false
+  },
+  "after": {
+    "key": false,
+    "free": false,
+    "smtp": true,
+    "chat": false
+  },
+  "databaseVerified": true,
+  "healthStatus": 200,
+  "records": [
+    {
+      "command": "docker exec <verified container; boolean probe or nginx reload>",
+      "cwd": ".",
+      "exitCode": 0
+    },
+    {
+      "command": "docker compose <verified default dev backend; no volume operations>",
+      "cwd": ".",
+      "exitCode": 0
+    },
+    {
+      "command": "docker compose <verified default dev backend; no volume operations>",
+      "cwd": ".",
+      "exitCode": 0
+    },
+    {
+      "command": "docker exec <verified container; boolean probe or nginx reload>",
+      "cwd": ".",
+      "exitCode": 0
+    },
+    {
+      "command": "docker exec <verified container; boolean probe or nginx reload>",
+      "cwd": ".",
+      "exitCode": 0
+    }
+  ]
+}

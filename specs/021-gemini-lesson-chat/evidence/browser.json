@@ -1,0 +1,80 @@
+[
+  {
+    "role": "INSTRUCTOR",
+    "width": 1280,
+    "height": 800,
+    "unselected": true,
+    "unchecked": true,
+    "sendDisabled": true,
+    "missingConfig": true,
+    "overflow": false,
+    "sourceSelected": true,
+    "consent": true,
+    "questionEntered": true,
+    "textareaFocused": true,
+    "nativeKeyboardDelivered": true,
+    "nativeTabToClear": true,
+    "clearButton": true,
+    "realProviderRequests": 0
+  },
+  {
+    "role": "INSTRUCTOR",
+    "width": 1440,
+    "height": 900,
+    "unselected": true,
+    "unchecked": true,
+    "sendDisabled": true,
+    "missingConfig": true,
+    "overflow": false,
+    "sourceSelected": true,
+    "consent": true,
+    "questionEntered": true,
+    "textareaFocused": true,
+    "nativeKeyboardDelivered": true,
+    "nativeTabToClear": true,
+    "clearButton": true,
+    "realProviderRequests": 0
+  },
+  {
+    "freshProfileCleanup": true
+  },
+  {
+    "role": "STUDENT",
+    "width": 1280,
+    "height": 800,
+    "unselected": true,
+    "unchecked": true,
+    "sendDisabled": true,
+    "missingConfig": true,
+    "overflow": false,
+    "sourceSelected": true,
+    "consent": true,
+    "questionEntered": true,
+    "textareaFocused": true,
+    "nativeKeyboardDelivered": false,
+    "nativeTabToClear": false,
+    "clearButton": true,
+    "realProviderRequests": 0
+  },
+  {
+    "role": "STUDENT",
+    "width": 1440,
+    "height": 900,
+    "unselected": true,
+    "unchecked": true,
+    "sendDisabled": true,
+    "missingConfig": true,
+    "overflow": false,
+    "sourceSelected": true,
+    "consent": true,
+    "questionEntered": true,
+    "textareaFocused": true,
+    "nativeKeyboardDelivered": false,
+    "nativeTabToClear": false,
+    "clearButton": true,
+    "realProviderRequests": 0
+  },
+  {
+    "freshProfileCleanup": true
+  }
+]

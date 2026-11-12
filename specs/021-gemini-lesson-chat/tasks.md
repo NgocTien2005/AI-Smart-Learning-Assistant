@@ -4,20 +4,20 @@ Input: [spec](spec.md), [plan](plan.md), contracts/data-model/research. All task
 
 ## Phase 1: Setup
 
-- [ ] T001 P0 Capture clean baseline, official resolver/allocation, clarification and reviewed design in `specs/021-gemini-lesson-chat/`; accept when artifacts trace FR001–008 and read-only analyze has no blocking findings.
+- [x] T001 P0 Capture clean baseline, official resolver/allocation, clarification and reviewed design in `specs/021-gemini-lesson-chat/`; accept when artifacts trace FR001–008 and read-only analyze has no blocking findings.
 
 ## Phase 2: Foundation and US2 access boundary
 
-- [ ] T002 [US2] P0 Write negative production-router/source tests in `backend/test/lessonChat.test.js`, then implement strict validation/source selection/pre-post authorization in `backend/src/{services,routes}/lessonChat.js`; depends T001; accept FR002–003/005, SC002–003, zero initial denied egress and source/session changes rejected.
+- [x] T002 [US2] P0 Write negative production-router/source tests in `backend/test/lessonChat.test.js`, then implement strict validation/source selection/pre-post authorization in `backend/src/{services,routes}/lessonChat.js`; depends T001; accept FR002–003/005, SC002–003, zero initial denied egress and source/session changes rejected.
 
 ## Phase 3: US1 conversation
 
-- [ ] T003 [US1] P1 Extend `backend/src/services/demoCloudAssistant.js` with bounded untrusted free text/history, shared budget and existing validated real transport; mount in `backend/src/app.js`; depends T002; accept FR004/006/008, finite demo regression and fake-transport contract tests pass without network calls.
-- [ ] T004 [US1] P1 Write `frontend/src/__tests__/GeminiChatPanel.test.jsx` before implementing `frontend/src/components/GeminiChatPanel.{jsx,css}` and workspace entry; depends T003; accept FR001/007, consent, conversation, duplicate/stale/cancel/error/clear regression and existing component suite pass.
+- [x] T003 [US1] P1 Extend `backend/src/services/demoCloudAssistant.js` with bounded untrusted free text/history, shared budget and existing validated real transport; mount in `backend/src/app.js`; depends T002; accept FR004/006/008, finite demo regression and fake-transport contract tests pass without network calls.
+- [x] T004 [US1] P1 Write `frontend/src/__tests__/GeminiChatPanel.test.jsx` before implementing `frontend/src/components/GeminiChatPanel.{jsx,css}` and workspace entry; depends T003; accept FR001/007, consent, conversation, duplicate/stale/cancel/error/clear regression and existing component suite pass.
 
 ## Phase 4: US3 configuration and recovery
 
-- [ ] T005 [US3] P1 Add private `scripts/start-gemini-chat.ps1`, explicit chat Compose flag and `docs/gemini-chat.md`/README instructions; depends T003; accept FR006/008 with boolean-only readiness, no secret file/output/provider call; verify launcher bridge tests and docs links.
+- [x] T005 [US3] P1 Add private `scripts/start-gemini-chat.ps1`, explicit chat Compose flag and `docs/gemini-chat.md`/README instructions; depends T003; accept FR006/008 with boolean-only readiness, no secret file/output/provider call; verify launcher bridge tests and docs links.
 
 ## Phase 5: Verification and handoff
 

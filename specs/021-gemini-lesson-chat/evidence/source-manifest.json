@@ -1,0 +1,72 @@
+{
+  "files": [
+    {
+      "file": "backend/src/app.js",
+      "sha256": "21a6723d57a6cad368afbbde132d81f79366ecf4bc616dafc98ce5a0730648ea"
+    },
+    {
+      "file": "backend/src/services/demoCloudAssistant.js",
+      "sha256": "3eeb780174d2fdb5e4b20c74c455407ceddf5549937d49c001983c99ba191647"
+    },
+    {
+      "file": "backend/src/services/lessonChat.js",
+      "sha256": "07115fad5cff6f40a964c8ddf21bda19fcc4119b0991a4416910a6600094f4c1"
+    },
+    {
+      "file": "backend/src/routes/lessonChat.js",
+      "sha256": "3e76cbfeac2984f2d06b352e948400bff6b9524cfdcf1bbe8e8c26e72b148950"
+    },
+    {
+      "file": "backend/test/lessonChat.test.js",
+      "sha256": "ae7e61e5a0fdffa3de44b482367693a8692639d7d31a403f8dad1ce93b14a2f6"
+    },
+    {
+      "file": "backend/scripts/integration-check.mjs",
+      "sha256": "4631131f549881a1b1d5220b32bf879744e9a6ac2c5b06b7027d7daaa4e12548"
+    },
+    {
+      "file": "scripts/ci/common.mjs",
+      "sha256": "500022c3e6de8eb6f65283d38f13df92cf641e6df92c5b10947506bb50f46a4d"
+    },
+    {
+      "file": "scripts/ci/test/ci.test.mjs",
+      "sha256": "2e93b100e68c9ac8811ea9cb983388f67eaf1d9910e352ff077042819f63e246"
+    },
+    {
+      "file": "frontend/src/components/GeminiChatPanel.jsx",
+      "sha256": "275d051435d729f1765614609097dfd91b1573cf39f8b8649a5b03fb4161fbb6"
+    },
+    {
+      "file": "frontend/src/components/GeminiChatPanel.css",
+      "sha256": "8e5003ea6c9039fd944f32690fab515935693aa1bcc45e014ed0a92fc4bd8431"
+    },
+    {
+      "file": "frontend/src/__tests__/GeminiChatPanel.test.jsx",
+      "sha256": "9068a6550f79e9a55464b7d0371c6f06efe5822cd4b5f999c574e025565e5dc9"
+    },
+    {
+      "file": "frontend/src/pages/CourseWorkspacePage.jsx",
+      "sha256": "a65da870ab61784507ea1a875b136666b89415ed12bb66e7d74afc4a151a8149"
+    },
+    {
+      "file": "compose.dev.yaml",
+      "sha256": "55c216e9d895b5b6d79da9d789c8872c9530e047764291472d943d903597a0ef"
+    },
+    {
+      "file": "scripts/start-gemini-chat.ps1",
+      "sha256": "fe741a1280a1cbe298330ba2ab0b51af73aecb1cde7722d8588499e125a42f48"
+    },
+    {
+      "file": "scripts/start-demo-cloud-ai.ps1",
+      "sha256": "4bedd64a72284640328ffec1b2ff2a21a6523806cea15b08d1aa9e625a164f5d"
+    },
+    {
+      "file": "frontend/package-lock.json",
+      "sha256": "4496b1db4e85ac1606c4847e7a0adcaa71a83937a1a6f06bdf145674890f61b7"
+    },
+    {
+      "file": "backend/package-lock.json",
+      "sha256": "7fbd30654727a26e8443d9a9dbb181404e0efc5ccbbb8af2a0c6534e2a8d9d18"
+    }
+  ]
+}
