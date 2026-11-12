@@ -1,0 +1,104 @@
+{
+  "time": "2026-11-12T06:33:43.435Z",
+  "http": [
+    {
+      "role": "ADMIN",
+      "loginStatus": 200,
+      "meStatus": 200
+    },
+    {
+      "role": "INSTRUCTOR",
+      "loginStatus": 200,
+      "meStatus": 200
+    },
+    {
+      "role": "STUDENT",
+      "loginStatus": 200,
+      "meStatus": 200
+    }
+  ],
+  "browser": [
+    {
+      "role": "ADMIN",
+      "origin": "http://localhost:5173",
+      "formSubmitted": true,
+      "route": "/admin",
+      "meStatus": 200,
+      "googleDisabled": true
+    },
+    {
+      "role": "INSTRUCTOR",
+      "origin": "http://localhost:5173",
+      "formSubmitted": true,
+      "route": "/dashboard",
+      "meStatus": 200,
+      "googleDisabled": true
+    },
+    {
+      "role": "STUDENT",
+      "origin": "http://localhost:5173",
+      "formSubmitted": true,
+      "route": "/dashboard",
+      "meStatus": 200,
+      "googleDisabled": true
+    }
+  ],
+  "credentialsRecorded": false,
+  "providerRequests": 0,
+  "target": {
+    "project": "ai-smart-learning-assistant",
+    "database": "lumina_lms",
+    "backendDatabaseMatched": true,
+    "frontendOrigin": "http://localhost:5173",
+    "protected8081Touched": false
+  },
+  "before": {
+    "viteOriginAllowed": false,
+    "health5173": 403,
+    "login5173": 403,
+    "google8080": 503,
+    "googleCode": "GOOGLE_NOT_CONFIGURED"
+  },
+  "after": {
+    "readiness": {
+      "smtpConfigured": true,
+      "googleConfigured": false,
+      "geminiConfigured": false,
+      "viteOriginAllowed": true
+    },
+    "health5173": 200,
+    "invalidLoginBody5173": 400,
+    "unknownOrigin": 403,
+    "google": 503,
+    "googleCode": "GOOGLE_NOT_CONFIGURED"
+  },
+  "commands": [
+    {
+      "command": "docker exec <verified backend> node <boolean readiness and database identity probes>",
+      "cwd": ".",
+      "exitCode": 0
+    },
+    {
+      "command": "docker compose -p ai-smart-learning-assistant -f compose.yaml -f compose.dev.yaml run --rm --no-deps --entrypoint node backend <boolean planned readiness>",
+      "cwd": ".",
+      "exitCode": 0
+    },
+    {
+      "command": "docker compose -p ai-smart-learning-assistant -f compose.yaml -f compose.dev.yaml up -d --no-deps --wait --wait-timeout 90 backend",
+      "cwd": ".",
+      "exitCode": 0
+    },
+    {
+      "command": "docker exec <verified frontend> nginx -s reload",
+      "cwd": ".",
+      "exitCode": 0
+    },
+    {
+      "command": "node <in-memory owned-demo API and fresh Chrome UI login probe>",
+      "cwd": ".",
+      "exitCode": 0
+    }
+  ],
+  "emailsSent": 0,
+  "sensitiveArtifactsSaved": false
+}

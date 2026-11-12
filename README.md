@@ -119,6 +119,23 @@ API client dùng cùng origin hoặc `VITE_API_URL` khi có override chủ độ
 làm mất key Gemini chỉ được nhập vào container qua launcher. Dùng hướng dẫn
 provider riêng khi cần; không đọc/in Docker environment để lấy lại key.
 
+### Nếu đăng nhập ở5173 bị lỗi
+
+- **403 “Origin không được phép truy cập”**: backend đang chạy cấu hình Docker
+  thường chỉ cho8080. Hãy dùng cả `compose.yaml` và `compose.dev.yaml` theo lệnh
+  development phía trên; chỉ khởi động Vite không cập nhật CORS của backend.
+  Không tắt CORS hoặc sửa mật khẩu để xử lý lỗi này.
+- **401 thông tin đăng nhập không đúng**: API đã nhận request; kiểm tra đúng email,
+  mật khẩu và trạng thái tài khoản. Seed rerun không khôi phục mật khẩu cũ.
+- **Google chưa sẵn sàng / `GOOGLE_NOT_CONFIGURED`**: cần Google Web Client ID khớp
+  ở backend và frontend build, cùng authorized origins8080/5173. Nút disabled khi
+  thiếu cấu hình không có nghĩa tài khoản Google bị khóa. Làm theo
+  [hướng dẫn Google](docs/google-sign-in.md); không tự bỏ validation hoặc tạo/gộp user.
+
+CI kiểm tra một stack riêng; kết quả đó không xác nhận cấu hình container đang
+chạy trên máy. Khi chuyển sang dev override, giữ cấu hình secret riêng và kiểm
+tra lại health, login và `/api/auth/me` qua đúng origin đang mở.
+
 ## Dữ liệu demo và tài khoản
 
 Dataset tổng hợp có **18 user**, gồm1ADMIN,4INSTRUCTOR,12STUDENT hoạt động và
