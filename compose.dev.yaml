@@ -5,4 +5,5 @@ services:
       LUMINA_DEMO_ALLOWED: "true"
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_FREE_ONLY_CONFIRMED: ${GEMINI_FREE_ONLY_CONFIRMED:-false}
+      GEMINI_CHAT_ALLOWED: ${GEMINI_CHAT_ALLOWED:-false}
       CORS_ORIGIN: ${DEV_CORS_ORIGIN:-http://localhost:5173,http://localhost:8080}

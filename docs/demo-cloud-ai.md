@@ -1,5 +1,9 @@
 # Gemini miễn phí cho dữ liệu demo
 
+Tài liệu này dành cho API demo hữu hạn cũ. Giao diện bài học hiện dùng
+[Chat Gemini với câu hỏi tự do và nguồn được chọn](gemini-chat.md); launcher chat
+riêng mở phạm vi nguồn sau xác nhận. API demo vẫn chỉ cho dữ liệu tổng hợp.
+
 Đã có đường gọi model thật qua server; mặc định **tắt**. Chỉ nguồn tổng hợp
 nguyên bản của dataset `lumina-demo-v2` được phép gửi. Backend xác minh quyền
 owner/enrollment hiện tại, registry ID và đối chiếu chính xác nội dung/tài liệu

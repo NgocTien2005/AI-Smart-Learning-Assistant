@@ -19,6 +19,8 @@ try {
     $env:GEMINI_API_KEY = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($pointer)
     if ([string]::IsNullOrWhiteSpace($env:GEMINI_API_KEY)) { throw 'Empty key; setup stopped.' }
     $env:GEMINI_FREE_ONLY_CONFIRMED = 'true'
+    # This launcher retains the original synthetic/finite demo scope only.
+    $env:GEMINI_CHAT_ALLOWED = 'false'
     # Docker build progress on stderr is not an error. The Node bridge drains
     # native streams privately and returns Docker's real exit code on PS5.1.
     node scripts/configure-demo-cloud.mjs
@@ -30,5 +32,6 @@ try {
     if ($pointer -ne [IntPtr]::Zero) { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($pointer) }
     [Environment]::SetEnvironmentVariable('GEMINI_API_KEY', $null, 'Process')
     [Environment]::SetEnvironmentVariable('GEMINI_FREE_ONLY_CONFIRMED', $null, 'Process')
+    [Environment]::SetEnvironmentVariable('GEMINI_CHAT_ALLOWED', $null, 'Process')
     $secureKey.Dispose()
 }

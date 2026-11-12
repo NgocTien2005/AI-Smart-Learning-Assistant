@@ -36,12 +36,12 @@ truy cập. Dự án hướng tới một portfolio dễ chạy thử, đọc hi
 | Tra cứu tài liệu | Tìm đoạn nguồn bằng token cục bộ | Không phải chatbot LLM hiểu mọi tài liệu |
 | Tóm tắt trích xuất | Chọn câu từ nguồn | Không diễn giải bằng AI sinh nội dung |
 | Quiz ôn tập | Generator nhận dạng mẫu câu định nghĩa | Có thể tạo ít câu hoặc thiếu nguồn phù hợp |
-| Gemini cloud demo | Gọi model qua backend, tùy chọn và mặc định tắt | Chỉ nguồn demo tổng hợp nguyên bản/câu hỏi hữu hạn; chưa nghiệm thu chất lượng model thật |
+| Chat Gemini | Câu hỏi tự do và hội thoại theo nguồn bài học được chọn, gọi model thật qua backend | Cần key/Free riêng, quyền chia sẻ nguồn và xác nhận; chưa nghiệm thu model thật ở runtime hiện tại |
 
 Không tự gửi tài liệu riêng, lịch sử chat hoặc nội dung người dùng ra provider.
 Gemini cần project Free **không bật billing**, key nhập riêng, xác nhận phạm vi
 dữ liệu và giới hạn app. App không thể tự bảo đảm billing của project Google.
-Xem [cấu hình cloud](docs/demo-cloud-ai.md) và [bộ đánh giá AI](docs/ai-evaluation.md).
+Xem [cấu hình Chat Gemini](docs/gemini-chat.md), [API demo hữu hạn](docs/demo-cloud-ai.md) và [bộ đánh giá AI](docs/ai-evaluation.md).
 
 ## Công nghệ và kiến trúc
 
@@ -164,7 +164,7 @@ và [demo Instructor → Student → Admin](docs/demo-script.md).
   không chứng minh thư đã tới hộp thư.
 - **Google:** [Client ID, authorized origins và liên kết tài khoản](docs/google-sign-in.md).
   Nghiệm thu Google thật vẫn còn mở; không yêu cầu Client Secret trong chat.
-- **Gemini:** [launcher và phạm vi Free demo](docs/demo-cloud-ai.md).
+- **Gemini:** [Chat Gemini và launcher cấu hình riêng](docs/gemini-chat.md).
   Key chỉ ở backend; không đặt vào biến `VITE_*`, source, ảnh hoặc chat.
 
 ## Kiểm thử và CI
