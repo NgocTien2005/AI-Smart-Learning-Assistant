@@ -2,7 +2,7 @@
 
 Mở khóa học bạn sở hữu/đã tham gia → bài học → **Chat Gemini**. Chọn nguồn, đọc thông báo chia sẻ, xác nhận quyền chia sẻ rồi nhập câu hỏi tự do. Model thật trả lời bằng tiếng Việt với trích dẫn được đối chiếu văn bản nguồn. Hỏi tiếp trong cùng màn hình; chỉ 3 cặp hỏi/đáp gần nhất được gửi lại. Đóng, tải lại, đổi bài hoặc xóa hội thoại sẽ bỏ lịch sử trong bộ nhớ.
 
-Backend dùng Gemini3.8Flash/Interactions hiện có; không giả lập câu trả lời. API demo hữu hạn vẫn giữ tương thích; tra cứu cục bộ, tóm tắt trích xuất và bài ôn được lưu/chấm là công cụ riêng. Quiz gợi ý trong chat không thay đổi bài ôn đã lưu.
+Chat gọi model thật `gemini-3.1-flash-lite` qua `generateContent`, dùng structured JSON và kiểm tra trích dẫn nguyên văn ở server. Cấu hình này thay pin3.8 sau khi tái hiện503 ở3.8 và kiểm chứng3.1 trả nội dung thật với cùng runtime. Không có mock, tự retry hay chuyển model/paid fallback. API demo hữu hạn cũ vẫn giữ tương thích riêng; tra cứu cục bộ, tóm tắt trích xuất và bài ôn được lưu/chấm là công cụ riêng. Quiz gợi ý trong chat không thay đổi bài ôn đã lưu.
 
 ## Cấu hình riêng trên máy development
 
@@ -22,7 +22,7 @@ Chạy Compose thông thường/recreate mà không có các giá trị runtime 
 
 Chỉ gửi nội dung bài/tài liệu người dùng chủ động chọn và có quyền xem; mặc định chưa chọn/chưa đồng ý. Nguồn ưu tiên lớp văn bản tài liệu đã trích xuất, nếu không có dùng nội dung bài học; UI hiển thị loại nguồn. Tối đa12.000 ký tự đầu, có thông báo cắt ngắn. Không gửi file gốc, định danh tài khoản, token, khóa học khác hay toàn bộ database. Câu hỏi≤2000 ký tự; output≤6000 ký tự. Không hỗ trợ OCR, web search, URL fetching hoặc agent tools.
 
-Theo [điều khoản Free](https://aistudio.google.com/docs/terms#data-use-unpaid), dữ liệu có thể được dùng cải thiện sản phẩm và được người xem xét. **Không gửi thông tin cá nhân, nhạy cảm hoặc tài liệu mật**, dù bạn có quyền đọc chúng. `store:false` chỉ tắt lưu trạng thái Interaction, không thay đổi điều khoản Free. Hãy dùng dữ liệu tổng hợp để nghiệm thu.
+Theo [điều khoản Free](https://aistudio.google.com/docs/terms#data-use-unpaid), dữ liệu có thể được dùng cải thiện sản phẩm và được người xem xét. **Không gửi thông tin cá nhân, nhạy cảm hoặc tài liệu mật**, dù bạn có quyền đọc chúng. Chat không tạo hội thoại lưu trạng thái ở provider; điều này không thay đổi điều khoản Free. Hãy dùng dữ liệu tổng hợp để nghiệm thu.
 
 Hạn mức cục bộ dùng chung giữa chat/demo:1 yêu cầu đang xử lý,20 yêu cầu/ngày/process,20giây/user; timeout30giây, không tự retry. Đây là giới hạn một process, không phải hệ thống cưỡng chế billing/phân tán. Hủy chỉ dừng chờ; Google có thể đã nhận yêu cầu. Lịch sử không lưu database/localStorage và không được log/upload. Trích dẫn đúng nguyên văn vẫn không bảo đảm suy luận đúng; luôn đối chiếu bài học. Không đủ nguồn thì model phải nói rõ.
 

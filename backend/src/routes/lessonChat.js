@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import {CLOUD_MODEL,createCloudService} from '../services/demoCloudAssistant.js'
+import {CHAT_MODEL,createCloudService} from '../services/demoCloudAssistant.js'
 import {selectChatSource,validateChatRequest} from '../services/lessonChat.js'
 
 const messages={
@@ -28,7 +28,7 @@ export function createLessonChatRouter({prisma,authenticate,service=createCloudS
       if(!lesson)return res.status(404).json({error:'Không tìm thấy bài học',code:'CHAT_NOT_FOUND'})
       if(!allowed(lesson,req.user))return res.status(403).json({error:'Bạn không có quyền xem bài học này',code:'CHAT_FORBIDDEN'})
       const source=selectChatSource(lesson)
-      if(req.method!=='POST')return res.json({enabled:service.configured(),provider:'Gemini',model:CLOUD_MODEL,source:source?{type:source.sourceType,revision:source.revision,title:source.title,characters:source.text.length,truncated:source.truncated}:null})
+      if(req.method!=='POST')return res.json({enabled:service.configured(),provider:'Gemini',model:CHAT_MODEL,source:source?{type:source.sourceType,revision:source.revision,title:source.title,characters:source.text.length,truncated:source.truncated}:null})
       if(!source)return res.status(422).json({error:'Bài học chưa có đủ văn bản để trò chuyện. PDF cần lớp văn bản; không hỗ trợ OCR.',code:'CHAT_NO_SOURCE'})
       if(req.chatRequest.sourceRevision!==source.revision||req.chatRequest.sourceType!==source.sourceType)return res.status(409).json({error:'Nguồn đã thay đổi. Hãy tải lại và chọn lại nguồn.',code:'CHAT_SOURCE_CHANGED'})
       const controller=new AbortController(),cancel=()=>controller.abort()
