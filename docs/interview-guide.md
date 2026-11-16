@@ -25,7 +25,7 @@ The [report](portfolio-improvement-report.md) identifies real observed results.
 | Abuse controls | Bounded expiring process-local windows, no new dependency | Shared proxy IPs and multi-instance limits need topology/shared-state planning |
 | Quiz persistence | Snapshot questions, debounced drafts, optimistic version checks, authoritative submit | Browser unload cannot promise delivery; conflicts require explicit recovery |
 | Password reset | Generic forgot response, hashed expiring token and atomic one-use update | SMTP acceptance is not mailbox delivery; real evidence is separate |
-| Google | Explicit authenticated linking, sign-in only linked existing accounts | No automatic email merge; real GIS configuration/acceptance still needed |
+| Authentication | Email/password; OAuth removed by feature022 | Users and immutable historical migrations preserved; no automatic provider merge |
 | Uploads | Protected download and bounded extension/MIME/content/text extraction checks | PDF text layer only; no OCR, antivirus or arbitrary document understanding claim |
 | AI grounding | Source excerpts/structured output checks and original-demo ownership validation | Structural grounding does not prove semantic entailment or defeat every injection |
 | Testing | Actual components/production routers plus real isolated HTTP/DB/files | Mocked provider contracts do not prove actual provider quality |

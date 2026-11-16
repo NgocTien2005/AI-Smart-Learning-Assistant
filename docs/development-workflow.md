@@ -273,3 +273,9 @@ Các tình huống sau là tiêu chí review định tuyến; chúng không ph�
 
 Trigger có thể phối hợp khi công việc đi qua nhiều lớp; tránh nạp hai skill chỉ
 vì cùng từ khóa UI/API nếu không có quyết định thuộc cả hai phạm vi.
+
+### Current additions2026-11-16
+
+Feature021 adds actual Gemini lesson conversation, free questions and up to3 context pairs with explicitly selected authorized text and sharing consent. It now pins Free3.1Flash-Lite/generateContent; dedicated chat schema and server quote validation, no automatic retry/fallback. Two actual synthetic-source UI turns passed; see021 verification for precise scope. Local tools remain local and distinct.
+
+Feature022 retires Google OAuth UI/SDK/API/config at user request. Password auth and Gmail recovery remain; old endpoints404, legacy subject column/migration dormant. Historical010 provider acceptance is superseded, not newly passed. See022 spec/verification.

@@ -15,9 +15,8 @@ with locally and CI-verified workflows and explicit production limitations.
 | ADMIN | Search/edit/disable accounts and change roles | Account administration does not bypass course content ownership |
 
 Email/password authentication, recoverable session loading, password recovery
-and account settings are implemented. Google is optional and only signs in
-existing accounts that explicitly linked their Google identity. There is no
-automatic registration or email-based account merge.
+and account settings are implemented. Google OAuth was retired in feature022;
+email/password remains the authentication path, with existing users preserved.
 
 Four different study capabilities must be described accurately:
 
@@ -26,7 +25,7 @@ Four different study capabilities must be described accurately:
 | Document lookup | Local normalized token retrieval with source passages | Not general language understanding |
 | Summary | Extractive source sentences | Not an LLM paraphrase |
 | Practice quiz | Definition-pattern generation, persisted snapshot/draft/version | May generate fewer questions than requested |
-| Cloud demo | Optional server-side Gemini adapter, original synthetic sources and finite actions only | Real model acceptance remains open; no private-document egress |
+| Gemini chat | Real3.1Flash-Lite, free questions over explicitly selected authorized source, verified citations | Two synthetic-source UI turns accepted2026-11-16; Free quota/privacy restrictions apply |
 
 PDF processing extracts text layers, with size/page/output limits. There is no
 OCR. Offline AI evaluation validates deterministic retrieval and output
@@ -54,9 +53,9 @@ the distinction between independent PRs and their combined reference branch.
 - [Three-role demo script](demo-script.md) and [interview guide](interview-guide.md)
 - [CI and coverage](continuous-integration.md), [AI evaluation](ai-evaluation.md)
 - [Synthetic dataset](demo-data.md), [optional cloud setup](demo-cloud-ai.md),
-  [Google setup](google-sign-in.md)
+  [OAuth retirement](google-sign-in.md), [actual lesson chat](gemini-chat.md)
 - [Operations](operations.md) and [production readiness](production-readiness.md)
 
-No public deployment URL, benchmark, security certification or successful real
-Google/Gemini acceptance is asserted. Historical email recovery acceptance is
+No public deployment URL, benchmark or security certification is asserted.
+Real Gemini chat acceptance is scoped to the recorded two turns, not general accuracy. Historical email recovery acceptance is
 preserved separately from current SMTP configuration and public-release checks.

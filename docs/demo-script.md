@@ -69,16 +69,15 @@ local8081 or an unknown/production database.
 
 ## Optional provider and recovery segments
 
-Google is shown only after private Client ID/origin setup and user-driven real
-link/sign-in acceptance. Do not show an unconfigured button as a successful
-integration. Follow [Google guide](google-sign-in.md); no new-account creation
-or automatic email merging is supported.
+Google OAuth is retired by feature022. Demonstrate email/password; no provider
+account linking or Client ID is required. Existing user data is preserved.
 
-Gemini is optional: follow [private free-demo setup](demo-cloud-ai.md), billing
-disabled, original synthetic sources and finite actions only. API key never
-enters frontend/chat. Actual provider outputs and quality have not been accepted
-by this portfolio verification; show the disabled/configuration state honestly
-or omit this segment. Offline contracts are not a fabricated live response.
+For actual Gemini conversation follow [private chat setup](gemini-chat.md),
+billing disabled. Select an authorized synthetic lesson, acknowledge sharing,
+ask a free question, expand citations and ask a follow-up after20seconds.
+Two actual3.1Flash-Lite UI turns with validated quotations were accepted2026-11-16.
+No key enters frontend/chat. Free quota/provider errors remain possible; no mock
+or automatic retry. The old finite demo has separate historical acceptance.
 
 Historical real email/reset acceptance belongs to008T023 and remains recorded.
 Do not reuse its old send budget or `.invalid` demo emails for another send.

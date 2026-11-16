@@ -15,7 +15,7 @@ flowchart LR
   Prisma --> DB[(PostgreSQL)]
   Routes --> Files[Protected upload storage and text extraction]
   Files --> Local[Local retrieval / extractive summary / pattern quiz]
-  Routes --> Cloud[Optional synthetic-only Gemini service]
+  Routes --> Cloud[Gemini chat with selected authorized source]
   Routes --> Mail[Optional Gmail reset email]
 ```
 
@@ -104,10 +104,10 @@ not disclose account existence. Link navigation alone is not a validity check:
 the reset POST enforces invalid/expired/used-token rejection. Password mutations
 are not automatically replayed after uncertain network outcomes.
 
-Google uses a challenge/cookie/nonce and verified identity token. Linking is an
-explicit authenticated action; sign-in only resolves an already-linked active
-account. An email match does not create or merge users. Real provider evidence
-is still required separately; see [Google configuration](google-sign-in.md).
+Google OAuth login/linking is retired by feature022; old endpoints return404.
+Email/password, session revocation and recovery remain. The nullable subject
+column is dormant compatibility storage; no user data or historical migration
+was deleted. See [retirement notice](google-sign-in.md).
 
 | Role | Global capability | Resource rule |
 | --- | --- | --- |
@@ -124,9 +124,12 @@ responses. Public registration allows only INSTRUCTOR/STUDENT.
 Successful document text takes priority over manual content; replace/remove
 invalidates stored text/hash and changes revision. PDF extraction is bounded
 text-layer processing, not OCR. Local retrieval, extractive summary and pattern
-quiz do not call a provider. Optional Gemini only accepts original owned demo
-sources plus finite actions, with current access checks, timeout/size/quota
-limits, no silent fallback, retry, tools or private-document transfer.
+quiz do not call a provider. Gemini conversation accepts free questions and
+explicitly selected authorized text after consent; bounded history, pre/post
+access checks, exact citations and timeout/size/quota limits apply. Chat uses
+Free3.1Flash-Lite/generateContent with a dedicated structured-output schema,
+no silent fallback, retry or tools. Do not share sensitive/confidential material
+with the Free service. The old finite synthetic-demo API remains separate.
 Deterministic contract evaluation and real provider quality are separate gates.
 
 ## Operation and scale limits
@@ -136,7 +139,7 @@ packages have separate lockfiles; no root npm workspace exists. Migration deploy
 runs on backend startup; immutable history is preserved. Health is liveness;
 integration separately verifies actual backend DB identity and writes.
 
-Rate/challenge/quota stores are per-process, and Express does not blindly trust
+Rate/quota stores are per-process, and Express does not blindly trust
 forwarded IPs. Shared-proxy users may share IP throttles; multi-replica operation
 needs a planned shared-state/topology change. DB least privilege, non-root upload
 ownership migration, TLS, monitoring and real backup objectives remain open.
