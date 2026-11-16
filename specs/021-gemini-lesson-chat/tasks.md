@@ -31,4 +31,4 @@ T001 → T002 → T003 → T004/T005 → T006 → T007/T008. T004 and T005 can b
 
 ## Phase 6: Convergence
 
-- [ ] T009 [US1] P0 Repair actual chat generation per FR004/006, SC001 and plan2026-11-16 (partial): pin available Free3.1Flash-Lite/generateContent for chat only in `backend/src/services/demoCloudAssistant.js` and `routes/lessonChat.js`, preserve authorization/limits and old finite contract; extend `backend/test/lessonChat.test.js` transport/citation/blocked/truncated/error tests, run backend/quiz/integration and real UI two-turn source acceptance. Existing T007 remains its acceptance gate, not a duplicate transport task.
+- [x] T009 [US1] P0 Repair actual chat generation per FR004/006, SC001 and plan2026-11-16 (partial): pin available Free3.1Flash-Lite/generateContent for chat only in `backend/src/services/demoCloudAssistant.js` and `routes/lessonChat.js`, preserve authorization/limits and old finite contract; extend `backend/test/lessonChat.test.js` transport/citation/blocked/truncated/error tests, run backend/quiz/integration and real UI two-turn source acceptance. Existing T007 remains its acceptance gate, not a duplicate transport task.
