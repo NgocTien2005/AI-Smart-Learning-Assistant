@@ -1,0 +1,59 @@
+{
+  "date": "2026-11-16",
+  "scope": "local uncommitted OAuth retirement on f22d6d8; no hosted CI",
+  "commands": [
+    {
+      "command": "npm test",
+      "cwd": "frontend",
+      "exitCode": 0,
+      "passedTests": 232
+    },
+    {
+      "command": "npm run lint",
+      "cwd": "frontend",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "cwd": "frontend",
+      "exitCode": 0
+    },
+    {
+      "command": "npm test",
+      "cwd": "backend",
+      "exitCode": 0,
+      "passedTests": 85
+    },
+    {
+      "command": "npm test -- --test-name-pattern=quiz",
+      "cwd": "backend",
+      "exitCode": 0,
+      "passedTests": 21
+    },
+    {
+      "command": "node --test scripts/ci/test/ci.test.mjs scripts/ci/test/operations.test.mjs",
+      "cwd": ".",
+      "exitCode": 0,
+      "passedTests": 25
+    },
+    {
+      "command": "node scripts/ci/integration.mjs",
+      "cwd": ".",
+      "exitCode": 0
+    },
+    {
+      "command": "docker compose -f compose.yaml -f compose.dev.yaml up -d --no-deps --build frontend",
+      "cwd": ".",
+      "exitCode": 0
+    }
+  ],
+  "corrections": [
+    "Initial helper glob targeted no files (0 tests); corrected explicit paths ran25 tests",
+    "A test launched from root failed path resolution; rerun in backend passed",
+    "Production404 test failed503 before implementation, then passed after mount removal"
+  ],
+  "smtpSends": 0,
+  "oauthProviderRequests": 0,
+  "dependenciesChanged": false,
+  "schemaChanged": false
+}

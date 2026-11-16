@@ -1,0 +1,25 @@
+{
+  "targetVerified": true,
+  "database": "lumina_lms",
+  "readiness": {
+    "key": true,
+    "free": true,
+    "chat": true,
+    "smtp": true,
+    "model": "gemini-3.1-flash-lite"
+  },
+  "statuses": [
+    {
+      "origin": "http://localhost:5173",
+      "health": 200,
+      "oauth": 404
+    },
+    {
+      "origin": "http://localhost:8080",
+      "health": 200,
+      "oauth": 404
+    }
+  ],
+  "runtimeSourceMatches": true,
+  "retiredFilesAbsent": true
+}
