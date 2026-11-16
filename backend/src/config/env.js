@@ -14,11 +14,6 @@ export const uploadDirectory = resolve(process.env.UPLOAD_DIR || 'uploads')
 export const appOrigin = (process.env.APP_ORIGIN || corsOrigins[0]).replace(/\/$/, '')
 export const smtpUser = process.env.SMTP_USER?.trim()
 export const smtpAppPassword = process.env.SMTP_APP_PASSWORD?.replace(/\s/g, '')
-export const googleClientId = process.env.GOOGLE_CLIENT_ID?.trim() || ''
-
-if (googleClientId && !/^[\w-]+\.apps\.googleusercontent\.com$/.test(googleClientId)) {
-  throw new Error('GOOGLE_CLIENT_ID must be a Google web client ID')
-}
 
 if (!connectionString) {
   throw new Error('DATABASE_URL is required to start the backend')

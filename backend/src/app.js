@@ -1,11 +1,10 @@
 import cors from 'cors'
 import express from 'express'
 import multer from 'multer'
-import { appOrigin, corsOrigins, googleClientId } from './config/env.js'
+import { corsOrigins } from './config/env.js'
 import { authenticate } from './middleware/authenticate.js'
 import { prisma } from './lib/prisma.js'
 import { createToken, publicUser } from './utils/auth.js'
-import { createGoogleAuthRouter } from './routes/googleAuth.js'
 import { createAuthRouter } from './routes/auth.js'
 import { isEmailConfigured, sendPasswordResetEmail } from './services/email.js'
 import adminRouter from './routes/admin.js'
@@ -34,7 +33,6 @@ export const createApp = () => {
   app.use(express.json({ limit: '1mb' }))
   app.use(requestBoundary)
   app.use('/api/health', healthRouter)
-  app.use('/api/auth/google', createGoogleAuthRouter({ prisma, authenticate, createToken, publicUser, clientId: googleClientId, secureCookie: appOrigin.startsWith('https://') }))
   app.use('/api/auth', createAuthRouter({ prisma, authenticate, createToken, publicUser, isEmailConfigured, sendPasswordResetEmail }))
   app.use('/api/admin', adminRouter)
   const budget = createCloudBudget()
