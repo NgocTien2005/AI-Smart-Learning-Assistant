@@ -25,9 +25,9 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "multer": "2.4.0",
-    "nodemailer": "10.0.16",
-    "pdfjs-dist": "^5.7.284",
+    "multer": "2.5.0",
+    "nodemailer": "10.1.4",
+    "pdfjs-dist": "6.2.108",
     "pg": "^8.23.0"
   },
   "devDependencies": {
