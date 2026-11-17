@@ -2,6 +2,8 @@
 
 2026-11-17, baseline f863133 clean; branch chore/self-host-deploy-kit temporarily stacked on022, intended PR base refactor/remove-google-auth. Resolver/official allocator selected023. Constitution/workflow/actual production path reviewed, managed specify/clarify/plan/checklist/tasks/analyze/implement applied; extensions file absent, no hooks.5/5 checklist requirement-quality items reviewed before implement and markers kept read-only. Read-only analysis maps6FR/3SC/2US to6tasks without constitution conflicts.
 
+Latest: Docker recovered; local web-stack/three-role smoke and Caddy parser pass (follow-up below). Only actual operator VPS/DNS/TLS/renewal/staging acceptance remains T005; the initial engine-blocked observations below are historical.
+
 ## Verified
 
 - FR001/002/005 -> T002 ->4 synthetic Compose tests pass: merged port exclusively127.0.0.1:18080, DB/backend internal, exact HTTPS origins, required domain/DB/JWT missing rejected, optional Gemini server-only, demo false, default compose behavior unchanged. Docker compose CLI5.1.1, no daemon/start/DB/provider calls. Wired new tests into existing backend CI runner.
@@ -24,3 +26,9 @@ No SMTP/Google/Gemini request in023. No seed/reset/drop or new data. No hosted C
 ## Analysis/convergence
 
 Final artifact review read-only: all6FR have tasks/evidence or explicit T005 pending acceptance; no security guard/API compatibility dilution. Config supports only hostname presence, operator must validate hostname/DNS separately (guide explicit). Converge compares code/artifacts without changing spec/plan/code; T005 already covers unrun runtime gate, no duplicate/empty convergence section. T006 records local handoff with current hosted/remote limitations; kit preparation does not mean023/public deployment complete.
+
+## Docker recovery and local web runtime2026-11-17
+
+Operator restored engine. Fresh web project lumina-acceptance-ci-web-1794929093773-4b279401 built patched Node24 sources using base+web override, actual port exclusively127.0.0.1:18080, backend/db unpublished, actual Prisma database address matched owned DB. Health200, configured HTTPS Origin200, foreign Origin403. Actual synthetic ADMIN bootstrap plus ADMIN/INSTRUCTOR/STUDENT login/me all200. Exact3 owned synthetic accounts deleted; containers/network down, named postgres/uploads volumes retained (evidence/web-runtime.json). No email/model request. This validates local topology, not real VPS/DNS/TLS.
+
+Caddy sample validated in an isolated network-none/read-only container with tmpfs data/config/tmp, exit0/Valid configuration after formatting. Image caddy:2-alpine digest caddy@sha256:003a97808e781aa9f7e75cc2f43d34d461099031faf5e20faefb9f61126836f0. No public domain/ACME success claimed. T005 remains partial solely for operator staging/public DNS/TLS/renewal and deployment-specific acceptance; no new duplicate task. Dependency advisories were separately patched and tested by024. Earlier engine blockage is historical; current default8080/5173 health200 and private Gemini boolean readiness preserved after guarded same-container update.
