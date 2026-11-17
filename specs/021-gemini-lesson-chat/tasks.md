@@ -21,7 +21,7 @@ Input: [spec](spec.md), [plan](plan.md), contracts/data-model/research. All task
 
 ## Phase 5: Verification and handoff
 
-- [ ] T006 P0 Run package gates, quiz, isolated HTTP/database integration and real desktop browser acceptance; record safe command/cwd/exit/results and traceability in `specs/021-gemini-lesson-chat/verification.md`; depends T002–005; accept SC002–004 and regression gates.
+- [x] T006 P0 Run package gates, quiz, isolated HTTP/database integration and real desktop browser acceptance; record safe command/cwd/exit/results and traceability in `specs/021-gemini-lesson-chat/verification.md`; depends T002–005; accept SC002–004 and regression gates.
 - [x] T007 [US1] P1 Verify two real Gemini questions with citations in actual UI using selected synthetic source and free project; depends T006 + privately configured readiness; record only safe outcome, no key/prompt/token/provider request. SC001. Blocked if key/Free readiness absent; user must configure privately, no fabricated response.
 - [ ] T008 P1 Update `specs/021-gemini-lesson-chat/verification.md`, read-only analyze and append-only converge; make small feature commits/push and reviewable PR; depends T006 (T007 may remain explicitly blocked); FR008. Hosted CI reported on exact SHA separately, never merge/deploy automatically.
 
