@@ -1,19 +1,8 @@
 import bcrypt from 'bcryptjs'
 import { prisma } from '../src/lib/prisma.js'
+import { validateAdminBootstrap } from '../src/utils/adminBootstrap.js'
 
-const name = process.env.ADMIN_BOOTSTRAP_NAME?.trim()
-const email = process.env.ADMIN_BOOTSTRAP_EMAIL?.trim().toLowerCase()
-const password = process.env.ADMIN_BOOTSTRAP_PASSWORD
-
-if (!name || name.length < 2 || name.length > 80) {
-  throw new Error('ADMIN_BOOTSTRAP_NAME must be between 2 and 80 characters.')
-}
-if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
-  throw new Error('ADMIN_BOOTSTRAP_EMAIL must be a valid email address.')
-}
-if (typeof password !== 'string' || password.length < 12 || password.length > 72) {
-  throw new Error('ADMIN_BOOTSTRAP_PASSWORD must be between 12 and 72 characters.')
-}
+const {name,email,password} = validateAdminBootstrap(process.env)
 
 try {
   const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } })
