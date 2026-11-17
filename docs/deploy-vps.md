@@ -2,6 +2,8 @@
 
 Hướng dẫn dành cho **VPS mới, một host, một instance backend**, Ubuntu LTS được Docker hỗ trợ. Bạn tự chọn/mua VPS và domain; không có tài nguyên cloud hoặc billing nào được tạo bởi repository. Gemini Free không đồng nghĩa VPS/domain miễn phí. Đây là bộ cấu hình đã kiểm tra merge, **chưa có nghiệm thu trên VPS/domain thật**. Xem [trạng thái bàn giao](release-status-20261117.md) và [production readiness](production-readiness.md).
 
+Bản hiện tại đã qua local web-stack smoke, Caddy parser và isolated HTTP/database integration trên dependency đã vá; production npm audit backend/frontend0 tại2026-11-17. Hãy lấy commit chứa feature024 và đối chiếu [verification](../specs/024-runtime-security-patches/verification.md), không triển khai release cũ còn advisory. Vẫn cần nghiệm thu staging/host thật bên dưới.
+
 Luồng: Internet HTTPS → **Caddy cài trên host** → `127.0.0.1:18080` → Nginx frontend → Express → PostgreSQL. Chỉ Caddy mở80/443. Backend3000 và database5432 không publish. PostgreSQL và uploads có volumes riêng. Không dùng Vite5173 hoặc `compose.dev.yaml` để deploy công khai.
 
 ## 1. Chuẩn bị VPS, domain và phần mềm
@@ -169,6 +171,6 @@ Rollback chỉ app image/code tương thích với schema đang có; không tự
 
 ## Nguồn và mức kiểm chứng
 
-Bộ config có test synthetic merge ở [feature023](../specs/023-self-host-deploy/verification.md). Hostname, Caddy parser/renewal, VPS firewall, mail, provider quota, backup thực và tải của bạn chưa được kiểm chứng. Không có deployed URL/benchmark/provider-success giả.
+Bộ config có test synthetic merge, Caddy parser và local web-stack smoke ở [feature023](../specs/023-self-host-deploy/verification.md). Hostname thật, TLS/renewal, VPS firewall, mail, provider quota, backup thực và tải của bạn chưa được kiểm chứng. Không có deployed URL/benchmark/provider-success giả.
 
 Đối chiếu chính thức2026-11-17: [Docker production](https://docs.docker.com/compose/how-tos/production/), [merge/override](https://docs.docker.com/reference/compose-file/merge/), [port publishing](https://docs.docker.com/engine/network/port-publishing/), [Caddy HTTPS](https://caddyserver.com/docs/automatic-https), [Caddy reverse proxy](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy).

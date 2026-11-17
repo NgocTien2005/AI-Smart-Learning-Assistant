@@ -75,3 +75,7 @@ Feature021 now pins real Free3.1Flash-Lite/generateContent for conversation, wit
 ## Opt-in VPS kit2026-11-17
 
 See [VPS Ubuntu deployment](deploy-vps.md) and [release status](release-status-20261117.md). Feature023 supplies a merge-tested override: exclusive127.0.0.1:18080 frontend port, host Caddy HTTPS example, required domain and server-only Gemini settings, demo disabled. Default compose/dev stack unchanged. Actual web image build, Caddy/DNS/TLS, production SMTP/Gemini/storage/restore and topology load remain unverified. Dependency audit findings must be resolved/reviewed before public release; config validation does not satisfy that gate.
+
+## Patched runtime release2026-11-17
+
+Feature024 resolves the6 reported production npm advisories with targeted direct/transitive updates and actual Node24 integration. Current npm audit backend/frontend0 is not a certification; image/OS review and public topology/privacy/load/recovery gates remain. New web stack and Caddy parser tested locally (023 evidence); actual VPS domain/TLS/renewal, SMTP delivery, deployment-specific roles/storage/restore and operational ownership remain023T005. Docker recovered, default5173/8080 health200 and private provider readiness preserved. See release-status-20261117.md and024 verification for current scope instead of historical table statuses.

@@ -11,9 +11,10 @@
 - 011 dataset:16/16;18 synthetic users/8courses/48lessons/26docs/24assignments trong evidence lịch sử. Không seed hoặc xóa dữ liệu mặc định trong lượt này, không đưa dataset/password demo lên public.
 - 012 demo hữu hạn:12/13, T012 chưa nghiệm thu4 action thật; tách biệt với chat mới. UI dùng chat021; web override tắt marker demo. Không chạy lại provider chỉ để đổi checkbox của demo cũ.
 - 013–020: các task portfolio/architecture/security/tests/UI/local-AI/operations/docs đã có verification theo phạm vi gốc; không phải chứng nhận bảo mật hay triển khai public.
-- 021 chat:7/9 tại đầu lượt này; model3.1Flash-Lite đã trả2 câu hỏi qua UI,1 trích dẫn hợp lệ mỗi lượt. Sửa transport503 và schema quiz lẫn chat, không mock/tự retry. T006/T008 còn mở như bảng bên dưới.
-- 022:5/5 nghiệm thu local:232 frontend tests,85 backend,21 quiz runner,25 CI helpers,102 HTTP/database operations,15 role/browser records; sau đó Docker Desktop gặp lỗi môi trường, không trình bày checkpoint healthy như trạng thái hiện tại.
-- 023: thêm bộ deploy opt-in, sửa lỗi email bootstrap ADMIN đã tái hiện; validation cấu hình và backend regression có evidence riêng. Chưa chạy VPS/Caddy/TLS thật.
+- 021 chat:8/9; model3.1Flash-Lite đã trả2 câu hỏi qua UI,1 trích dẫn hợp lệ mỗi lượt. T006 native Send/Cancel/Clear đã đạt ở1280×800 và1440×900; T008 remote handoff còn mở.
+- 022:5/5 nghiệm thu local lịch sử:232 frontend tests,85 backend,21 quiz runner,25 CI helpers,102 HTTP/database operations,15 role/browser records. Docker từng gặp lỗi môi trường rồi đã phục hồi; trạng thái runtime mới ghi ở phần môi trường bên dưới.
+- 023:5/6; bộ deploy opt-in, lỗi email bootstrap ADMIN đã sửa; config tests, Caddy parser và stack web riêng/ba role đã chạy thật. T005 còn phần VPS/DNS/TLS/renewal và staging của operator.
+- 024: bản vá có mục tiêu cho6 package advisory, backend production audit hiện0; regression parser, backend/quiz và rebuilt Node24 integration có [bằng chứng riêng](../specs/024-runtime-security-patches/verification.md). Không phải chứng nhận không còn mọi lỗ hổng.
 
 ## Việc còn mở và điều kiện đóng
 
@@ -22,20 +23,20 @@
 |008 T026 | Policy đã chặn xóa profile thử; không thử phương pháp khác. Chỉ đóng khi có cleanup proof hợp lệ và được phép. Không chặn chức năng LMS/public host |
 |010 T016 | Historical provider acceptance chưa chạy; chức năng đã retired. Không cần cấp Client ID, không giả thành pass |
 |012 T012 | Demo cũ chưa nghiệm thu4 action; không thay bằng2 đáp án chat. Không tự gửi tài liệu/email hoặc bật demo trên public host |
-|021 T006 | Còn enabled native Cancel/Clear ở hai desktop sizes; cần Docker runtime hoạt động, chọn nguồn tổng hợp và kiểm thao tác thật. Component tests không thay thế quan sát này |
-|021 T008 | Handoff/remote theo dependencyT006; push/hosted exact SHA mới chưa có sau khi Git credential dialog bị hủy. Không bypass credentials hoặc tự merge |
-|023 T005 | Build/health stack web mới, Caddy parser, DNS/TLS/renewal, quyền ba role, protected upload, optional mail/chat, recovery trên staging do operator chọn |
+|021 T006 | ĐÃ ĐẠT: native Send/Cancel/Clear hai desktop sizes; xem native-controls-20261117.json. Không còn là task mở |
+|021 T008 | Local handoff đã ghi, push/hosted exact SHA mới chưa có sau khi Git credential dialog bị hủy. Không bypass credentials hoặc tự merge |
+|023 T005 | Local web build/health, Caddy parser và ba role đã đạt. Còn DNS/TLS/renewal, protected upload/mail/chat/recovery trên VPS staging do operator chọn |
 |Public release | Review dependency/image advisories, quyền DB tối thiểu, proxy/IP-limiter shared budget, tải, monitoring, backup/restore thực, domain/secret ownership |
 
 ## Dependency audit trước deploy
 
-Audit production backend2026-11-17 phát hiện6 package advisory (3High/3Moderate), frontend0. Các package được báo gồmbody-parser,fast-uri,multer,nodemailer,pdfjs-dist,qs. Đây là dependency-level findings, không phải bằng chứng exploit đã chạy vào Lumina. PDF.js advisory có điều kiện viewer scripting; backend hiện trích text với isEvalSupported=false, không render scripting viewer, nhưng vẫn phải review/cập nhật dependency thay vì coi audit là sạch.
+Audit production backend2026-11-17 ban đầu phát hiện6 package advisory (3High/3Moderate), frontend0. Feature024 đã vá Multer2.5.0, Nodemailer10.1.4, PDF.js6.2.108 và cập nhật body-parser2.4.0, fast-uri3.1.9, qs6.17.1 theo range cha. Audit sau `npm ci`: **backend0/frontend0** tại thời điểm ghi nhận. Express/Prisma và dependency frontend không đổi.
 
-Remediation được tách khỏi bộ config, không tự `npm audit fix --force` hoặc nâng hàng loạt. Xem báo cáo kiểm chứng dependency bổ sung khi có; cho đến khi có lockfile/bản vá và integration đã kiểm, **không coi release này đã qua cổng dependency security**.
+PDF.js advisory có điều kiện viewer scripting, không phải exploit đã tái hiện ở đường text extraction của Lumina. PDF6 không còn đọc option `isEvalSupported`; đã bỏ option thừa, không giả nó là guard. PDF/text/Unicode/no-text/size/page/timeout và protected upload/quiz/auth được kiểm qua tests cùng Docker Node24. Có thêm lỗi gzip hỏng trả500 đã tái hiện và sửa thành JSON400 giới hạn đúng decoder errors. Không dùng `audit fix --force`, không thay schema/giảm guards. Audit0 chỉ có nghĩa không còn advisory được công cụ báo cho dependency production tại lúc kiểm, không chứng nhận bảo mật hoặc thay image/OS advisories.
 
 ## Môi trường và dữ liệu
 
-Docker Linux engine pipe chưa kết nối được ở đầu lượt; lần trước start/restart Desktop và Windows service thất bại vì timeout/quyền OS. Vite có thể phục vụ UI nhưng API502 nếu8080 không hoạt động. Không xóa volume để sửa lỗi này. Cần khôi phục Docker Desktop/service bằng quyền máy, sau đó kiểm health và actual backend database identity; giữ env Gemini riêng, không recreate backend làm mất key.
+Docker engine không kết nối được ở đầu lượt; operator đã mở lại Docker Desktop, agent mở lại Vite5173. Backend local được cập nhật có guard, cài lockfile bằng npm ci trong cùng container rồi restart để giữ private env; hash source khớp, backend/database identity xác minh lại. Hai origin5173/8080 hiện health200, OAuth cũ404, boolean Gemini key/Free/chat và SMTP vẫn true. Readiness SMTP không chứng minh delivery; không gửi email mới. Không đọc/in giá trị secret hoặc recreate backend làm mất key.
 
 Các volumes/restore fixtures của isolated test được giữ và liệt kê trong verification tương ứng; containers/network cleanup đã có ownership checks. Không xóa volumes, không đụng local8081 hoặc profile bị policy chặn. Không thu thập secret/browser profile/raw authenticated request để làm evidence.
 
