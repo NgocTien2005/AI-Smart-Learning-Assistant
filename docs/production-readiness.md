@@ -71,3 +71,7 @@ và [verification012](../specs/012-demo-cloud-assistant/verification.md).
 ## Actual chat follow-up2026-11-16
 
 Feature021 now pins real Free3.1Flash-Lite/generateContent for conversation, with dedicated chat schema, exact quotation validation and no automatic model fallback/retry. Two actual synthetic-source UI answers accepted; see feature021 verification. Old finite-demo3.8 acceptance remains distinct. Billing-disabled confirmation remains operator responsibility; Free data use/privacy, per-process rate limits, TLS/backups/monitoring and public deployment review remain release gates. OAuth is retired by022.
+
+## Opt-in VPS kit2026-11-17
+
+See [VPS Ubuntu deployment](deploy-vps.md) and [release status](release-status-20261117.md). Feature023 supplies a merge-tested override: exclusive127.0.0.1:18080 frontend port, host Caddy HTTPS example, required domain and server-only Gemini settings, demo disabled. Default compose/dev stack unchanged. Actual web image build, Caddy/DNS/TLS, production SMTP/Gemini/storage/restore and topology load remain unverified. Dependency audit findings must be resolved/reviewed before public release; config validation does not satisfy that gate.

@@ -3,3 +3,4 @@
 !.env.docker.example
 .artifacts/
 ci-results/
+/lumina-release.tar

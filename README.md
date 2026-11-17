@@ -73,6 +73,14 @@ active và `authVersion`. Reset thành công thu hồi phiên cũ. Cookie HttpOn
 [Kiến trúc, ERD và luồng authentication](docs/architecture.md) ·
 [Ranh giới module](docs/module-boundaries.md)
 
+## Tự deploy lên web
+
+Làm theo [hướng dẫn VPS Ubuntu + Docker + HTTPS](docs/deploy-vps.md): chuyển đúng
+release, cấu hình domain/secrets riêng, dùng `compose.web.yaml` để chỉ mở HTTP ở
+loopback rồi đặt Caddy HTTPS phía trước. Không dùng Vite hoặc dev override để public.
+Xem [trạng thái release và việc còn mở](docs/release-status-20261117.md) trước khi
+triển khai; config đã validate không đồng nghĩa VPS, TLS hoặc toàn bộ app đã nghiệm thu.
+
 ## Chạy bằng Docker
 
 Yêu cầu: Docker Desktop chạy Linux containers; Git. Node24+ cần cho các lệnh
