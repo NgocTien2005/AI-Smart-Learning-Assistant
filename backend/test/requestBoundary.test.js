@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { once } from 'node:events'
+import { gzipSync } from 'node:zlib'
 
 process.env.DATABASE_URL = 'postgresql://unused:unused@127.0.0.1:1/unused'
 process.env.JWT_SECRET = 'unit-only-boundary-secret'
@@ -30,4 +31,12 @@ test('production boundary rejects absent/array/null/scalar JSON before DB; handl
   const health = await fetch(base + '/api/health')
   assert.equal(health.status, 200)
   assert.equal(health.headers.get('x-powered-by'), null)
+
+  // Exercise the patched production JSON parser, not a legacy auth harness.
+  // Invalid bytes after a compressed body must terminate with a safe error,
+  // without reaching the database or leaving the request pending indefinitely.
+  const compressed = Buffer.concat([gzipSync(Buffer.from('{"email":"synthetic@example.invalid"}')), Buffer.from('invalid-trailer')])
+  const malformed = await fetch(base + '/api/auth/login', { method: 'POST', headers: { 'content-type': 'application/json', 'content-encoding': 'gzip' }, body: compressed, signal: AbortSignal.timeout(3000) })
+  assert.equal(malformed.status, 400)
+  assert.equal(typeof (await malformed.json()).error, 'string')
 })

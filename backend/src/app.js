@@ -58,6 +58,10 @@ export const createApp = () => {
       return response.status(400).json({ error: 'JSON không hợp lệ' })
     }
 
+    if (error.status === 400 && ['Z_DATA_ERROR', 'Z_BUF_ERROR'].includes(error.code)) {
+      return response.status(400).json({ error: 'Nội dung nén không hợp lệ' })
+    }
+
     if (error.message === 'Origin is not allowed by CORS') {
       return response.status(403).json({ error: 'Origin không được phép truy cập' })
     }

@@ -3,6 +3,7 @@ import { writeFile } from 'node:fs/promises'
 import { createIntegrationTarget } from './integration-target.mjs'
 import { createHash } from 'node:crypto'
 import bcrypt from 'bcryptjs'
+import { gzipSync } from 'node:zlib'
 
 const target = createIntegrationTarget()
 const { baseUrl } = target
@@ -15,6 +16,8 @@ globalThis.fetch = async (url, options) => {
   catch (error) { entry.failure = error.name; throw error }
 }
 const stamp = Date.now()
+const invalidCompressed = await fetch(`${baseUrl}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Encoding': 'gzip' }, body: Buffer.concat([gzipSync(Buffer.from('{"email":"synthetic@example.invalid"}')), Buffer.from('invalid-trailer')]), signal: AbortSignal.timeout(5000) })
+if (invalidCompressed.status !== 400 || typeof (await invalidCompressed.json()).error !== 'string') throw new Error('Malformed compressed body must terminate with safe400')
 const instructorEmail = `integration-instructor-${stamp}@example.com`
 const studentEmail = `integration-student-${stamp}@example.com`
 const managedEmail = `integration-managed-${stamp}@example.com`
