@@ -1,0 +1,15 @@
+# Opt-in VPS topology. Use only with compose.yaml, never compose.dev.yaml.
+# Requires Compose>=2.24.4 (!override) and Engine>=28 (loopback publishing).
+services:
+  backend:
+    environment:
+      APP_ORIGIN: https://${LUMINA_DOMAIN:?Set LUMINA_DOMAIN to your DNS hostname}
+      CORS_ORIGIN: https://${LUMINA_DOMAIN:?Set LUMINA_DOMAIN to your DNS hostname}
+      LUMINA_DEMO_ALLOWED: "false"
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_FREE_ONLY_CONFIRMED: ${GEMINI_FREE_ONLY_CONFIRMED:-false}
+      GEMINI_CHAT_ALLOWED: ${GEMINI_CHAT_ALLOWED:-false}
+  frontend:
+    # Replace base public8080 instead of appending an additional mapping.
+    ports: !override
+      - "127.0.0.1:18080:80"

@@ -1,0 +1,12 @@
+{
+    # Request-bearing runtime errors may contain reset URLs.
+    # Privacy default: discard logs; arrange sanitized monitoring separately.
+    log {
+        output discard
+    }
+}
+
+# Replace with the SAME hostname as LUMINA_DOMAIN in private .env.web.
+lms.example.com {
+    reverse_proxy 127.0.0.1:18080
+}
