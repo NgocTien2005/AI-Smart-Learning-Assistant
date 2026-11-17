@@ -1,0 +1,41 @@
+{
+  "date": "2026-11-17",
+  "targetVerified": true,
+  "database": "lumina_lms",
+  "container": "c93d6af6ce24f891eae87d5290b4df03527bd346dad6a15ea0989fcf91962566",
+  "runtimeSourceMatches": true,
+  "readiness": {
+    "key": true,
+    "free": true,
+    "chat": true,
+    "smtp": true
+  },
+  "versions": {
+    "multer": "2.5.0",
+    "nodemailer": "10.1.4",
+    "pdfjs-dist": "6.2.108",
+    "body-parser": "2.4.0",
+    "qs": "6.17.1",
+    "fast-uri": "3.1.9"
+  },
+  "statuses": [
+    {
+      "origin": "http://localhost:5173",
+      "health": 200,
+      "retiredOAuth": 404
+    },
+    {
+      "origin": "http://localhost:8080",
+      "health": 200,
+      "retiredOAuth": 404
+    }
+  ],
+  "install": {
+    "command": "docker exec <verified development backend> npm ci",
+    "cwd": "/app",
+    "exitCode": 0
+  },
+  "containerRecreated": false,
+  "defaultDatasetModified": false,
+  "postflightNote": "Initial postflight guard ran before Docker health changed from starting to healthy; read-only recheck now passes, no repeated install"
+}

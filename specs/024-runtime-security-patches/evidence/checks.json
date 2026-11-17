@@ -1,0 +1,146 @@
+{
+  "date": "2026-11-17",
+  "node": "v25.2.0",
+  "before": {
+    "counts": {
+      "info": 0,
+      "low": 0,
+      "moderate": 3,
+      "high": 3,
+      "critical": 0,
+      "total": 6
+    },
+    "findings": [
+      {
+        "name": "body-parser",
+        "severity": "high",
+        "advisories": [
+          "https://github.com/advisories/GHSA-27r3-jxmh-p828"
+        ]
+      },
+      {
+        "name": "fast-uri",
+        "severity": "moderate",
+        "advisories": [
+          "https://github.com/advisories/GHSA-w74x-v6f9-j3xg",
+          "https://github.com/advisories/GHSA-xhq7-xmqj-769h",
+          "https://github.com/advisories/GHSA-wjr9-j795-jxcr",
+          "https://github.com/advisories/GHSA-333x-w4r6-6crp"
+        ]
+      },
+      {
+        "name": "multer",
+        "severity": "high",
+        "advisories": [
+          "https://github.com/advisories/GHSA-q7qp-rjg7-q26m"
+        ]
+      },
+      {
+        "name": "nodemailer",
+        "severity": "moderate",
+        "advisories": [
+          "https://github.com/advisories/GHSA-8c8m-p3m8-cjg8",
+          "https://github.com/advisories/GHSA-m943-m63m-w62w",
+          "https://github.com/advisories/GHSA-85x2-q946-cp5h"
+        ]
+      },
+      {
+        "name": "pdfjs-dist",
+        "severity": "high",
+        "advisories": [
+          "https://github.com/advisories/GHSA-hq66-cqwq-w95j"
+        ]
+      },
+      {
+        "name": "qs",
+        "severity": "moderate",
+        "advisories": [
+          "https://github.com/advisories/GHSA-6pq8-jhm2-2vcw"
+        ]
+      }
+    ]
+  },
+  "after": {
+    "counts": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    }
+  },
+  "versions": {
+    "multer": "2.5.0",
+    "nodemailer": "10.1.4",
+    "pdfjs-dist": "6.2.108",
+    "body-parser": "2.4.0",
+    "qs": "6.17.1",
+    "fast-uri": "3.1.9",
+    "@napi-rs/canvas": "1.1.1"
+  },
+  "commands": [
+    {
+      "cwd": "backend",
+      "command": "npm install --save-exact multer@2.5.0 nodemailer@10.1.4 pdfjs-dist@6.2.108 --ignore-scripts",
+      "exitCode": 0
+    },
+    {
+      "cwd": "backend",
+      "command": "npm update body-parser fast-uri qs --ignore-scripts",
+      "exitCode": 0
+    },
+    {
+      "cwd": "backend",
+      "command": "npm ci",
+      "exitCode": 0
+    },
+    {
+      "cwd": "backend",
+      "command": "npm audit --omit=dev --json",
+      "exitCode": 0
+    },
+    {
+      "cwd": "backend",
+      "command": "npm test",
+      "exitCode": 0,
+      "passed": 87
+    },
+    {
+      "cwd": "backend",
+      "command": "npm test -- --test-name-pattern=quiz",
+      "exitCode": 0,
+      "passed": 22
+    },
+    {
+      "cwd": ".",
+      "command": "node --test scripts/ci/test/ci.test.mjs scripts/ci/test/operations.test.mjs scripts/ci/test/web-deploy.test.mjs",
+      "exitCode": 0,
+      "passed": 29
+    },
+    {
+      "cwd": ".",
+      "command": "node scripts/ci/integration.mjs",
+      "exitCode": 0
+    },
+    {
+      "cwd": ".",
+      "command": "node scripts/ci/seed-integration.mjs",
+      "exitCode": 0
+    },
+    {
+      "cwd": ".",
+      "command": "node scripts/ci/integration.mjs (after malformed-gzip fix)",
+      "exitCode": 0,
+      "httpOperations": 103
+    }
+  ],
+  "smtpSends": 0,
+  "providerRequestsInDependencyTests": 0,
+  "compatibility": {
+    "gzipMalformedBefore": 500,
+    "gzipMalformedAfter": 400,
+    "source": "production app and real Nginx/HTTP check",
+    "apiSchemaChanged": false
+  }
+}
