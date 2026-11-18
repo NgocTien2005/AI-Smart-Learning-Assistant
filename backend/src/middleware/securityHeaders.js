@@ -10,7 +10,7 @@ export function securityHeaders(_request, response, next) {
 // Never serialize arbitrary errors: Prisma/provider errors can contain payloads,
 // credentials, queries or URLs. Event text is an internal constant, not input.
 export function logSafeError(event, error) {
-  const knownCodes = new Set(['EAUTH', 'ECONNECTION', 'ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', 'ENOTFOUND', 'EENVELOPE', 'ESOCKET'])
+  const knownCodes = new Set(['EAUTH', 'ECONNECTION', 'ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', 'ENOTFOUND', 'EENVELOPE', 'ESOCKET', 'EMAIL_DELIVERY_FAILED'])
   const code = typeof error?.code === 'string' && (/^P\d{4}$/.test(error.code) || knownCodes.has(error.code))
     ? error.code : 'INTERNAL_ERROR'
   console.error(event, code)
