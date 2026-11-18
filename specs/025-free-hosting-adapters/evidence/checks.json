@@ -1,0 +1,40 @@
+[
+  {
+    "command": "npm test",
+    "cwd": "backend",
+    "durationMs": 3504,
+    "exitCode": 0,
+    "status": "passed",
+    "tests": 97
+  },
+  {
+    "command": "npm test -- --test-name-pattern=quiz",
+    "cwd": "backend",
+    "durationMs": 1807,
+    "exitCode": 0,
+    "status": "passed",
+    "tests": 26
+  },
+  {
+    "command": "node --test scripts/ci/test/ci.test.mjs scripts/ci/test/operations.test.mjs scripts/ci/test/web-deploy.test.mjs",
+    "cwd": ".",
+    "durationMs": 2874,
+    "exitCode": 0,
+    "status": "passed",
+    "tests": 29
+  },
+  {
+    "command": "npm exec --no -- prisma validate",
+    "cwd": "backend",
+    "durationMs": 7933,
+    "exitCode": 0,
+    "status": "passed"
+  },
+  {
+    "command": "npm exec --no -- prisma generate",
+    "cwd": "backend",
+    "durationMs": 2708,
+    "exitCode": 0,
+    "status": "passed"
+  }
+]

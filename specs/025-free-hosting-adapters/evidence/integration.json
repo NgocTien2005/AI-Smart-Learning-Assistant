@@ -1,0 +1,216 @@
+{
+  "time": "2026-11-18T02:42:45.268Z",
+  "revision": "d8716a86a77caefcbdc994aa1da5e1ff00d63afd",
+  "sourceType": "local working tree; see source manifest",
+  "node": "v25.2.0",
+  "platform": "win32",
+  "job": "integration",
+  "project": "lumina-acceptance-ci-1794969765227-b121bb1e",
+  "commands": [
+    {
+      "command": "docker compose <explicit fresh project/file/empty env> up --build --wait --wait-timeout 180",
+      "cwd": ".",
+      "durationMs": 14509,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified isolated backend> prisma migrate status",
+      "cwd": ".",
+      "durationMs": 1488,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "npm run test:integration",
+      "cwd": "backend",
+      "durationMs": 5232,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 166,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 172,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker logs <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 83,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker inspect <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 75,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker inspect <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 70,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker inspect <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 76,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 164,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 176,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 310,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 281,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 555,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 163,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 178,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 205,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 148,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 147,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 144,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 154,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified operations fixture; arguments suppressed>",
+      "cwd": ".",
+      "durationMs": 164,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker compose <this run only> down (named volumes retained)",
+      "cwd": ".",
+      "durationMs": 2694,
+      "exitCode": 0,
+      "status": "passed"
+    }
+  ],
+  "targetVerifiedBeforeProvisioning": true,
+  "suiteEvidenceAvailable": true,
+  "namedVolumesRemoved": false,
+  "http": "http://127.0.0.1:57630/api",
+  "provisioningScope": "only the newly allocated empty isolated project; production suite owns its registered test accounts/resources",
+  "database": "lumina_acceptance",
+  "containers": {
+    "db": "225351507eb8171cd0776dda80a550eceeb502243e3f6cd9dc6199f7afbccc37",
+    "backend": "8e3f69a6934b65138fee41d068e2ae46d61b95336a00007671670a829dea97db",
+    "frontend": "2f9ef5f2f6e23fee8fd579b85cbbdfc44254b057b10f53e86586675233ade25e"
+  },
+  "retainedVolumes": [
+    "lumina-acceptance-ci-1794969765227-b121bb1e_postgres_data",
+    "lumina-acceptance-ci-1794969765227-b121bb1e_uploads_data"
+  ],
+  "remainingOwnedUsers": 0,
+  "httpOperations": 103,
+  "recordedResources": 33,
+  "operations": {
+    "headers": true,
+    "probeStatuses": [
+      200,
+      200,
+      404,
+      400,
+      400
+    ],
+    "proxyCanaryAbsent": true,
+    "accessFieldsAllowlisted": true,
+    "loggingRotation": true,
+    "databaseRestored": true,
+    "uploadDigestMatched": true,
+    "restoreDatabase": "lumina_restore_3549d114264fc9ad",
+    "retainedSyntheticFixtureRows": 1,
+    "retainedSyntheticUploadFiles": 1,
+    "archivesPublished": false,
+    "realProviderRequests": 0
+  },
+  "failure": null,
+  "cleanup": {
+    "attempted": true,
+    "success": true
+  },
+  "exitCode": 0
+}

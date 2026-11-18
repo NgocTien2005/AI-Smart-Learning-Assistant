@@ -43,3 +43,7 @@ Các volumes/restore fixtures của isolated test được giữ và liệt kê 
 ## Cách deploy
 
 Bạn đã chọn VPS Ubuntu. Làm theo [deploy-vps.md](deploy-vps.md); không có host/domain/tài nguyên trả phí được agent tạo. Chuyển **đúng commit local** bằng git archive nếu chưa push được, không clone main và tưởng đã có mọi bản sửa. Không có deployed URL hoặc hosted CI mới được dựng lên. Sau deploy staging, thực hiện toàn bộ acceptance trong guide trước khi công khai.
+
+## Cập nhật lựa chọn miễn phí2026-11-18
+
+Người dùng đổi sang gói Free. Feature025 bổ sung Supabase private Storage và Brevo HTTPS recovery, giữ local/Gmail SMTP mặc định và auth/role APIs. Xem [hướng dẫn deploy miễn phí](deploy-free.md), [bằng chứng025](../specs/025-free-hosting-adapters/verification.md). Local97backend/26quiz runner/29CI checks, Prisma validate/generate và rebuilt isolated103HTTP/database ops đạt. Provider contracts dùng fake transport; chưa có Supabase/Brevo/Render thật hoặc hosted CI mới. T008 của025 giữ mở cho cấu hình riêng và nghiệm thu thực tế, không thay bằng chứng lịch sử008. Hướng dẫn VPS phía trên trở thành phương án tùy chọn, không phải yêu cầu mua dịch vụ.
