@@ -75,6 +75,8 @@ active và `authVersion`. Reset thành công thu hồi phiên cũ. Cookie HttpOn
 
 ## Tự deploy lên web
 
+Muốn demo bằng gói miễn phí: xem [Render + Supabase private Storage + Brevo HTTPS](docs/deploy-free.md). Cần cấu hình tài khoản/key riêng, xác minh sender và nghiệm thu provider; local tests không thay bằng chứng deploy thật.
+
 Làm theo [hướng dẫn VPS Ubuntu + Docker + HTTPS](docs/deploy-vps.md): chuyển đúng
 release, cấu hình domain/secrets riêng, dùng `compose.web.yaml` để chỉ mở HTTP ở
 loopback rồi đặt Caddy HTTPS phía trước. Không dùng Vite hoặc dev override để public.
