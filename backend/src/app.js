@@ -44,6 +44,12 @@ export const createApp = () => {
     response.status(404).json({ error: 'Không tìm thấy endpoint' })
   })
   app.use((error, _request, response, _next) => {
+    if (error.code === 'STORAGE_UNAVAILABLE') {
+      return response.status(503).json({ code: error.code, error: 'Kho tài liệu tạm thời không khả dụng' })
+    }
+    if (error.code === 'DOCUMENT_NOT_FOUND') {
+      return response.status(404).json({ code: error.code, error: 'Tệp tài liệu không còn tồn tại' })
+    }
     if (error.type === 'entity.too.large') {
       return response.status(413).json({ error: 'Nội dung yêu cầu vượt quá giới hạn 1 MiB' })
     }

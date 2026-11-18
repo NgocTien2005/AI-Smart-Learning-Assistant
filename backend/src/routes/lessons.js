@@ -1,17 +1,12 @@
 import { Router } from 'express'
-import { prisma } from '../lib/prisma.js'
+import { prisma as productionPrisma } from '../lib/prisma.js'
 import { authorizeRole } from '../middleware/authorizeRole.js'
 import { parseId, canAccessCourse } from '../utils/courseAccess.js'
-import { randomUUID } from 'node:crypto'
-import { access, mkdir, writeFile } from 'node:fs/promises'
-import { extname, resolve } from 'node:path'
-import { uploadDirectory } from '../config/env.js'
+import { extname } from 'node:path'
 import { answerFromDocument } from '../utils/studyAssistant.js'
 import { lessonTextAfterContentEdit, resolveLessonSource, createExtractiveSummary } from '../utils/lessonText.js'
 import { processDocument } from '../services/documentProcessing.js'
-import { upload, removeStoredFile, processUploadForStorage } from '../services/courseDocuments.js'
-
-const router = Router()
+import { upload, documentStorage, removeStoredFile as cleanupStoredFile, processUploadForStorage } from '../services/courseDocuments.js'
 
 export const lessonSelect = {
   id: true,
@@ -27,6 +22,10 @@ export const lessonSelect = {
   createdAt: true,
   updatedAt: true,
 }
+
+export const createLessonsRouter = ({ prisma = productionPrisma, storage = documentStorage } = {}) => {
+const router = Router()
+const removeStoredFile = reference => cleanupStoredFile(reference, storage)
 
 router.put('/lessons/:lessonId/progress', authorizeRole('STUDENT'), async (request, response) => {
   const lessonId = parseId(request.params.lessonId)
@@ -80,18 +79,16 @@ router.post('/:courseId/lessons', authorizeRole('INSTRUCTOR'), upload.single('do
 
   let storedName = null
   try {
+    const processed = request.file ? await processUploadForStorage(request.file) : null
     if (request.file) {
       const allowedExtension = request.file.mimetype === 'application/pdf'
         ? '.pdf'
         : ['.txt', '.md', '.csv'].includes(extname(request.file.originalname).toLowerCase())
           ? extname(request.file.originalname).toLowerCase()
           : '.txt'
-      storedName = `${randomUUID()}${allowedExtension}`
-      await mkdir(uploadDirectory, { recursive: true })
-      await writeFile(resolve(uploadDirectory, storedName), request.file.buffer)
+      storedName = await storage.save(request.file.buffer, allowedExtension)
     }
 
-    const processed = request.file ? await processUploadForStorage(request.file) : null
     const lesson = await prisma.lesson.create({
       data: {
         title,
@@ -113,7 +110,7 @@ router.post('/:courseId/lessons', authorizeRole('INSTRUCTOR'), upload.single('do
 
     return response.status(201).json({ lesson })
   } catch (error) {
-    await removeStoredFile(storedName)
+    // An uncertain database outcome may have committed; retain potential orphans.
     throw error
   }
 })
@@ -164,11 +161,10 @@ router.patch('/lessons/:lessonId/document', authorizeRole('INSTRUCTOR'), upload.
   catch (error) { return response.status(error.code === 'SIZE_LIMIT' ? 413 : 400).json({ code: error.code || 'INVALID_DOCUMENT', error: error.message }) }
   const originalExtension = extname(request.file.originalname).toLowerCase()
   const allowedExtension = originalExtension === '.markdown' ? '.md' : originalExtension
-  const storedName = `${randomUUID()}${allowedExtension}`
+  let storedName
 
   try {
-    await mkdir(uploadDirectory, { recursive: true })
-    await writeFile(resolve(uploadDirectory, storedName), request.file.buffer)
+    storedName = await storage.save(request.file.buffer, allowedExtension)
     const committed = await prisma.lesson.updateMany({
       where: { id: lessonId, documentUrl: lesson.documentUrl },
       data: { documentUrl: storedName, documentName: request.file.originalname.slice(0, 255), extractedText: null,
@@ -181,7 +177,7 @@ router.patch('/lessons/:lessonId/document', authorizeRole('INSTRUCTOR'), upload.
     await removeStoredFile(lesson.documentUrl)
     return response.json({ lesson: updatedLesson })
   } catch (error) {
-    await removeStoredFile(storedName)
+    // An uncertain database outcome may have committed; retain potential orphans.
     throw error
   }
 })
@@ -226,10 +222,10 @@ router.post('/lessons/:lessonId/document/process', authorizeRole('INSTRUCTOR'), 
   if (!lesson) return response.status(404).json({ error: 'Không tìm thấy bài học' })
   if (lesson.course.instructorId !== request.user.id) return response.status(403).json({ error: 'Chỉ giảng viên sở hữu khóa học được xử lý tài liệu' })
   if (!lesson.documentUrl) return response.status(404).json({ error: 'Bài học chưa có tài liệu' })
-  const filePath = resolve(uploadDirectory, lesson.documentUrl)
-  const { readFile } = await import('node:fs/promises')
+  // Storage outages leave the existing extracted source intact.
+  const buffer = await storage.read(lesson.documentUrl)
   let processed
-  try { processed = await processDocument({ name: lesson.documentName, buffer: await readFile(filePath) }) }
+  try { processed = await processDocument({ name: lesson.documentName, buffer }) }
   catch (error) {
     await prisma.lesson.updateMany({ where: { id: lessonId, documentUrl: lesson.documentUrl }, data: {
       documentText: null, documentHash: null, extractionStatus: 'FAILED', extractionErrorCode: error.code || 'PROCESSING_FAILED',
@@ -270,15 +266,10 @@ router.get('/lessons/:lessonId/document', async (request, response) => {
   if (!canAccessCourse(lesson.course, request.user)) return response.status(403).json({ error: 'Bạn không có quyền xem tài liệu này' })
   if (!lesson.documentUrl) return response.status(404).json({ error: 'Bài học chưa có tài liệu' })
 
-  const filePath = resolve(uploadDirectory, lesson.documentUrl)
-  try {
-    await access(filePath)
-  } catch (error) {
-    if (error.code === 'ENOENT') return response.status(404).json({ error: 'Tệp tài liệu không còn tồn tại' })
-    throw error
-  }
-
-  return response.download(filePath, lesson.documentName || 'tai-lieu')
+  const buffer = await storage.read(lesson.documentUrl)
+  response.set('Cache-Control', 'private, no-store')
+  response.attachment(lesson.documentName || 'tai-lieu')
+  return response.send(buffer)
 })
 
 router.get('/lessons/:lessonId/chat', async (request, response) => {
@@ -320,4 +311,7 @@ router.post('/lessons/:lessonId/chat', async (request, response) => {
   return response.status(201).json({ message })
 })
 
-export default router
+return router
+}
+
+export default createLessonsRouter()
