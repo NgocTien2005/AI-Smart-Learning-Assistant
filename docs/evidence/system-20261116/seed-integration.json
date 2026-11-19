@@ -1,0 +1,133 @@
+{
+  "time": "2026-11-16T08:49:07.713Z",
+  "revision": "be39e565c16dc2f92ec961a5c1da1b2593b97761",
+  "sourceType": "local working tree; see source manifest",
+  "node": "v25.2.0",
+  "platform": "win32",
+  "project": "lumina-acceptance-ci-demo-1794818947674-72f67f",
+  "job": "seed-integration",
+  "commands": [
+    {
+      "command": "docker context show",
+      "cwd": ".",
+      "durationMs": 61,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker context inspect <endpoint only>",
+      "cwd": ".",
+      "durationMs": 59,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 74,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 92,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 85,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 77,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 70,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker <fresh project ownership inventory>",
+      "cwd": ".",
+      "durationMs": 74,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker compose <fresh seed project> up --build --wait",
+      "cwd": ".",
+      "durationMs": 21716,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker exec <verified seed backend> prisma migrate status",
+      "cwd": ".",
+      "durationMs": 1471,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "docker compose <this seed run only> down (volumes retained)",
+      "cwd": ".",
+      "durationMs": 2640,
+      "exitCode": 0,
+      "status": "passed"
+    }
+  ],
+  "emailsSent": 0,
+  "providerRequests": 0,
+  "namedVolumesRemoved": false,
+  "targetVerifiedBeforeProvisioning": true,
+  "database": "lumina_acceptance",
+  "api": "http://127.0.0.1:53170/api",
+  "sentinelId": 1,
+  "counts": {
+    "users": 18,
+    "admin": 1,
+    "instructors": 4,
+    "activeStudents": 12,
+    "disabledStudents": 1,
+    "courses": 8,
+    "lessons": 48,
+    "assignments": 24,
+    "documents": 26
+  },
+  "modifiedSourceDenied": true,
+  "httpOperations": 247,
+  "coverage": {
+    "submitted": 8,
+    "draft": 1,
+    "unstarted": 40,
+    "graded": 8,
+    "pending": 8,
+    "notSubmitted": 8,
+    "documents": 26
+  },
+  "dryRunNoWrites": true,
+  "collisionDenied": true,
+  "rerunNoDuplicates": true,
+  "preexistingSentinelPreserved": true,
+  "remainingUsers": "0",
+  "retainedSyntheticDocuments": 26,
+  "retainedVolumes": [
+    "lumina-acceptance-ci-demo-1794818947674-72f67f_postgres_data",
+    "lumina-acceptance-ci-demo-1794818947674-72f67f_uploads_data"
+  ],
+  "failure": null,
+  "cleanup": {
+    "attempted": true,
+    "success": true
+  },
+  "exitCode": 0
+}

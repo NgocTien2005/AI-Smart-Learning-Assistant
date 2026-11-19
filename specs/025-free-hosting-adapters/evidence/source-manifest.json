@@ -1,0 +1,70 @@
+{
+  "baseline": "d8716a86a77caefcbdc994aa1da5e1ff00d63afd",
+  "sourceType": "local working tree, exact in-scope file hashes at test completion",
+  "files": [
+    {
+      "file": "backend/prisma.config.ts",
+      "sha256": "1ae1722315581886cf833e8b4fb75e655ab598902caf085707593186ff14384b"
+    },
+    {
+      "file": "backend/src/app.js",
+      "sha256": "8e51d5820afd6e900ecfc0142d6f3324736bcc7cca0dc75060b00bb24517b6e7"
+    },
+    {
+      "file": "backend/src/middleware/securityHeaders.js",
+      "sha256": "7d33acfbed1b3e09d396c310cddbd0c33a724e0fb940ee241aee88e74869ce5a"
+    },
+    {
+      "file": "backend/src/routes/lessons.js",
+      "sha256": "14ffd8c023049eea444fb05f23ee955b41ae988a01aa96c17137d1ddc333d09c"
+    },
+    {
+      "file": "backend/src/services/courseDocuments.js",
+      "sha256": "6b45d5697cfa2cac19a07327a4bfbbaa1ab880417579397a1ca0d7b41836c655"
+    },
+    {
+      "file": "backend/src/services/email.js",
+      "sha256": "9fc7102cd2bb30788dcc86cf9e0d94cc5f778c946253efc281c43f5b42df8134"
+    },
+    {
+      "file": "scripts/ci/common.mjs",
+      "sha256": "35014117a4ca25b6b70e8885b984dd87355b1de4dd77eac8c05f446728810c2a"
+    },
+    {
+      "file": "backend/scripts/bootstrap-free-admin.mjs",
+      "sha256": "edf5313451c430febb3ab33ac807757dc95e66daf0f25399bb286ba9c1f1fcb9"
+    },
+    {
+      "file": "backend/src/services/documentStorage.js",
+      "sha256": "ba89707f91a6990fa76b29867b94bfa5c8b3d736a00e3dbc837fd4a3634c8985"
+    },
+    {
+      "file": "backend/src/services/providerHttp.js",
+      "sha256": "0c7254ab44accbc70ca3fa12c3d4f0ee4c0e61ffd2d67e91e50f846f469c1adc"
+    },
+    {
+      "file": "backend/src/services/recoveryEmail.js",
+      "sha256": "e6f4349b344e91daf90cf3c87a01e539556b057fd7e2deb14e784ef8b52e6f70"
+    },
+    {
+      "file": "backend/src/utils/freeDeployTarget.js",
+      "sha256": "ac1f9d636f67d67c1f6c6f0ba7694694150dfb99589e572de21e8f434d5d42c6"
+    },
+    {
+      "file": "backend/test/documentStorageRoutes.test.js",
+      "sha256": "327a873e4ff872a0638df353974da9e3503c59e74ab02f15bfacf9b6e50f2305"
+    },
+    {
+      "file": "backend/test/freeDeployTarget.test.js",
+      "sha256": "b6dfcca489bb4533f4f4df26da84e9b7300f6fba06644850f3d131340889f895"
+    },
+    {
+      "file": "backend/test/freeHosting.test.js",
+      "sha256": "be38c9c059958acec4f61c3665721a9a65a9a9a26a3aba8487598716d1d30e3e"
+    },
+    {
+      "file": "backend/test/recoveryEmail.test.js",
+      "sha256": "8967827df0d31b36004a95b34e986ae0b6830d9bd2a27be6eda6923eede4a3f9"
+    }
+  ]
+}

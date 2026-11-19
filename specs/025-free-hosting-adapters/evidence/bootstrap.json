@@ -1,0 +1,18 @@
+[
+  {
+    "command": "node scripts/bootstrap-free-admin.mjs --check-only",
+    "cwd": "backend",
+    "durationMs": 244,
+    "exitCode": 0,
+    "status": "passed",
+    "expectedExitCode": 0
+  },
+  {
+    "command": "node scripts/bootstrap-free-admin.mjs --check-only",
+    "cwd": "backend",
+    "durationMs": 83,
+    "exitCode": 1,
+    "status": "failed",
+    "expectedExitCode": 1
+  }
+]

@@ -1,0 +1,24 @@
+{
+  "page": "c2412304-8726-4014-9f56-1c08750b5db1",
+  "source": "original synthetic demo only",
+  "generationAttempts": 2,
+  "automaticRetries": 0,
+  "answers": [
+    {
+      "answered": true,
+      "citations": 1,
+      "error": null,
+      "inputRetained": false,
+      "modelDeclared": true
+    },
+    {
+      "answered": true,
+      "citations": 1,
+      "error": null,
+      "inputRetained": false,
+      "modelDeclared": true
+    }
+  ],
+  "keyboardSubmitFocused": true,
+  "accepted": true
+}

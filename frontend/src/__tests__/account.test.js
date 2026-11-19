@@ -62,6 +62,8 @@ for (const [role, label] of [['ADMIN','Quản trị viên'],['INSTRUCTOR','Giả
   assert.equal(screen.queryByLabelText('Email'), null)
   assert.equal(screen.queryByLabelText('Mật khẩu hiện tại'), null)
   assert.equal(screen.getByRole('button', { name: 'Mở biểu mẫu đổi mật khẩu' }).getAttribute('aria-expanded'), 'false')
+  assert.equal(screen.queryByRole('button', { name: /Google/ }), null)
+  assert.equal(document.querySelector('script[src*="accounts.google.com"]'), null)
 })
 
 test('account profile validates trimmed2–80 and serializes same-tick saves', async () => {

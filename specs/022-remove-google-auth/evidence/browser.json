@@ -1,0 +1,147 @@
+{
+  "date": "2026-11-16",
+  "results": [
+    {
+      "role": "ADMIN",
+      "view": "auth",
+      "width": 1280,
+      "height": 800,
+      "noGoogle": true,
+      "noOverflow": true,
+      "noSDK": true
+    },
+    {
+      "role": "ADMIN",
+      "view": "auth",
+      "width": 1440,
+      "height": 900,
+      "noGoogle": true,
+      "noOverflow": true,
+      "noSDK": true
+    },
+    {
+      "role": "ADMIN",
+      "view": "actual password login and role routing",
+      "pass": true
+    },
+    {
+      "role": "ADMIN",
+      "view": "account",
+      "width": 1280,
+      "height": 800,
+      "noGoogle": true,
+      "noOverflow": true,
+      "noSDK": true,
+      "passwordControl": true
+    },
+    {
+      "role": "ADMIN",
+      "view": "account",
+      "width": 1440,
+      "height": 900,
+      "noGoogle": true,
+      "noOverflow": true,
+      "noSDK": true,
+      "passwordControl": true
+    },
+    {
+      "role": "INSTRUCTOR",
+      "view": "auth",
+      "width": 1280,
+      "height": 800,
+      "noGoogle": true,
+      "noOverflow": true,
+      "noSDK": true
+    },
+    {
+      "role": "INSTRUCTOR",
+      "view": "auth",
+      "width": 1440,
+      "height": 900,
+      "noGoogle": true,
+      "noOverflow": true,
+      "noSDK": true
+    },
+    {
+      "role": "INSTRUCTOR",
+      "view": "actual password login and role routing",
+      "pass": true
+    },
+    {
+      "role": "INSTRUCTOR",
+      "view": "account",
+      "width": 1280,
+      "height": 800,
+      "noGoogle": true,
+      "noOverflow": true,
+      "noSDK": true,
+      "passwordControl": true
+    },
+    {
+      "role": "INSTRUCTOR",
+      "view": "account",
+      "width": 1440,
+      "height": 900,
+      "noGoogle": true,
+      "noOverflow": true,
+      "noSDK": true,
+      "passwordControl": true
+    },
+    {
+      "role": "STUDENT",
+      "view": "auth",
+      "width": 1280,
+      "height": 800,
+      "noGoogle": true,
+      "noOverflow": true,
+      "noSDK": true
+    },
+    {
+      "role": "STUDENT",
+      "view": "auth",
+      "width": 1440,
+      "height": 900,
+      "noGoogle": true,
+      "noOverflow": true,
+      "noSDK": true
+    },
+    {
+      "role": "STUDENT",
+      "view": "actual password login and role routing",
+      "pass": true
+    },
+    {
+      "role": "STUDENT",
+      "view": "account",
+      "width": 1280,
+      "height": 800,
+      "noGoogle": true,
+      "noOverflow": true,
+      "noSDK": true,
+      "passwordControl": true
+    },
+    {
+      "role": "STUDENT",
+      "view": "account",
+      "width": 1440,
+      "height": 900,
+      "noGoogle": true,
+      "noOverflow": true,
+      "noSDK": true,
+      "passwordControl": true
+    }
+  ],
+  "accepted": true,
+  "manualVisualReview": {
+    "auth": [
+      1280,
+      1440
+    ],
+    "account": [
+      1280,
+      1440
+    ],
+    "twoColumnIdentityPreserved": true
+  },
+  "rawScreenshotsPublished": false
+}

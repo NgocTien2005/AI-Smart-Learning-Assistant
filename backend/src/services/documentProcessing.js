@@ -69,7 +69,9 @@ export const processDocument = async ({ name, mimetype, buffer, timeoutMs = EXTR
   const parse = async () => {
     let pdf
     try {
-      const task = getDocument({ data: new Uint8Array(buffer), stopAtErrors: true, isEvalSupported: false,
+      // PDF.js6 core text API has no viewer/scripting manager. The former
+      // isEvalSupported option is no longer consumed; do not treat it as a guard.
+      const task = getDocument({ data: new Uint8Array(buffer), stopAtErrors: true,
         standardFontDataUrl: new URL('../../node_modules/pdfjs-dist/standard_fonts/', import.meta.url).href })
       activeTask = task
       pdf = await task.promise

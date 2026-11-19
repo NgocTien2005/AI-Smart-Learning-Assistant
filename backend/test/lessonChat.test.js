@@ -4,12 +4,12 @@ import express from 'express'
 import {once} from 'node:events'
 import {validateChatRequest,selectChatSource} from '../src/services/lessonChat.js'
 import {createLessonChatRouter} from '../src/routes/lessonChat.js'
-import {createCloudService,createCloudBudget} from '../src/services/demoCloudAssistant.js'
+import {createCloudService,createCloudBudget,CHAT_MODEL} from '../src/services/demoCloudAssistant.js'
 
 const text='Thuật toán là dãy bước hữu hạn giải quyết một bài toán xác định.'
 const request={question:'Thuật toán giúp gì?',history:[],sourceType:'LESSON_CONTENT',sourceRevision:1,consent:true}
 const output={answer:'Thuật toán giải quyết bài toán bằng một dãy bước hữu hạn.',insufficient:false,citations:[{sourceId:'S1',quote:text}],questions:[]}
-const provider=()=>Response.json({status:'completed',model:'gemini-3.8-flash',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(output)}]}]})
+const provider=(patch={})=>Response.json({modelVersion:CHAT_MODEL,candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify(output)}]}}],...patch})
 
 test('chat rejects missing consent, forged fields, history, source and question bounds',()=>{
   assert.equal(validateChatRequest(request).question,request.question)
@@ -32,11 +32,16 @@ test('chat pinned transport sends bounded untrusted conversation, no identity an
   const budget=createCloudBudget()
   const chat=createCloudService({key:'test',enabled:true,freeOnly:true,budget,chat:true,fetchImpl:async(url,options)=>{
     calls++
-    const body=JSON.parse(options.body),input=JSON.parse(body.input)
-    assert.equal(body.store,false);assert.equal(body.tools,undefined);assert.equal(body.previous_interaction_id,undefined)
+    const body=JSON.parse(options.body),input=JSON.parse(body.contents[0].parts[0].text)
+    assert.equal(url,'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent')
+    assert.equal(body.tools,undefined);assert.equal(body.cachedContent,undefined)
+    assert.equal(body.generationConfig.thinkingConfig.thinkingLevel,'minimal')
+    assert.equal(body.generationConfig.responseMimeType,'application/json')
+    assert.equal(body.generationConfig.maxOutputTokens,3072)
+    assert.equal(body.generationConfig.responseJsonSchema.properties.questions.maxItems,0)
     assert.equal(input.question,request.question);assert.deepEqual(input.history,[])
     assert.equal(input.userId,undefined);assert.equal(input.SOURCE[0].text,text)
-    assert.match(body.system_instruction,/không đáng tin/iu)
+    assert.match(body.systemInstruction.parts[0].text,/không đáng tin/iu)
     return provider()
   }})
   const source=selectChatSource({content:text,title:'Demo',sourceRevision:1})
@@ -44,6 +49,16 @@ test('chat pinned transport sends bounded untrusted conversation, no identity an
   const demo=createCloudService({key:'test',enabled:true,freeOnly:true,budget,fetchImpl:async()=>{calls++;return provider()}})
   await assert.rejects(demo.generate({userId:1,request:{mode:'summary',questionId:'concepts'},source}),{code:'CLOUD_LIMIT'})
   assert.equal(calls,1)
+})
+
+test('chat rejects incomplete blocked tool wrong-model or invented citation output with no retry',async()=>{
+  const source=selectChatSource({content:text,title:'Test',sourceRevision:1})
+  for(const patch of [{candidates:[{finishReason:'MAX_TOKENS',content:{parts:[{text:JSON.stringify(output)}]}}]},{promptFeedback:{blockReason:'SAFETY'}},{modelVersion:'other-model'},{candidates:[{finishReason:'STOP',content:{parts:[{functionCall:{name:'fetch'}}]}}]},{candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify({...output,citations:[{sourceId:'S1',quote:'An invented quotation not in the source text.'}]})}]}}]}]){
+    let calls=0
+    const service=createCloudService({key:'test',enabled:true,freeOnly:true,chat:true,fetchImpl:async()=>{calls++;return provider(patch)}})
+    await assert.rejects(service.generate({userId:1,request:{...request,mode:'ask'},source}),{code:'CLOUD_INVALID_OUTPUT'})
+    assert.equal(calls,1)
+  }
 })
 
 test('chat production router denies initial access/selection and discards delayed revoked results',async()=>{

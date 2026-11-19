@@ -9,6 +9,8 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // CLI migrations and the pg runtime have different TLS URL parameters.
+    // Local deployments keep their existing single URL when no override is set.
+    url: process.env["MIGRATION_DATABASE_URL"] || process.env["DATABASE_URL"],
   },
 });

@@ -2,6 +2,8 @@
 
 This is a single-host local/demo foundation, not approval to deploy. See
 [production readiness](production-readiness.md) for unverified public-release gates.
+For the opt-in VPS operator kit, see [Ubuntu deployment](deploy-vps.md) and
+[current release status](release-status-20261117.md). No deployment was performed.
 The actual runtime is `backend/server.js` → `backend/src/app.js`; the root
 `backend/app.js` is a legacy harness. PostgreSQL and uploads are separate volumes.
 
@@ -27,8 +29,8 @@ archives, tokens, reset links or authenticated requests as CI evidence.
 
 Proxy responses add nosniff, no-referrer, SAMEORIGIN and disabled camera,
 microphone/geolocation permissions. They retain API routing/body limits and
-same-origin blob-document preview. Real GIS acceptance remains feature010's
-separate gate. CSP, COOP and HTTPS/HSTS require deployment-specific review;
+same-origin blob-document preview. OAuth was retired by feature022;
+Gmail recovery and Gemini remain independent. CSP, COOP and HTTPS/HSTS require deployment-specific review;
 they are not silently enabled on the HTTP development server.
 
 ## Synthetic recovery drill
@@ -85,7 +87,7 @@ or historical policy-blocked browser profile is touched.
 ## Release and rollback checklist
 
 - Select domain/TLS termination, renewals, firewall and binding. Verify
-  APP_ORIGIN/CORS/reset-link/GIS origins through the actual HTTPS proxy.
+  APP_ORIGIN/CORS/reset-link origins through the actual HTTPS proxy.
 - Provision strong secrets privately; disable demo markers/accounts and cloud
   demo in a public environment. Review DB least privilege and container/upload
   ownership before changing users. Existing root-owned volume compatibility

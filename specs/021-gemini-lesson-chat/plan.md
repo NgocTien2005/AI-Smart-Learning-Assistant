@@ -6,6 +6,10 @@
 
 Add a separate authenticated `/gemini-chat` contract and React conversation panel in the existing lesson workspace. Reuse the pinned Gemini transport and exact citation validator with a free-text adapter and shared process budget. Keep the finite `/cloud-assistant` contract and demo proof unchanged. No schema, dependency, lockfile, billing or authentication architecture changes.
 
+### Repair decision 2026-11-16 (supersedes chat provider pin above)
+
+User explicitly requires working real chat. Current3.8Flash generation reproduced503 even for a constant synthetic prompt using supported low thinking on generateContent; metadata/readiness alone was misleading. Same private key+Free confirmation produced200/text/STOP with3.1Flash-Lite and minimal thinking. Pin **chat only** to `gemini-3.1-flash-lite` on native REST `generateContent`; leave historical finite demo transport/model unchanged. This is a deliberate configuration/adapter repair, not automatic fallback. Preserve30s/128KiB/output/citation/access/history guards and common limiter. Request JSON schema and minimal thinking; reject blocked, incomplete, wrong-model and tool output. No new dependency. Official references: https://aistudio.google.com/docs/text-generation?generate-content=true , https://aistudio.google.com/docs/thinking?generate-content=true , https://aistudio.google.com/docs/pricing#gemini-3.1-flash-lite . Only original synthetic prompts were used for diagnosis; no key/provider-body logging. Runtime source sync/restart must preserve privately configured container environment; do not recreate it with missing key.
+
 ## Technical Context
 
 - Language/platform: existing JavaScript ES modules, Node24+ backend, React19/Vite8 frontend, Docker Linux/PostgreSQL17.

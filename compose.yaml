@@ -34,7 +34,6 @@ services:
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
       CORS_ORIGIN: ${APP_ORIGIN:-http://localhost:8080}
       APP_ORIGIN: ${APP_ORIGIN:-http://localhost:8080}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       SMTP_USER: ${SMTP_USER:-}
       SMTP_APP_PASSWORD: ${SMTP_APP_PASSWORD:-}
       ADMIN_BOOTSTRAP_NAME: ${ADMIN_BOOTSTRAP_NAME:-}
@@ -61,7 +60,6 @@ services:
       context: ./frontend
       args:
         VITE_API_URL: ""
-        VITE_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
     restart: unless-stopped
     ports:
       - "${FRONTEND_PORT:-8080}:80"

@@ -1,0 +1,38 @@
+{
+  "date": "2026-11-16",
+  "currentAvailability": {
+    "vite5173": true,
+    "api5173": 502,
+    "api8080": "unreachable",
+    "dockerEngine": "pipe unavailable"
+  },
+  "commands": [
+    {
+      "command": "node .artifacts/gemini-repair-20261116/readiness.mjs",
+      "cwd": ".",
+      "exitCode": 1,
+      "result": "guard failed before database operations; daemon unavailable"
+    },
+    {
+      "command": "docker desktop start",
+      "cwd": ".",
+      "exitCode": 0,
+      "result": "already running; engine still unreachable"
+    },
+    {
+      "command": "docker desktop restart --detach --timeout 45",
+      "cwd": ".",
+      "exitCode": 1,
+      "result": "UI processes failed to stop before deadline"
+    },
+    {
+      "command": "Start-Service -Name com.docker.service",
+      "cwd": ".",
+      "exitCode": 1,
+      "result": "OS permission denied"
+    }
+  ],
+  "operatorNextAction": "Recover Docker Desktop/service, start existing default containers without recreating private backend env; recheck health and boolean readiness",
+  "additionalProviderRequests": 0,
+  "additionalEmailSends": 0
+}

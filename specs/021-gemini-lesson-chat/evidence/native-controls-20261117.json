@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-17",
+  "role": "STUDENT",
+  "syntheticSourceOnly": true,
+  "accepted": true,
+  "viewports": [
+    {
+      "width": 1280,
+      "height": 800,
+      "nativeSendFocused": true,
+      "nativeCancelFocused": true,
+      "cancelNotice": true,
+      "questionRetained": true,
+      "cleared": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "nativeSendFocused": true,
+      "nativeCancelFocused": true,
+      "cancelNotice": true,
+      "questionRetained": true,
+      "cleared": true,
+      "noOverflow": true
+    }
+  ],
+  "uiSubmissions": 3,
+  "automaticRetries": 0,
+  "notes": [
+    "Initial navigation failed while Vite was stopped:0 submissions; restarted Vite",
+    "Initial1440 cancellation raced provider completion; replaced slow helper focus-check with passive DOM focus observation and a new explicit test case, no application changes",
+    "Cancel is local wait cancellation; provider may have received each of3 submissions, not proof of upstream cancellation",
+    "Clear resets in-memory messages/question/source/consent; no raw response/request/profile persisted"
+  ]
+}

@@ -20,8 +20,7 @@ Nguồn và giới hạn nghiệm thu: [MVP handoff](mvp-handoff.md).
 | Secrets và quyền vận hành | JWT_SECRET bắt buộc production; Compose nhận DB/JWT/SMTP/bootstrap qua environment; DB/app hiện dùng user postgres | Cơ chế cấp/rotate/revoke secret và quyền truy cập được chọn; readiness chỉ boolean; review quyền DB phù hợp; không dùng demo credentials | CHƯA KIỂM CHỨNG |
 | Admin bootstrap | `backend/scripts/create-admin.mjs` qua npm run admin:create; README yêu cầu bỏ biến bootstrap sau khi tạo | Bootstrap đúng target, xác nhận admin đăng nhập/quyền; bỏ cấu hình bootstrap sau dùng; không đụng tài khoản local | CHƯA CHẠY TRÊN PRODUCTION |
 | Email recovery | Gmail SMTP; token 30 phút, single use qua POST; generic forgot response | 008 T023 đã được người dùng xác nhận email/reset/login/link đã dùng; vẫn cần kiểm APP_ORIGIN/SMTP trên môi trường triển khai riêng | MVP PASS (USER-CONFIRMED); PRODUCTION CHƯA KIỂM CHỨNG |
-| Google tùy chọn | GIS popup + public Client ID; nullable unique User.googleSubject; chỉ liên kết chủ động tài khoản đã có, không tự tạo/gộp user | Client ID frontend/backend khớp, authorized HTTPS origins/Branding/Audience, consent riêng và nghiệm thu thật theo feature010 T016; log không chứa credential | IMPLEMENTED/LOCAL TESTED; GOOGLE THẬT CHƯA CẤU HÌNH/NGHIỆM THU |
-| Google challenge/topology | Cookie HttpOnly/SameSite=Lax, Secure theo APP_ORIGIN HTTPS; challenge Map5 phút/1000 entry, 20 yêu cầu/IP/5 phút, một process | Cùng origin qua proxy; kiểm browser cookie/TLS/FedCM/popup trên domain thật. Multi-replica cần kho challenge chia sẻ; IP/proxy limiter cần review theo topology | CHƯA KIỂM CHỨNG PUBLIC; KHÔNG TỰ SCALE/DEPLOY |
+| OAuth Google | Đã gỡ UI/SDK/API/config theo feature022; endpoint cũ404 | Giữ column lịch sử dormant, không xóa tài khoản/migration. Dùng email/mật khẩu | RETIRED, không phải provider acceptance pass |
 | Persistence và backup/restore | PostgreSQL17 trong postgres_data; uploads trong uploads_data; startup migrate deploy | Chọn RPO/RTO/lịch giữ bản sao; backup DB và upload có tính nhất quán; restore vào target mới, kiểm quyền/dữ liệu/file; bảo vệ backup như dữ liệu nhạy cảm | CHƯA THỬ BACKUP/RESTORE |
 | Migration và release/rollback | Backend chạy prisma migrate deploy trước server; migrations bất biến | Review status/SQL trên target, backup trước release; rollback app tương thích dữ liệu; không sửa migration cũ hoặc reset database | CHƯA KIỂM CHỨNG RELEASE THẬT |
 | Health và monitoring | DB có pg_isready; backend /api/health chỉ là liveness; restart unless-stopped | Query DB và upload storage smoke riêng; theo dõi lỗi/latency/capacity, cảnh báo và người xử lý; log không token/reset URL/password | CHƯA CÓ BẰNG CHỨNG VẬN HÀNH |
@@ -60,7 +59,7 @@ hoặc ghi đạt khi chưa có proof.
 | Gemini012 | Panel/API riêng, nguồn demo nguyên bản, câu hỏi hữu hạn, optional key chỉ server; global20lượt/ngày/process, active1, cooldown20giây | Key/rotation/quyền vận hành và provider terms; billing phải tắt cho budget0; nhiều replica cần quota durable; không mở tài liệu thật khi chưa có quyền gửi riêng | LOCAL CONTROLLED/DISABLED CHECKS; REAL MODEL CHƯA NGHIỆM THU |
 | Chi phí và dữ liệu AI | Gemini3.8Flash Free tier, không tool/search/fallback/retry; store:false | App không thể xác minh project billing; cờ xác nhận không bảo đảm miễn phí nếu operator dùng key project trả phí. Free-tier data có thể cải thiện sản phẩm/human review | CHỈ DEMO TỔNG HỢP; CHƯA PRODUCTION-READY |
 
-Các bổ sung trên không đổi cổng domain/TLS/backup/monitoring/SMTP/Google còn mở.
+Các bổ sung trên không đổi cổng domain/TLS/backup/monitoring/SMTP còn mở. OAuth được ngừng hỗ trợ theo022, không còn là điều kiện cấu hình.
 Không deploy trong lượt này; xem [verification011](../specs/011-seed-complete-demo/verification.md)
 và [verification012](../specs/012-demo-cloud-assistant/verification.md).
 
@@ -68,3 +67,15 @@ và [verification012](../specs/012-demo-cloud-assistant/verification.md).
 - [Express production security](https://expressjs.com/en/advanced/best-practice-security/): cơ sở kiểm TLS và cấu hình bảo vệ; không thêm dependency hoặc đổi chính sách.
 - [Express behind proxies](https://expressjs.com/en/guide/behind-proxies/): trust proxy phải khớp topology/forwarding headers; không đặt true mặc định.
 - [PostgreSQL17 SQL dump/restore](https://www.postgresql.org/docs/17/backup-dump.html): phương pháp dump và restore DB; review này chưa chạy backup/phục hồi.
+
+## Actual chat follow-up2026-11-16
+
+Feature021 now pins real Free3.1Flash-Lite/generateContent for conversation, with dedicated chat schema, exact quotation validation and no automatic model fallback/retry. Two actual synthetic-source UI answers accepted; see feature021 verification. Old finite-demo3.8 acceptance remains distinct. Billing-disabled confirmation remains operator responsibility; Free data use/privacy, per-process rate limits, TLS/backups/monitoring and public deployment review remain release gates. OAuth is retired by022.
+
+## Opt-in VPS kit2026-11-17
+
+See [VPS Ubuntu deployment](deploy-vps.md) and [release status](release-status-20261117.md). Feature023 supplies a merge-tested override: exclusive127.0.0.1:18080 frontend port, host Caddy HTTPS example, required domain and server-only Gemini settings, demo disabled. Default compose/dev stack unchanged. Actual web image build, Caddy/DNS/TLS, production SMTP/Gemini/storage/restore and topology load remain unverified. Dependency audit findings must be resolved/reviewed before public release; config validation does not satisfy that gate.
+
+## Patched runtime release2026-11-17
+
+Feature024 resolves the6 reported production npm advisories with targeted direct/transitive updates and actual Node24 integration. Current npm audit backend/frontend0 is not a certification; image/OS review and public topology/privacy/load/recovery gates remain. New web stack and Caddy parser tested locally (023 evidence); actual VPS domain/TLS/renewal, SMTP delivery, deployment-specific roles/storage/restore and operational ownership remain023T005. Docker recovered, default5173/8080 health200 and private provider readiness preserved. See release-status-20261117.md and024 verification for current scope instead of historical table statuses.

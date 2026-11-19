@@ -59,3 +59,7 @@ T017 handoff is complete with this evidence; feature010 **16/17**, only T016 ope
 ## Actual development configuration observation - 2026-11-12
 
 During008 localhost5173 runtime follow-up, backend Google readiness=false and POST /api/auth/google/challenge returned503 GOOGLE_NOT_CONFIGURED. Actual fresh Chrome login page showed the Google button disabled for missing frontend build configuration. No Google provider token/login request was sent, so there is no evidence that a Google account/provider has been blocked. Private Web Client ID/backend+frontend build/origin setup and explicit linking acceptance remain required under existing open T016. No fake enablement, validation bypass, auto-registration or email merge was added. SMTP readinesstrue is separate from Google configuration and no email was sent. Cross-reference008 verification/evidence for the corrected CORS runtime and successful three-role email/password checks. T016 remains open; no duplicate convergence task.
+
+## Superseded2026-11-16
+
+User explicitly requested removing Google OAuth. Feature022 retires active UI/SDK/API/config and replaces obsolete provider regressions with absence/404/password-preservation tests. Historical evidence above and T016 status are preserved; retirement is not real-Google acceptance. Nullable subject data/migration retained without active use. Gmail SMTP and Gemini remain separate.

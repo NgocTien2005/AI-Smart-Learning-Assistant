@@ -7,8 +7,9 @@ viên**. Lumina kết nối khóa học, tài liệu, bài tập, chấm điểm
 một ứng dụng fullstack; đồng thời cung cấp công cụ học từ nguồn tài liệu có quyền
 truy cập. Dự án hướng tới một portfolio dễ chạy thử, đọc hiểu và kiểm chứng.
 
-> Các luồng LMS đã có kiểm thử local và CI. Google/Gemini là tích hợp tùy chọn,
-> còn cần nghiệm thu provider thật. Dự án chưa được chứng nhận production-ready.
+> Các luồng LMS đã có kiểm thử local và CI. Chat Gemini đã có bằng chứng hai lượt
+> trả lời model thật với trích dẫn nguồn; hạn mức Free vẫn phụ thuộc provider.
+> Dự án chưa được chứng nhận production-ready.
 
 ## Tính năng
 
@@ -20,8 +21,7 @@ truy cập. Dự án hướng tới một portfolio dễ chạy thử, đọc hi
 
 - Đăng ký/đăng nhập bằng email + mật khẩu, khôi phục phiên qua `/api/auth/me`,
   đổi mật khẩu và quên/đặt lại mật khẩu qua SMTP khi được cấu hình.
-- Google tùy chọn chỉ đăng nhập **tài khoản đã chủ động liên kết**; không tự tạo
-  tài khoản hoặc gộp user chỉ vì trùng email.
+- Đã gỡ đăng nhập/liên kết Google theo yêu cầu; không cần OAuth Client ID.
 - PDF/TXT/Markdown/CSV có kiểm tra upload và tải qua API được bảo vệ. PDF chỉ
   trích xuất **lớp văn bản**, không có OCR.
 - Quiz lưu snapshot câu hỏi, draft và version; server kiểm quyền/chấm điểm.
@@ -36,7 +36,7 @@ truy cập. Dự án hướng tới một portfolio dễ chạy thử, đọc hi
 | Tra cứu tài liệu | Tìm đoạn nguồn bằng token cục bộ | Không phải chatbot LLM hiểu mọi tài liệu |
 | Tóm tắt trích xuất | Chọn câu từ nguồn | Không diễn giải bằng AI sinh nội dung |
 | Quiz ôn tập | Generator nhận dạng mẫu câu định nghĩa | Có thể tạo ít câu hoặc thiếu nguồn phù hợp |
-| Chat Gemini | Câu hỏi tự do và hội thoại theo nguồn bài học được chọn, gọi model thật qua backend | Cần key/Free riêng, quyền chia sẻ nguồn và xác nhận; chưa nghiệm thu model thật ở runtime hiện tại |
+| Chat Gemini | Câu hỏi tự do theo nguồn được chọn, gọi `gemini-3.1-flash-lite` thật qua backend, trích dẫn được đối chiếu nguồn | Cần key/Free riêng, quyền chia sẻ nguồn; không OCR/web search, không bảo đảm mọi suy luận đều đúng |
 
 Không tự gửi tài liệu riêng, lịch sử chat hoặc nội dung người dùng ra provider.
 Gemini cần project Free **không bật billing**, key nhập riêng, xác nhận phạm vi
@@ -60,7 +60,7 @@ flowchart LR
   API --> Guards[Auth / role / owner-enrollment]
   Guards --> DB[(Prisma / PostgreSQL)]
   Guards --> Files[Protected uploads / local study tools]
-  Guards --> Optional[SMTP / Google / synthetic Gemini demo]
+  Guards --> Optional[SMTP / Gemini chat]
 ```
 
 Runtime backend là `backend/server.js` → `backend/src/app.js`.
@@ -72,6 +72,16 @@ active và `authVersion`. Reset thành công thu hồi phiên cũ. Cookie HttpOn
 
 [Kiến trúc, ERD và luồng authentication](docs/architecture.md) ·
 [Ranh giới module](docs/module-boundaries.md)
+
+## Tự deploy lên web
+
+Muốn demo bằng gói miễn phí: xem [Render + Supabase private Storage + Brevo HTTPS](docs/deploy-free.md). Cần cấu hình tài khoản/key riêng, xác minh sender và nghiệm thu provider; local tests không thay bằng chứng deploy thật.
+
+Làm theo [hướng dẫn VPS Ubuntu + Docker + HTTPS](docs/deploy-vps.md): chuyển đúng
+release, cấu hình domain/secrets riêng, dùng `compose.web.yaml` để chỉ mở HTTP ở
+loopback rồi đặt Caddy HTTPS phía trước. Không dùng Vite hoặc dev override để public.
+Xem [trạng thái release và việc còn mở](docs/release-status-20261117.md) trước khi
+triển khai; config đã validate không đồng nghĩa VPS, TLS hoặc toàn bộ app đã nghiệm thu.
 
 ## Chạy bằng Docker
 
@@ -127,10 +137,8 @@ provider riêng khi cần; không đọc/in Docker environment để lấy lại
   Không tắt CORS hoặc sửa mật khẩu để xử lý lỗi này.
 - **401 thông tin đăng nhập không đúng**: API đã nhận request; kiểm tra đúng email,
   mật khẩu và trạng thái tài khoản. Seed rerun không khôi phục mật khẩu cũ.
-- **Google chưa sẵn sàng / `GOOGLE_NOT_CONFIGURED`**: cần Google Web Client ID khớp
-  ở backend và frontend build, cùng authorized origins8080/5173. Nút disabled khi
-  thiếu cấu hình không có nghĩa tài khoản Google bị khóa. Làm theo
-  [hướng dẫn Google](docs/google-sign-in.md); không tự bỏ validation hoặc tạo/gộp user.
+- **Trang cũ vẫn hiện Google**: tải lại app. OAuth đã được gỡ; endpoint cũ trả404.
+  Dùng email + mật khẩu; xem [thông báo tương thích](docs/google-sign-in.md).
 
 CI kiểm tra một stack riêng; kết quả đó không xác nhận cấu hình container đang
 chạy trên máy. Khi chuyển sang dev override, giữ cấu hình secret riêng và kiểm
@@ -162,8 +170,7 @@ và [demo Instructor → Student → Admin](docs/demo-script.md).
   `APP_ORIGIN` trong môi trường riêng. Dùng App Password, không dùng mật khẩu
   Gmail thường. Email/reset URL không được ghi vào evidence. HTTP200/SMTP accepted
   không chứng minh thư đã tới hộp thư.
-- **Google:** [Client ID, authorized origins và liên kết tài khoản](docs/google-sign-in.md).
-  Nghiệm thu Google thật vẫn còn mở; không yêu cầu Client Secret trong chat.
+- OAuth Google đã ngừng hỗ trợ; không cấu hình Client ID/Client Secret.
 - **Gemini:** [Chat Gemini và launcher cấu hình riêng](docs/gemini-chat.md).
   Key chỉ ở backend; không đặt vào biến `VITE_*`, source, ảnh hoặc chat.
 
@@ -216,7 +223,7 @@ frontend/src/
 backend/
   server.js     Production entrypoint
   src/routes/   Auth, admin, courses, lessons, assignments, quiz
-  src/services/ Email, tài liệu và cloud demo
+  src/services/ Email, tài liệu và chat Gemini
   src/middleware/ Authentication, authorization, validation, rate limiting
   prisma/       Schema và migration history
   scripts/      Seed và integration harness
@@ -229,9 +236,10 @@ docs/           Kiến trúc, demo, quyết định kỹ thuật và vận hành
 
 - Authorization được kiểm trên server theo role **và từng tài nguyên**; không
   chỉ ẩn nút ở frontend. Password reset/quiz concurrency có kiểm thử riêng.
-- Rate limit, Google challenge và quota cloud hiện theo process; multi-replica
+- Rate limit và quota cloud hiện theo process; multi-replica
   và topology proxy cần thiết kế thêm. Không bật `trust proxy` tùy tiện.
-- Google thật còn feature010/T016; chất lượng Gemini thật còn012/T012.
+- OAuth Google đã được ngừng hỗ trợ theo022. Chat Gemini có bằng chứng thật ở021;
+  nghiệm thu demo hữu hạn cũ012/T012 vẫn tách riêng.
   Email recovery008/T023 đã có nghiệm thu lịch sử; cleanup008/T026 vẫn bị policy
   chặn và không được xóa bằng cách khác.
 - Chưa có OCR, recommendations, notifications hoặc analytics toàn hệ thống.

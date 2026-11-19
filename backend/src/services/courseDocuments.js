@@ -1,9 +1,11 @@
 import { createHash } from 'node:crypto'
-import { unlink } from 'node:fs/promises'
-import { extname, resolve } from 'node:path'
+import { extname } from 'node:path'
 import multer from 'multer'
 import { uploadDirectory } from '../config/env.js'
 import { processDocument } from './documentProcessing.js'
+import { createDocumentStorage } from './documentStorage.js'
+
+export const documentStorage = createDocumentStorage({ directory: uploadDirectory })
 
 const maxDocumentSize = 10 * 1024 * 1024
 export const upload = multer({
@@ -18,16 +20,14 @@ export const upload = multer({
   },
 })
 
-export const removeStoredFile = async (storedName) => {
+export const removeStoredFile = async (storedName, storage = documentStorage) => {
   if (!storedName) return
 
-  const filePath = resolve(uploadDirectory, storedName)
-  if (!filePath.startsWith(`${resolve(uploadDirectory)}\\`) && !filePath.startsWith(`${resolve(uploadDirectory)}/`)) return
-
   try {
-    await unlink(filePath)
+    await storage.remove(storedName)
   } catch (error) {
-    if (error.code !== 'ENOENT') console.error('Document cleanup error:', error)
+    // A provider failure may retain an orphan. Never log URLs, keys or response bodies.
+    console.error('Document cleanup incomplete', { code: error.code === 'STORAGE_UNAVAILABLE' ? error.code : 'STORAGE_CLEANUP_FAILED' })
   }
 }
 

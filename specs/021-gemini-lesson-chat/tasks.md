@@ -21,10 +21,14 @@ Input: [spec](spec.md), [plan](plan.md), contracts/data-model/research. All task
 
 ## Phase 5: Verification and handoff
 
-- [ ] T006 P0 Run package gates, quiz, isolated HTTP/database integration and real desktop browser acceptance; record safe command/cwd/exit/results and traceability in `specs/021-gemini-lesson-chat/verification.md`; depends T002–005; accept SC002–004 and regression gates.
-- [ ] T007 [US1] P1 Verify two real Gemini questions with citations in actual UI using selected synthetic source and free project; depends T006 + privately configured readiness; record only safe outcome, no key/prompt/token/provider request. SC001. Blocked if key/Free readiness absent; user must configure privately, no fabricated response.
+- [x] T006 P0 Run package gates, quiz, isolated HTTP/database integration and real desktop browser acceptance; record safe command/cwd/exit/results and traceability in `specs/021-gemini-lesson-chat/verification.md`; depends T002–005; accept SC002–004 and regression gates.
+- [x] T007 [US1] P1 Verify two real Gemini questions with citations in actual UI using selected synthetic source and free project; depends T006 + privately configured readiness; record only safe outcome, no key/prompt/token/provider request. SC001. Blocked if key/Free readiness absent; user must configure privately, no fabricated response.
 - [ ] T008 P1 Update `specs/021-gemini-lesson-chat/verification.md`, read-only analyze and append-only converge; make small feature commits/push and reviewable PR; depends T006 (T007 may remain explicitly blocked); FR008. Hosted CI reported on exact SHA separately, never merge/deploy automatically.
 
 ## Dependencies and execution
 
 T001 → T002 → T003 → T004/T005 → T006 → T007/T008. T004 and T005 can be worked independently once contract is fixed (different files); no parallel agents needed. US2 is the security foundation rather than a deployable unsecured intermediate US1. Test-first per phase, incremental commits for specification, backend, UI/configuration and verification. No schema/dependency changes. MVP is scoped grounded lesson conversation; general web chat/persistence remains out of scope.
+
+## Phase 6: Convergence
+
+- [x] T009 [US1] P0 Repair actual chat generation per FR004/006, SC001 and plan2026-11-16 (partial): pin available Free3.1Flash-Lite/generateContent for chat only in `backend/src/services/demoCloudAssistant.js` and `routes/lessonChat.js`, preserve authorization/limits and old finite contract; extend `backend/test/lessonChat.test.js` transport/citation/blocked/truncated/error tests, run backend/quiz/integration and real UI two-turn source acceptance. Existing T007 remains its acceptance gate, not a duplicate transport task.

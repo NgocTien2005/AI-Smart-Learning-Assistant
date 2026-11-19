@@ -1,0 +1,17 @@
+{
+  "page": "af8b4cc5-c271-4340-a46a-4b4a60c28977",
+  "source": "original synthetic demo only",
+  "generationAttempts": 1,
+  "automaticRetries": 0,
+  "answers": [
+    {
+      "answered": false,
+      "citations": 0,
+      "error": "Chưa thể kết nối Gemini hoặc model chưa khả dụng. Không có câu trả lời thay thế.",
+      "inputRetained": true,
+      "modelDeclared": false
+    }
+  ],
+  "keyboardSubmitFocused": true,
+  "accepted": false
+}

@@ -19,9 +19,8 @@ Public user responses contain id/name/email/role only. Forgot responses remain
 generic for valid email requests below budgets; configuration-unavailable503
 does not depend on account existence. No automatic retry of password mutations.
 
-Google is optional: existing active, explicitly linked accounts only; no
-auto-registration/email merge. Challenge cookie/nonce/signature/audience/expiry
-validation remains unchanged. Real provider acceptance is feature010T016.
+Google OAuth login/linking was retired by feature022. No provider SDK,
+challenge cookie, token exchange or account merge remains in the active app.
 Historical real-mail acceptance stays008T023; current SMTP readiness is not proof
 of delivery. No real email/provider call is part of security regression tests.
 
@@ -59,8 +58,7 @@ server-side. CORS and escaping are layers, not proof that XSS is impossible.
 
 Bearer headers are attached explicitly by the client rather than automatically
 as ambient cookies; a cookie-CSRF middleware is not blindly added to this design.
-The Google challenge binding cookie is HttpOnly/SameSite=Lax (Secure for HTTPS)
-and challenge consumption/nonce remains required.
+The former Google challenge cookie is no longer issued or consumed.
 
 A future session migration should jointly change frontend/backend, define
 HttpOnly/Secure/SameSite cookies, CSRF/origin protections for mutations,
@@ -80,7 +78,7 @@ Quiz attempts retain owner/current access, snapshots and version concurrency.
 API responses disable framework banner and set nosniff/no-referrer/no-store,
 including errors. Static HTML headers/CSP/TLS need their own Nginx/deployment
 review; API headers do not secure an HTML document. No broad CSP/COOP/HSTS is
-enabled without Google/popup/blob-preview and HTTPS validation. Internal auth
+enabled without provider/blob-preview and HTTPS validation. Internal auth
 and uncaught errors log only constant event names and known safe error codes;
 never arbitrary error objects, SQL parameters, tokens or reset URLs.
 
@@ -89,7 +87,7 @@ never arbitrary error objects, SQL parameters, tokens or reset URLs.
 See [feature014 verification](../specs/014-auth-abuse-hardening/verification.md)
 for actual commands, production-handler coverage, isolated database integration
 and hosted SHA. No penetration-test, distributed-load or production readiness
-claim. Existing Google/Gemini acceptance, TLS, backup/restore, CSP and operational
+claim. Gemini operational/privacy limits, TLS, backup/restore, CSP and operational
 monitoring gates remain explicit in [production readiness](production-readiness.md).
 
 Primary references: [Express production security](https://expressjs.com/en/advanced/best-practice-security/),

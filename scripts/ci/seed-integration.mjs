@@ -13,7 +13,7 @@ await mkdir(dir,{recursive:true})
 await resetEvidence(dir)
 const emptyEnv = path.join(dir,'.empty.env')
 await writeFile(emptyEnv,'')
-const env = {...process.env,ACCEPTANCE_DB_PASSWORD:randomBytes(24).toString('hex'),ACCEPTANCE_JWT_SECRET:randomBytes(48).toString('hex'),DOTENV_CONFIG_PATH:emptyEnv,SMTP_USER:'',SMTP_APP_PASSWORD:'',GOOGLE_CLIENT_ID:'',VITE_GOOGLE_CLIENT_ID:'',GEMINI_API_KEY:'',GEMINI_FREE_ONLY_CONFIRMED:'false'}
+const env = {...process.env,ACCEPTANCE_DB_PASSWORD:randomBytes(24).toString('hex'),ACCEPTANCE_JWT_SECRET:randomBytes(48).toString('hex'),DOTENV_CONFIG_PATH:emptyEnv,SMTP_USER:'',SMTP_APP_PASSWORD:'',GEMINI_API_KEY:'',GEMINI_FREE_ONLY_CONFIRMED:'false'}
 if(env.GITHUB_ACTIONS==='true') for(const s of [env.ACCEPTANCE_DB_PASSWORD,env.ACCEPTANCE_JWT_SECRET]) console.log(`::add-mask::${s}`)
 const compose = ['compose','--env-file',emptyEnv,'-f',path.join(repoRoot,'compose.acceptance.yaml'),'-p',project]
 const summary = {...publicContext(),project,job:'seed-integration',commands:[],emailsSent:0,providerRequests:0,namedVolumesRemoved:false}

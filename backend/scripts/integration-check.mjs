@@ -3,6 +3,7 @@ import { writeFile } from 'node:fs/promises'
 import { createIntegrationTarget } from './integration-target.mjs'
 import { createHash } from 'node:crypto'
 import bcrypt from 'bcryptjs'
+import { gzipSync } from 'node:zlib'
 
 const target = createIntegrationTarget()
 const { baseUrl } = target
@@ -15,6 +16,8 @@ globalThis.fetch = async (url, options) => {
   catch (error) { entry.failure = error.name; throw error }
 }
 const stamp = Date.now()
+const invalidCompressed = await fetch(`${baseUrl}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Encoding': 'gzip' }, body: Buffer.concat([gzipSync(Buffer.from('{"email":"synthetic@example.invalid"}')), Buffer.from('invalid-trailer')]), signal: AbortSignal.timeout(5000) })
+if (invalidCompressed.status !== 400 || typeof (await invalidCompressed.json()).error !== 'string') throw new Error('Malformed compressed body must terminate with safe400')
 const instructorEmail = `integration-instructor-${stamp}@example.com`
 const studentEmail = `integration-student-${stamp}@example.com`
 const managedEmail = `integration-managed-${stamp}@example.com`
@@ -86,25 +89,13 @@ try {
   }))
   if ('password' in student.user) throw new Error('Password leaked in student response')
 
-  // Real HTTP/DB assertions; actual Google provider acceptance is separate.
-  const googleUnavailable = await fetch(`${baseUrl}/auth/google/challenge`, jsonOptions('POST', { intent: 'login' }))
-  if (googleUnavailable.status !== 503) throw new Error('Basic CI must keep real Google unconfigured')
-  const googleAnonymous = await fetch(`${baseUrl}/auth/google/link`)
-  if (googleAnonymous.status !== 401) throw new Error('Google link status must require authentication')
-  const initialLink = await request('/auth/google/link', { headers: { Authorization: `Bearer ${student.token}` } })
-  if (initialLink.linked !== false) throw new Error('New password account must not be automatically linked')
-  const syntheticSubject = `integration-subject-${stamp}`
-  target.query(`UPDATE "User" SET "googleSubject" = '${syntheticSubject}' WHERE id = ${student.user.id};
-DO $$ BEGIN
-  BEGIN
-    UPDATE "User" SET "googleSubject" = '${syntheticSubject}' WHERE id = ${instructor.user.id};
-    RAISE EXCEPTION 'Expected Google subject uniqueness';
-  EXCEPTION WHEN unique_violation THEN NULL;
-  END;
-END $$;`)
-  const persistedLink = await request('/auth/google/link', { headers: { Authorization: `Bearer ${student.token}` } })
-  if (persistedLink.linked !== true || Object.keys(persistedLink).length !== 1) throw new Error('Google link status must expose only persisted boolean')
-  target.query(`UPDATE "User" SET "googleSubject" = NULL WHERE id = ${student.user.id};`)
+  // Removed OAuth cannot authenticate or mutate users, even with a valid session.
+  for (const token of [undefined, student.token]) {
+    for (const [method,path] of [['POST','challenge'],['POST','login'],['GET','link'],['POST','link']]) {
+      const response = await fetch(baseUrl + '/auth/google/' + path, method === 'POST' ? jsonOptions(method, { intent: 'login', credential: 'synthetic' }, token) : { headers: token ? { Authorization: 'Bearer ' + token } : {} })
+      if (response.status !== 404 || response.headers.get('set-cookie')) throw new Error('Retired OAuth endpoint must return404 without cookies')
+    }
+  }
 
   const publicAdminRegistration = await fetch(`${baseUrl}/auth/register`, jsonOptions('POST', {
     name: 'Public Admin', email: `public-admin-${stamp}@example.com`, password, role: 'ADMIN',

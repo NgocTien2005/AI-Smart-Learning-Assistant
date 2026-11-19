@@ -1,0 +1,150 @@
+{
+  "project": "lumina-acceptance-ci-web-1794929093773-4b279401",
+  "commands": [
+    {
+      "command": "docker ps <owned resources; args suppressed>",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 71
+    },
+    {
+      "command": "docker compose <fresh web project/explicit empty env> up --build --wait",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 29483
+    },
+    {
+      "command": "docker ps <owned resources; args suppressed>",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 95
+    },
+    {
+      "command": "docker ps <owned resources; args suppressed>",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 82
+    },
+    {
+      "command": "docker ps <owned resources; args suppressed>",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 83
+    },
+    {
+      "command": "docker inspect <owned labels/mounts/networks/ports only>",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 72
+    },
+    {
+      "command": "docker inspect <owned labels/mounts/networks/ports only>",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 70
+    },
+    {
+      "command": "docker inspect <owned labels/mounts/networks/ports only>",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 71
+    },
+    {
+      "command": "docker inspect <owned labels/mounts/networks/ports only>",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 68
+    },
+    {
+      "command": "docker inspect <owned labels/mounts/networks/ports only>",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 67
+    },
+    {
+      "command": "docker inspect <owned labels/mounts/networks/ports only>",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 70
+    },
+    {
+      "command": "docker exec <owned resources; args suppressed>",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 534
+    },
+    {
+      "command": "docker exec <fresh web backend> npm run admin:create (synthetic only)",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 1039
+    },
+    {
+      "command": "docker inspect <owned labels/mounts/networks/ports only>",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 68
+    },
+    {
+      "command": "docker inspect <owned labels/mounts/networks/ports only>",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 68
+    },
+    {
+      "command": "docker inspect <owned labels/mounts/networks/ports only>",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 77
+    },
+    {
+      "command": "docker exec <owned resources; args suppressed>",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 608
+    },
+    {
+      "command": "docker volume <owned resources; args suppressed>",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 68
+    },
+    {
+      "command": "docker compose <this web run only> down (named volumes retained)",
+      "cwd": ".",
+      "exitCode": 0,
+      "durationMs": 2223
+    }
+  ],
+  "providerRequests": 0,
+  "emailSends": 0,
+  "usersCleaned": 3,
+  "volumesDeleted": false,
+  "loopbackOnly": true,
+  "databaseVerified": true,
+  "health": 200,
+  "allowedOrigin": 200,
+  "deniedOrigin": 403,
+  "roles": [
+    {
+      "role": "ADMIN",
+      "login": 200,
+      "me": 200
+    },
+    {
+      "role": "INSTRUCTOR",
+      "login": 200,
+      "me": 200
+    },
+    {
+      "role": "STUDENT",
+      "login": 200,
+      "me": 200
+    }
+  ],
+  "accepted": true,
+  "retainedVolumes": [
+    "lumina-acceptance-ci-web-1794929093773-4b279401_postgres_data",
+    "lumina-acceptance-ci-web-1794929093773-4b279401_uploads_data"
+  ]
+}

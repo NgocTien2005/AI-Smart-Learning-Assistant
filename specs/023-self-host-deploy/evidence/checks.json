@@ -1,0 +1,123 @@
+{
+  "date": "2026-11-17",
+  "commands": [
+    {
+      "command": "node --test scripts/ci/test/web-deploy.test.mjs",
+      "cwd": ".",
+      "exitCode": 0,
+      "passed": 4
+    },
+    {
+      "command": "node --test scripts/ci/test/ci.test.mjs scripts/ci/test/operations.test.mjs scripts/ci/test/web-deploy.test.mjs",
+      "cwd": ".",
+      "exitCode": 0,
+      "passed": 29
+    },
+    {
+      "command": "npm test",
+      "cwd": "backend",
+      "exitCode": 0,
+      "passed": 87
+    },
+    {
+      "command": "npm test -- --test-name-pattern=quiz",
+      "cwd": "backend",
+      "exitCode": 0,
+      "passed": 22
+    },
+    {
+      "command": "node --test test/adminBootstrap.test.js",
+      "cwd": "backend",
+      "exitCode": 0,
+      "passed": 2
+    },
+    {
+      "command": "npm audit --omit=dev --json",
+      "cwd": "backend",
+      "exitCode": 1
+    },
+    {
+      "command": "npm audit --omit=dev --json",
+      "cwd": "frontend",
+      "exitCode": 0
+    }
+  ],
+  "compose": "5.1.1",
+  "node": "v25.2.0",
+  "audits": {
+    "backend": {
+      "counts": {
+        "info": 0,
+        "low": 0,
+        "moderate": 3,
+        "high": 3,
+        "critical": 0,
+        "total": 6
+      },
+      "findings": [
+        {
+          "name": "body-parser",
+          "severity": "high",
+          "advisories": [
+            "https://github.com/advisories/GHSA-27r3-jxmh-p828"
+          ]
+        },
+        {
+          "name": "fast-uri",
+          "severity": "moderate",
+          "advisories": [
+            "https://github.com/advisories/GHSA-w74x-v6f9-j3xg",
+            "https://github.com/advisories/GHSA-xhq7-xmqj-769h",
+            "https://github.com/advisories/GHSA-wjr9-j795-jxcr",
+            "https://github.com/advisories/GHSA-333x-w4r6-6crp"
+          ]
+        },
+        {
+          "name": "multer",
+          "severity": "high",
+          "advisories": [
+            "https://github.com/advisories/GHSA-q7qp-rjg7-q26m"
+          ]
+        },
+        {
+          "name": "nodemailer",
+          "severity": "moderate",
+          "advisories": [
+            "https://github.com/advisories/GHSA-8c8m-p3m8-cjg8",
+            "https://github.com/advisories/GHSA-m943-m63m-w62w",
+            "https://github.com/advisories/GHSA-85x2-q946-cp5h"
+          ]
+        },
+        {
+          "name": "pdfjs-dist",
+          "severity": "high",
+          "advisories": [
+            "https://github.com/advisories/GHSA-hq66-cqwq-w95j"
+          ]
+        },
+        {
+          "name": "qs",
+          "severity": "moderate",
+          "advisories": [
+            "https://github.com/advisories/GHSA-6pq8-jhm2-2vcw"
+          ]
+        }
+      ]
+    },
+    "frontend": {
+      "counts": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "findings": []
+    }
+  },
+  "realProviderRequests": 0,
+  "emailSends": 0,
+  "newWebStackRuntime": "not run: Docker engine unavailable",
+  "hostedCI": "not run on this head"
+}
