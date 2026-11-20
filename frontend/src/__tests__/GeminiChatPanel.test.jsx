@@ -6,11 +6,11 @@ import {apiRequest,getSessionGeneration} from '../services/api.js'
 vi.mock('../services/api.js',()=>({apiRequest:vi.fn(),getSessionGeneration:vi.fn(()=>0)}))
 afterEach(cleanup)
 const lesson={id:11,title:'Thuật toán',sourceRevision:1}
-const cap={enabled:true,provider:'Gemini',model:'gemini-3.8-flash',source:{type:'LESSON_CONTENT',revision:1,title:lesson.title,characters:100,truncated:false}}
-const reply={lessonId:11,sourceRevision:1,sourceType:'LESSON_CONTENT',provider:'Gemini',model:'gemini-3.8-flash',answer:'Thuật toán gồm các bước hữu hạn.',insufficient:false,citations:[{sourceId:'S1',quote:'Thuật toán là dãy bước hữu hạn giải quyết bài toán.'}],questions:[]}
+const cap={enabled:true,status:'ready',provider:'Gemini',model:'gemini-3.1-flash-lite',source:{type:'LESSON_CONTENT',revision:1,title:lesson.title,characters:100,truncated:false}}
+const reply={lessonId:11,sourceRevision:1,sourceType:'LESSON_CONTENT',provider:'Gemini',model:'gemini-3.1-flash-lite',answer:'Thuật toán gồm các bước hữu hạn.',insufficient:false,citations:[{sourceId:'S1',quote:'Thuật toán là dãy bước hữu hạn giải quyết bài toán.'}],questions:[]}
 async function select() {
-  await screen.findByLabelText('Nguồn gửi tới Gemini')
-  fireEvent.change(screen.getByLabelText('Nguồn gửi tới Gemini'),{target:{value:'LESSON_CONTENT'}})
+  await screen.findByLabelText('Nội dung dùng để trả lời')
+  fireEvent.change(screen.getByLabelText('Nội dung dùng để trả lời'),{target:{value:'LESSON_CONTENT'}})
   fireEvent.click(screen.getByRole('checkbox'))
 }
 const ask=(question='Giải thích thuật toán?')=>{fireEvent.change(screen.getByLabelText('Câu hỏi của bạn'),{target:{value:question}});fireEvent.click(screen.getByRole('button',{name:'Gửi câu hỏi'}))}
@@ -65,7 +65,7 @@ describe('Gemini lesson chat',()=>{
     apiRequest.mockResolvedValueOnce(cap).mockImplementationOnce(()=>new Promise(r=>{finish=r})).mockResolvedValue({...cap,source:{...cap.source,revision:2}})
     const view=render(<GeminiChatPanel lesson={lesson} onClose={()=>{}} />);await select();ask()
     view.rerender(<GeminiChatPanel lesson={{...lesson,sourceRevision:2}} onClose={()=>{}} />);finish(reply)
-    await screen.findByLabelText('Nguồn gửi tới Gemini')
+    await screen.findByLabelText('Nội dung dùng để trả lời')
     expect(screen.getByRole('checkbox').checked).toBe(false);expect(screen.queryByText(reply.answer)).toBeNull()
   })
   it('suppresses a late response after session generation changed',async()=>{
@@ -78,7 +78,7 @@ describe('Gemini lesson chat',()=>{
   it('explains missing configuration and has no secret entry or provider request',async()=>{
     apiRequest.mockResolvedValue({...cap,enabled:false})
     render(<GeminiChatPanel lesson={lesson} onClose={()=>{}} />)
-    await screen.findByText(/Gemini chưa được cấu hình/)
+    await screen.findByText(/Tính năng hỏi đáp chưa được bật/)
     expect(screen.getByRole('button',{name:'Gửi câu hỏi'}).disabled).toBe(true);expect(apiRequest).toHaveBeenCalledTimes(1)
   })
   it('clears visible history and sharing consent',async()=>{
