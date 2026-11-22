@@ -12,7 +12,7 @@ describe('demo cloud explicit scoped interaction',()=>{
   it('reads capability only, disables all mutations without config and exposes no key input',async()=>{
     apiRequest.mockResolvedValue({...capability,enabled:false})
     render(<DemoCloudAssistantPanel lesson={lesson} onClose={()=>{}} />)
-    await screen.findByText(/Gemini chưa được cấu hình/)
+    await screen.findByText(/Tính năng AI chưa được bật/)
     expect(screen.getByRole('button',{name:'Hỏi theo nguồn'}).disabled).toBe(true)
     expect(apiRequest).toHaveBeenCalledTimes(1)
     expect(apiRequest.mock.calls[0][1].method).toBeUndefined()

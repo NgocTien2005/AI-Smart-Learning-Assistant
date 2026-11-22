@@ -44,7 +44,7 @@ function CloudWorkspace({lesson,onClose}) {
     <p>Công cụ này tạo nội dung bằng model khi được cấu hình. Tra cứu, tóm tắt trích xuất và bài ôn cục bộ vẫn là các công cụ riêng.</p>
     {checking&&<p role="status">Đang kiểm tra điều kiện AI cloud…</p>}
     {capability&&!capability.eligible&&<p role="status">Bài này không phải nguồn demo nguyên bản được phép gửi. Các công cụ cục bộ vẫn dùng được.</p>}
-    {capability&&!capability.enabled&&<p role="status">Gemini chưa được cấu hình. Cần API key riêng trên server và project miễn phí chưa bật billing; không nhập key vào giao diện hoặc chat.</p>}
+    {capability&&!capability.enabled&&<p role="status">Tính năng AI chưa được bật. Chỉ người quản trị hệ thống mới có thể cấu hình dịch vụ.</p>}
     <label htmlFor={id+'-question'}>Câu hỏi demo</label>
     <select id={id+'-question'} value={questionId} disabled={!enabled} onChange={e=>setQuestionId(e.target.value)}>{choices.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select>
     <div className="demo-cloud-actions">{[['ask','Hỏi theo nguồn'],['explain','Giải thích'],['summary','Tóm tắt bằng AI'],['quiz','Tạo 3 câu ôn tập']].map(([mode,label])=><Button key={mode} variant="secondary" disabled={!enabled} onClick={()=>generate(mode)}>{label}</Button>)}</div>

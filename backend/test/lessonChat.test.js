@@ -76,7 +76,7 @@ test('chat production router denies initial access/selection and discards delaye
     for(const role of ['ADMIN','INSTRUCTOR','STUDENT']){user={id:3,authVersion:0,role};assert.equal((await post()).status,403)}
     user={id:1,authVersion:0};assert.equal((await post({...request,sourceRevision:0})).status,409)
     assert.equal((await post({...request,sourceType:'DOCUMENT'})).status,409);assert.equal(calls,0)
-    const cap=await(await fetch(base)).json();assert.equal(cap.source.type,'LESSON_CONTENT');assert.equal(cap.source.text,undefined)
+    const cap=await(await fetch(base)).json();assert.equal(cap.status,'ready');assert.equal(cap.source.type,'LESSON_CONTENT');assert.equal(cap.source.text,undefined)
     assert.equal((await fetch(base,{method:'HEAD'})).status,200);assert.equal(calls,0)
     for(const id of [1,2]){user={id,authVersion:0};assert.equal((await post()).status,200)}
     mutation=()=>{active=false};assert.equal((await post()).status,401);active=true
